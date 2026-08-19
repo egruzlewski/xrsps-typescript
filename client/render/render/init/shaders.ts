@@ -842,11 +842,13 @@ export async function initShaders(host: WebGLOsrsRendererHost, ): Promise<Progra
                                         // For widget rendering, prefer the raw PlayerComposition model build.
                                         let model: any | undefined;
                                         if (host.playerModelLoader2D) {
-                                            model =
+                                            const nextModel =
                                                 host.playerModelLoader2D.buildStaticModelFromEquipment(
                                                     pa,
                                                     pa.equip,
                                                 );
+                                            if (nextModel) wAny.lastPlayerModel2D = nextModel;
+                                            model = nextModel ?? wAny.lastPlayerModel2D;
                                         }
                                         if (model) {
                                             // Widget type-6 models render into the *parent clip*,
