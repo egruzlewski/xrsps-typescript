@@ -29,11 +29,13 @@ git clone https://github.com/xrsps/xrsps-typescript.git
 cd xrsps-typescript
 ```
 
-## 2. Enable Yarn
+## 2. Verify Yarn
 
 ```bash
-corepack enable
+yarn --version
 ```
+
+It should print `4.12.0`. If `yarn` is not found, run `corepack enable` first (this may require an elevated terminal on Windows).
 
 ## 3. Set Up the Server and Client
 

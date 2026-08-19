@@ -15,11 +15,13 @@ This repository contains:
 
 Requires **Node.js v22.16+**. This repository uses Yarn `4.12.0`.
 
-Enable the repository-pinned Yarn version:
+Verify the repository-pinned Yarn version:
 
 ```bash
-corepack enable
+yarn --version
 ```
+
+It should print `4.12.0`. If `yarn` is not found, run `corepack enable` first (this may require an elevated terminal on Windows).
 
 Install the server and client, then build collision data:
 
