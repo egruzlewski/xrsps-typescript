@@ -2,6 +2,7 @@
   "name": "@xrsps/server",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "yarn@4.12.0",
   "engines": {
     "node": ">=22.5.0"
   },

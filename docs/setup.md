@@ -9,7 +9,7 @@ The repository contains **`client/`**, **`server/`**, and **`docs/`** packages. 
 | Tool                                                | Version      | Why                                |
 | --------------------------------------------------- | ------------ | ---------------------------------- |
 | [Node.js](https://nodejs.org/)                      | v22.16+      | Runtime for both client and server |
-| [Yarn](https://classic.yarnpkg.com/en/docs/install) | v1 (Classic) | Package manager                    |
+| [Yarn](https://yarnpkg.com/getting-started/install) | v4.12.0      | Package manager                    |
 | [Git](https://git-scm.com/)                         | Any recent   | Clone the repo                     |
 
 ::: tip Node Version
@@ -29,7 +29,13 @@ git clone https://github.com/xrsps/xrsps-typescript.git
 cd xrsps-typescript
 ```
 
-## 2. Set Up the Server and Client
+## 2. Enable Yarn
+
+```bash
+corepack enable
+```
+
+## 3. Set Up the Server and Client
 
 ```bash
 yarn setup
@@ -37,7 +43,7 @@ yarn setup
 
 This installs the root command runner, server dependencies, and client dependencies, downloads the required OSRS cache, then builds the collision cache.
 
-## 3. Start the Server and Client
+## 4. Start the Server and Client
 
 ```bash
 yarn start

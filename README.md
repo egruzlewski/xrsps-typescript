@@ -13,12 +13,12 @@ This repository contains:
 
 ## Quick Start
 
-Requires **Node.js v22.16+** and **Yarn**.
+Requires **Node.js v22.16+**. This repository uses Yarn `4.12.0`.
 
-Install Yarn if it is not already installed:
+Enable the repository-pinned Yarn version:
 
 ```bash
-npm install --global yarn
+corepack enable
 ```
 
 Install the server and client, then build collision data:

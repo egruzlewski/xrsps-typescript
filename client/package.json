@@ -2,6 +2,7 @@
   "name": "@xrsps/client",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "yarn@4.12.0",
   "engines": {
     "node": ">=22.5.0"
   },
@@ -47,10 +48,14 @@
     "export-items": "tsx scripts/cache/export-items.ts"
   },
   "eslintConfig": {
-    "extends": ["react-app"],
+    "extends": [
+      "react-app"
+    ],
     "overrides": [
       {
-        "files": ["rs/**/*.{ts,js}"],
+        "files": [
+          "rs/**/*.{ts,js}"
+        ],
         "rules": {
           "@typescript-eslint/no-unused-vars": "off",
           "eqeqeq": "off",
@@ -58,7 +63,9 @@
         }
       },
       {
-        "files": ["game/OsrsClient.ts"],
+        "files": [
+          "game/OsrsClient.ts"
+        ],
         "rules": {
           "@typescript-eslint/no-unused-vars": "off",
           "no-useless-escape": "off"
@@ -83,8 +90,12 @@
         }
       },
       {
-        "files": ["common/utils/*.js"],
-        "rules": { "strict": "off" }
+        "files": [
+          "common/utils/*.js"
+        ],
+        "rules": {
+          "strict": "off"
+        }
       }
     ]
   },
