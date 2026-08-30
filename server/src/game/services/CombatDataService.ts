@@ -2,6 +2,7 @@ import path from "path";
 
 import type { EnumTypeLoader } from "../../../../client/rs/config/enumtype/EnumTypeLoader";
 import type { NpcSoundType } from "../../audio/NpcSoundLookup";
+import { preloadNpcAggressionMetadata } from "../../data/npcCombatStats";
 import { logger } from "../../utils/logger";
 import type { ServerServices } from "../ServerServices";
 import type { NpcCombatProfile, NpcState } from "../npc";
@@ -31,7 +32,9 @@ export class CombatDataService {
     private specialAttackDescriptionByWeapon?: Map<number, string>;
     private specialAttackDefaultDescription?: string;
 
-    constructor(private readonly services: ServerServices) {}
+    constructor(private readonly services: ServerServices) {
+        preloadNpcAggressionMetadata();
+    }
 
     // --- NPC combat definitions ---
 

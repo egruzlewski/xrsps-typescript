@@ -35,12 +35,18 @@ export const NPC_PROTECTION_REDUCTION = 1.0;
 export const PVP_PROTECTION_REDUCTION = 0.4;
 
 export class CombatEffectService {
-    private npcDropRegistry?: NpcDropRegistry;
-    private npcDropRollService?: DropRollService;
+    private readonly npcDropRegistry: NpcDropRegistry;
+    private readonly npcDropRollService: DropRollService;
     private readonly hitEvaluator: CombatHitEvaluator;
 
     constructor(private readonly svc: ServerServices) {
         this.hitEvaluator = createCombatHitEvaluator(svc);
+        this.npcDropRegistry = new NpcDropRegistry();
+        this.npcDropRollService = new DropRollService(this.npcDropRegistry);
+        const counts = this.npcDropRegistry.getLoadedCounts();
+        logger.info(
+            `[drops] loaded ${counts.imported} NPC drop tables (+ ${counts.manual} manual overrides)`,
+        );
     }
 
     // ── Prayer Effects ──────────────────────────────────────────────
@@ -483,18 +489,12 @@ export class CombatEffectService {
 
     // ── NPC Drops ───────────────────────────────────────────────────
 
-    getNpcDropRollService(): DropRollService | undefined {
-        const npcTypeLoader = this.svc.npcTypeLoader;
-        if (!this.npcDropRollService && npcTypeLoader) {
-            this.npcDropRegistry = new NpcDropRegistry(npcTypeLoader);
-            this.npcDropRollService = new DropRollService(this.npcDropRegistry);
-        }
+    getNpcDropRollService(): DropRollService {
         return this.npcDropRollService;
     }
 
     rollNpcDrops(npc: NpcState, eligibility: DropEligibility | undefined): PendingNpcDrop[] {
-        const service = this.getNpcDropRollService();
-        if (!service) return [];
+        const service = this.npcDropRollService;
         const recipients: Array<{
             ownerId?: number;
             player?: PlayerState;

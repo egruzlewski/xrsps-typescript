@@ -44,7 +44,7 @@ function main(): void {
 
     const payload = {
         $comment:
-            "OSRS monster aggression flags derived from osrsbox-db monsters-complete.json. Standard aggressive NPCs use the combat-level formula from https://oldschool.runescape.wiki/w/Aggressiveness",
+            "NPC aggression flags keyed by type ID. Frozen osrsbox-db snapshot; not live wiki data. Standard aggressive NPCs use the combat-level formula from https://oldschool.runescape.wiki/w/Aggressiveness",
         npcs,
     };
     fs.writeFileSync(OUT, JSON.stringify(payload));

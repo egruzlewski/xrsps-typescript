@@ -488,7 +488,7 @@ export class NpcManager {
         npcType: NpcType,
         combatStats?: NpcCombatStatsData,
     ): boolean {
-        // Prefer the global osrsbox aggression index (npc-aggression.json).
+        // Prefer the committed aggression index (npc-aggression.json).
         // Curated combat-stats cover only a small subset and often omit/override wrongly.
         const metadata = getNpcAggressionMetadata(npcType.id);
         if (metadata) {

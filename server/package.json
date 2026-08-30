@@ -22,6 +22,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.quests.json",
     "build-collision": "tsx scripts/build-collision-cache.ts --include-models --force",
     "build-npc-aggression": "tsx scripts/build-npc-aggression.ts",
+    "build-npc-drops": "tsx scripts/build-npc-drops.ts",
     "build-shops": "tsx scripts/build-shops.ts",
     "ensure-cache": "tsx scripts/ensure-cache.ts --server",
     "test": "tsx tests/authentication.test.ts && tsx tests/friends-chat.test.ts"
