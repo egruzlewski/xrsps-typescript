@@ -13,39 +13,26 @@ This repository contains:
 
 ## Quick Start
 
-Requires **Node.js v22.16+**. This repository uses Yarn `4.12.0`.
+Requires **Node.js v22.16+**.
 
-Verify the repository-pinned Yarn version:
+### Windows
+
+1. Clone this repository.
+2. Double-click [`tools/dev.bat`](tools/dev.bat).
+
+The first run installs Yarn 4 via Corepack if needed, installs packages, fetches the game cache, and builds collision data (this can take several minutes). After that it starts the server and the web client together. Later launches skip setup and only start. Close the window or press Ctrl+C to stop both.
+
+### Other platforms (or Windows from a terminal)
+
+This repository uses Yarn `4.12.0`. If `yarn --version` is not `4.12.0`, run `corepack enable` first.
 
 ```bash
-yarn --version
-```
-
-It should print `4.12.0`. If `yarn` is not found, run `corepack enable` first (this may require an elevated terminal on Windows).
-
-Install the server and client, then build collision data:
-
-```bash
+yarn install
 yarn setup
-```
-
-Start the server and client together:
-
-```bash
 yarn start
 ```
 
-Start only the server:
-
-```bash
-yarn server
-```
-
-Start only the client:
-
-```bash
-yarn client
-```
+Start only the server with `yarn server`, or only the client with `yarn client`.
 
 Start the documentation site (optional):
 

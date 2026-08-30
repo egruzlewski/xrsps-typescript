@@ -29,7 +29,13 @@ git clone https://github.com/xrsps/xrsps-typescript.git
 cd xrsps-typescript
 ```
 
-## 2. Verify Yarn
+## 2. Start (Windows)
+
+Double-click `tools\dev.bat`. The first run installs Yarn 4 via Corepack if needed, installs packages, fetches the game cache, and builds collision data, then starts the server and client. Later runs skip setup and only start. Close the window or press Ctrl+C to stop both.
+
+For other platforms, or if you prefer a terminal, continue below.
+
+## 3. Verify Yarn
 
 ```bash
 yarn --version
@@ -37,15 +43,16 @@ yarn --version
 
 It should print `4.12.0`. If `yarn` is not found, run `corepack enable` first (this may require an elevated terminal on Windows).
 
-## 3. Set Up the Server and Client
+## 4. Set Up the Server and Client
 
 ```bash
+yarn install
 yarn setup
 ```
 
-This installs the root command runner, server dependencies, and client dependencies, downloads the required OSRS cache, then builds the collision cache.
+`yarn install` is required first: Yarn 4 will not run package scripts (including `setup`) until the root install exists. `yarn setup` then installs the server and client, downloads the OSRS cache, and builds collision data.
 
-## 4. Start the Server and Client
+## 5. Start the Server and Client
 
 ```bash
 yarn start
@@ -149,7 +156,8 @@ Run the first three commands from the repository root. Package-specific maintena
 
 | Command | Description |
 | ------- | ----------- |
-| `yarn setup` | Install the server and client and build collision data |
+| `tools\dev.bat` | Windows: setup if needed, then start server and client |
+| `yarn install` then `yarn setup` | Install the server and client and build collision data |
 | `yarn start` | Start the game server and web client together |
 | `yarn server` | Start only the game server |
 | `yarn client` | Start only the web client |
