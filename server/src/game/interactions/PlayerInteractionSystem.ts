@@ -44,27 +44,6 @@ import {
  *
  * @returns The Chebyshev distance (max of dx, dy) to the nearest bounding box edge
  */
-function distanceToNpcBounds(
-    px: number,
-    py: number,
-    npcX: number,
-    npcY: number,
-    npcSize: number,
-): number {
-    const minX = npcX;
-    const minY = npcY;
-    const maxX = minX + Math.max(1, npcSize) - 1;
-    const maxY = minY + Math.max(1, npcSize) - 1;
-
-    // Clamp player position to NPC bounds to find nearest edge
-    const clampedX = Math.max(minX, Math.min(px, maxX));
-    const clampedY = Math.max(minY, Math.min(py, maxY));
-
-    const dx = Math.abs(clampedX - px);
-    const dy = Math.abs(clampedY - py);
-
-    return Math.max(dx, dy);
-}
 
 export interface PlayerRepository {
     get(ws: WebSocket): PlayerState | undefined;

@@ -13,7 +13,6 @@ import {
     type ForcedMovementUpdate,
     type HealthBarUpdate,
     type HitsplatUpdate,
-    MovementMode,
     type PlayerMovementEvent,
     type PlayerSpawnEvent,
     type PlayerSyncFrame,
@@ -26,10 +25,6 @@ const SCENE_SIZE = 104;
 
 function toSignedByte(value: number): number {
     return value > 127 ? value - 256 : value;
-}
-
-function toSignedShort(value: number): number {
-    return value > 32767 ? value - 65536 : value;
 }
 
 function toSubCoord(tile: number): number {

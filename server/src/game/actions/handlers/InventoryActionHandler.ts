@@ -21,8 +21,7 @@ import { logger } from "../../../utils/logger";
 import type { ServerServices } from "../../ServerServices";
 import { combatConsumableManager } from "../../combat/engine/CombatConsumableManager";
 import { pickEquipSound, unequipItemApply } from "../../equipment";
-import type { NpcState } from "../../npc";
-import type { InventoryAddResult, PlayerState } from "../../player";
+import type { PlayerState } from "../../player";
 import type {
     InventoryConsumableType,
     InventoryConsumeActionData,

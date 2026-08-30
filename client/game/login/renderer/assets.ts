@@ -2,7 +2,6 @@ import { CacheIndex } from "../../../rs/cache/CacheIndex";
 import { CacheSystem } from "../../../rs/cache/CacheSystem";
 import { IndexType } from "../../../rs/cache/IndexType";
 import { BitmapFont } from "../../../rs/font/BitmapFont";
-import { IndexedSprite } from "../../../rs/sprite/IndexedSprite";
 import { SpriteLoader } from "../../../rs/sprite/SpriteLoader";
 import { LoginScreenAnimation } from "../LoginScreenAnimation";
 import type { LoginRendererHost } from "./host";

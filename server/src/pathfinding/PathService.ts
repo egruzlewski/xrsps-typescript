@@ -6,7 +6,6 @@ import { resolveCollisionPlaneAt } from "../world/PlaneResolver";
 import { NORMAL_STRATEGY } from "./legacy/pathfinder/CollisionStrategy";
 import { Pathfinder } from "./legacy/pathfinder/Pathfinder";
 import {
-    ApproximateRouteStrategy,
     CardinalAdjacentRouteStrategy,
     ExactRouteStrategy,
     RectAdjacentRouteStrategy,

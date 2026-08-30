@@ -17,7 +17,6 @@ import {
     JULIETS_MESSAGE_ITEM_ID,
     JULIET_NPC_IDS,
     ROMEO_NPC_ID,
-    STAGE_COMPLETE,
     STAGE_JULIET_IN_CRYPT,
     STAGE_PASSED_MESSAGE,
     STAGE_SPOKEN_TO_APOTHECARY,
@@ -254,7 +253,7 @@ function julietFromRomeoSteps(
 }
 
 function julietMessageRecoverySteps(
-    quest: QuestDefinition,
+    _quest: QuestDefinition,
     event: NpcInteractionEvent,
 ): DialogueStep[] {
     if (hasOwnedItem(event.player, event.services, JULIETS_MESSAGE_ITEM_ID)) {

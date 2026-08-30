@@ -9,7 +9,6 @@ import type { LoginRendererHost } from "./renderer/host";
 import type { LoginLayoutConfig, ServerListEntry, World } from "./renderer/types";
 import * as assets from "./renderer/assets";
 import * as canvas from "./renderer/canvas";
-import * as controls from "./renderer/controls";
 import * as hover from "./renderer/hover";
 import * as lifecycle from "./renderer/lifecycle";
 import * as serverList from "./renderer/serverList";

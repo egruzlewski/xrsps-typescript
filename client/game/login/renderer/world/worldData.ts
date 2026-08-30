@@ -1,9 +1,9 @@
 import { MOCK_WORLDS } from "../constants";
 import type { LoginRendererHost } from "../host";
-import type { World, WorldGridLayout, WorldHoverResult } from "../types";
+import type { World, WorldGridLayout } from "../types";
 import { WorldFlags, WorldBackgroundType } from "../types";
 
-export function getWorldBackgroundType(host: LoginRendererHost, world: World) {
+export function getWorldBackgroundType(_host: LoginRendererHost, world: World) {
 
         const isMember = (world.properties & WorldFlags.MEMBERS) !== 0;
 

@@ -26,7 +26,7 @@ export function resolvePlayerSourceOffset(
 }
 
 /** Resolve the vertical offset for a player target (chest). */
-export function resolvePlayerTargetOffset(endHeight: number, targetHeightOffset?: number): number {
+export function resolvePlayerTargetOffset(_endHeight: number, targetHeightOffset?: number): number {
     if (Number.isFinite(targetHeightOffset as number)) return Number(targetHeightOffset);
     // Player targets always use chest height, not endHeight.
     return PLAYER_CHEST_OFFSET_UNITS;

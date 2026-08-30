@@ -1,7 +1,6 @@
 import { SkillId } from "../../../rs/skill/skills";
 import { BANK_SLOT_COUNT_FALLBACK, INVENTORY_SLOT_COUNT } from "../constants";
 import type {
-    BankSlotMessage,
     InventorySlotMessage,
     ShopStockEntryMessage,
     SkillEntryMessage,

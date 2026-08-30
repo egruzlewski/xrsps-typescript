@@ -30,7 +30,6 @@ import {
 import type {
     HealthBarBlock,
     HitsplatBlock,
-    NpcEncodingServices,
     NpcSyncResult,
     NpcUpdateInfo,
     SpotAnimBlock,

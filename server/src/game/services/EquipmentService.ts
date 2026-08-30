@@ -18,7 +18,7 @@ import {
     getSkillcapeSpotId,
     inferEquipSlot,
 } from "../equipment";
-import type { PlayerAppearance as PlayerAppearanceState, PlayerState } from "../player";
+import type { PlayerState } from "../player";
 
 const EQUIP_SLOT_COUNT = 14;
 const EQUIPMENT_STATS_BONUS_COUNT = 14;

@@ -1,4 +1,3 @@
-import { SkillId } from "../../../../../../client/rs/skill/skills";
 import type { PlayerState } from "../../../../../src/game/player";
 import type {
     IScriptRegistry,

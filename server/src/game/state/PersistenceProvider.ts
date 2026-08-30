@@ -10,7 +10,7 @@
  *
  * The default implementation is {@link PlayerPersistence} which uses SQLite.
  */
-import type { PlayerPersistentVars, PlayerState } from "../player";
+import type { PlayerState } from "../player";
 
 export interface PersistenceProvider {
     /** Apply persisted state onto a player (merge defaults + player-specific data). */

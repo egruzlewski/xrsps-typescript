@@ -1,6 +1,4 @@
 import {
-    INSTANCE_CHUNK_COUNT,
-    PLANE_COUNT,
     deriveRegionsFromCenter,
     deriveRegionsFromTemplates,
 } from "../../../client/common/instance/InstanceTypes";

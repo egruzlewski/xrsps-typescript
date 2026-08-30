@@ -1,4 +1,3 @@
-import { RectAdjacentRouteStrategy } from "../../pathfinding/legacy/pathfinder/RouteStrategy";
 import { EntityType } from "../collision/EntityCollisionService";
 import { NO_INTERACTION, encodeInteractionIndex } from "../interactionIndex";
 import { NpcState } from "../npc";

@@ -10,7 +10,6 @@ import {
     getQuestStage,
     meetsQuestRequirements,
     setQuestStage,
-    takeQuestItems,
 } from "../../QuestService";
 import {
     choose,

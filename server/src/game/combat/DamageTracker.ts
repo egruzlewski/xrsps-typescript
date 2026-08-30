@@ -6,7 +6,6 @@
  * - For some bosses: All participants above a damage threshold share loot
  * - Tracks damage sources for death attribution and killcount
  */
-import { Actor } from "../actor";
 import { NpcState } from "../npc";
 import { PlayerState } from "../player";
 

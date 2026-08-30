@@ -6,7 +6,6 @@
 import { OggVorbisDecoder } from "@wasm-audio-decoders/ogg-vorbis";
 
 import {
-    type RawSoundData as OsrsRawSoundData,
     VorbisSample,
     initVorbisSetup,
     isSetupInitialized,

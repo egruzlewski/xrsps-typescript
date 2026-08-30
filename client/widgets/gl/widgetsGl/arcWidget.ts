@@ -1,7 +1,6 @@
 import { GLRenderer } from "../renderer";
 import type { WidgetNode } from "../../../widgets/WidgetNode";
 import { ARC_FULL_RADIANS, ARC_TURN_UNITS } from "./constants";
-import { scaleLogicalPixels } from "./scaleLogicalPixels";
 type Widget = WidgetNode;
 type ArcRenderCache = {
     canvas: HTMLCanvasElement;

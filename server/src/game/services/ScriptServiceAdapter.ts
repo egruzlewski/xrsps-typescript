@@ -3,7 +3,6 @@ import type { ProjectileLaunch } from "../../../../client/common/projectiles/Pro
 
 import {
     PRAYER_DEACTIVATE_SOUND_ID,
-    type PrayerName,
     getPrayerDefinition,
 } from "../../../../client/rs/prayer/prayers";
 import type { SkillId } from "../../../../client/rs/skill/skills";
@@ -65,8 +64,6 @@ import { getProviderRegistry } from "../providers/ProviderRegistry";
 import type { SailingInstanceManager } from "../sailing/SailingInstanceManager";
 import type {
     ProviderRegistrationFacade,
-    ScriptDialogOptionRequest,
-    ScriptDialogRequest,
     ScriptGroundItem,
     ScriptServices,
 } from "../scripts/types";

@@ -1,13 +1,10 @@
 import { vec3 } from "gl-matrix";
 
-import { directionToDelta } from "../common/Direction";
 import { ChatMessageType } from "../common/chat/ChatMessageType";
 import type { ProjectileLaunch } from "../common/projectiles/ProjectileLaunch";
 import { buildSelectedSpellPayload } from "../common/spells/selectedSpellPayload";
 import type { QuestListWidgetGroup } from "../common/ui/questList";
 import {
-    INTERFACE_ACHIEVEMENT_DIARY_ID,
-    INTERFACE_QUEST_LIST_ID,
     SIDE_JOURNAL_GROUP_ID,
 } from "../common/ui/sideJournal";
 import { ITEM_SPAWNER_MODAL_GROUP_ID } from "../common/ui/widgets";
@@ -16,29 +13,12 @@ import { clamp } from "../common/utils/MathUtil";
 import {
     TRANSMIT_VARPS,
     VARBIT_COMBATLEVEL_TRANSMIT,
-    VARBIT_LEAGUE_MAGIC_MASTERY,
-    VARBIT_LEAGUE_MELEE_MASTERY,
-    VARBIT_LEAGUE_RANGED_MASTERY,
-    VARBIT_LEAGUE_RELIC_1,
-    VARBIT_LEAGUE_RELIC_2,
-    VARBIT_LEAGUE_RELIC_3,
-    VARBIT_LEAGUE_RELIC_4,
-    VARBIT_LEAGUE_RELIC_5,
-    VARBIT_LEAGUE_RELIC_6,
-    VARBIT_LEAGUE_RELIC_7,
-    VARBIT_LEAGUE_RELIC_8,
     VARBIT_ROOF_REMOVAL,
     VARBIT_STAMINA_ACTIVE,
     VARC_COMBAT_LEVEL,
-    VARP_AREA_SOUNDS_VOLUME,
-    VARP_ATTACK_STYLE,
-    VARP_MAP_FLAGS_CACHED,
-    VARP_MASTER_VOLUME,
-    VARP_MUSIC_VOLUME,
     VARP_OPTION_ATTACK_PRIORITY_NPC,
     VARP_OPTION_ATTACK_PRIORITY_PLAYER,
     VARP_OPTION_RUN,
-    VARP_SOUND_EFFECTS_VOLUME,
 } from "../common/vars";
 import {
     getDefaultServerAddress,
@@ -100,14 +80,12 @@ import {
 import type { WorldEntityInfoPayload } from "../network/ServerConnection";
 import type {
     CollectionLogServerPayload,
-    HitsplatServerPayload,
     InventoryServerUpdate,
     NpcInfoPayload,
     ShopWindowState,
     SpellResultPayload,
     SpotAnimationPayload,
     TradeWindowState,
-    WidgetActionClientPayload,
 } from "../network/ServerConnection";
 import {
     sendEmote as netSendEmote,
@@ -116,23 +94,17 @@ import {
     sendLogout,
     sendResumeNameDialog,
     sendResumeStringDialog,
-    sendTradeAccept,
-    sendTradeConfirmAccept,
-    sendTradeConfirmDecline,
-    sendTradeDecline,
     sendTradeOffer,
     sendTradeRemove,
     subscribeLogoutResponse,
     suppressReconnection,
 } from "../network/ServerConnection";
 import {
-    getLastUrl,
     registerAnimDebugProvider,
     setServerUrl,
     subscribeProjectiles,
 } from "../network/ServerConnection";
 import { ClientPacketId, createPacket, queuePacket } from "../network/packet";
-import { WebGLMapSquare } from "../render/WebGLMapSquare";
 import type { MinimapIcon } from "../render/loader/SdMapData";
 import type { NpcInstance } from "../render/npc/NpcRenderTemplate";
 import { MenuTargetType, type OsrsMenuEntry } from "../rs/MenuEntry";
@@ -161,7 +133,6 @@ import { SpotAnimTypeLoader } from "../rs/config/spotanimtype/SpotAnimTypeLoader
 import { VarManager } from "../rs/config/vartype/VarManager";
 import { chatHistory } from "../rs/cs2/ChatHistory";
 import { Cs2Vm, ScriptArgMagic, type ScriptEvent, createScriptEvent } from "../rs/cs2/Cs2Vm";
-import { Opcodes as Cs2Opcodes } from "../rs/cs2/Opcodes";
 import { BitmapFont } from "../rs/font/BitmapFont";
 import { encodeInteractionIndex } from "../rs/interaction/InteractionIndex";
 import { Inventory, InventorySlotInput } from "../rs/inventory/Inventory";
@@ -177,16 +148,14 @@ import { SeqFrameLoader } from "../rs/model/seq/SeqFrameLoader";
 import type { SkeletalSeqLoader } from "../rs/model/skeletal/SkeletalSeqLoader";
 import { SkillId } from "../rs/skill/skills";
 import { TextureLoader } from "../rs/texture/TextureLoader";
-import { faceAngleRs } from "../rs/utils/rotation";
-import { getOsrsInterfaceScalingPercent, setOsrsInterfaceScalingPercent } from "../ui/UiScale";
+import { getOsrsInterfaceScalingPercent } from "../ui/UiScale";
 import {
     setNpcExamineIdResolver,
     setSpellSelectionClearHandler,
     setSpellSelectionResolver,
 } from "../ui/menu/MenuAction";
 import { type SimpleMenuEntry } from "../ui/menu/MenuEngine";
-import { MenuOpcode, MenuState } from "../ui/menu/MenuState";
-import { isDropTarget, isWidgetUseTarget } from "../widgets/WidgetFlags";
+import { MenuState } from "../ui/menu/MenuState";
 import { markWidgetInteractionDirty } from "../widgets/WidgetInteraction";
 import { WidgetManager } from "../widgets/WidgetManager";
 import { WidgetSessionManager } from "../widgets/WidgetSessionManager";
@@ -198,7 +167,7 @@ import { Js5RangeClient } from "../rs/cache/js5/Js5RangeClient";
 import { PresenceBitset } from "../rs/cache/js5/PresenceBitset";
 import { SparseMemoryStore } from "../rs/cache/store/SparseMemoryStore";
 import { CacheList, LoadedCache, getSparsePersistence } from "./Caches";
-import { Camera, CameraView, ProjectionType } from "./Camera";
+import { Camera, CameraView } from "./Camera";
 import {
     ClientState,
     DEFAULT_SCREEN_HEIGHT,
@@ -213,7 +182,6 @@ import { PlayerAnimController } from "./PlayerAnimController";
 import {
     type TransmitCycles,
     getTransmitCycles,
-    isTransmitProcessingNeeded,
     markChatTransmit,
     markClanTransmit,
     markFriendTransmit,
@@ -223,7 +191,6 @@ import {
     markVarTransmit,
     markWidgetsLoaded,
     resetTransmitCycles,
-    resetTransmitDirtyFlags,
 } from "./TransmitCycles";
 import { AudioVarpController } from "./audio/AudioVarpController";
 import { MusicSystem } from "./audio/MusicSystem";
@@ -243,7 +210,6 @@ import { NpcEcs } from "./ecs/NpcEcs";
 import { PlayerEcs } from "./ecs/PlayerEcs";
 import { TileHighlightManager } from "./highlights/TileHighlightManager";
 import { PlayerInteractionSystem } from "./interactions/PlayerInteractionSystem";
-import { IProjectileManager } from "./interfaces/IProjectileManager";
 import {
     GameState,
     type LoginAction,
@@ -272,7 +238,6 @@ import {
     createSelectedSpellOnLocPacket,
     createSelectedSpellOnNpcPacket,
     createSelectedSpellOnPlayerPacket,
-    createSelectedSpellOnWidgetPacket,
 } from "./selectedSpellPackets";
 import { createBrowserSidebarPersistence } from "./sidebar/BrowserSidebarPersistence";
 import { SidebarStore } from "./sidebar/SidebarStore";
@@ -285,13 +250,10 @@ import {
     GameStateMachine,
     LoadingRequirement,
     LoadingTracker,
-    type StateTransition,
 } from "./state";
 import { initPlayerSyncHuffman } from "./sync/HuffmanProvider";
 import { NpcUpdateDecoder } from "./sync/NpcUpdateDecoder";
 import { PlayerSyncManager } from "./sync/PlayerSyncManager";
-import type { PlayerSpotAnimationEvent } from "./sync/PlayerSyncTypes";
-import { resolveTradeActionQuantity } from "./trade/TradeActionQuantity";
 import { clampPlane } from "./utils/PlaneUtil";
 import { VarcPersistence } from "./vars/VarcPersistence";
 import { NotificationDisplay } from "./widgets/NotificationDisplay";
@@ -306,7 +268,6 @@ import { WidgetInputController } from "./widgets/WidgetInputController";
 import { WidgetInteractionController } from "./widgets/WidgetInteractionController";
 import { WidgetTransmitProcessor } from "./widgets/WidgetTransmitProcessor";
 import { ItemSpawnerUi } from "./widgets/itemSpawner";
-import { resolveWidgetIdentifiers } from "./widgets/widgetActionPayload";
 import { RenderDataWorkerPool } from "./worker/RenderDataWorkerPool";
 import { WorldMapController, type WorldMapRenderedIcon } from "./worldMap/WorldMapController";
 import { WorldViewManager } from "./worldview/WorldViewManager";

@@ -102,7 +102,6 @@ import {
     ScriptScheduler,
     StatusEffectSystem,
 } from "../game/systems";
-import { TEST_HIT_FORCE, testRandFloat } from "../game/testing/TestRng";
 import { TickPhaseOrchestrator } from "../game/tick";
 import { GameTicker } from "../game/ticker";
 import { TradeManager } from "../game/trade/TradeManager";
@@ -145,7 +144,6 @@ import {
     WidgetBroadcaster,
 } from "./broadcast";
 import { NpcPacketEncoder, PlayerPacketEncoder } from "./encoding";
-import { encodeAppearanceBinary } from "./encoding/AppearanceEncoder";
 import { WorldEntityInfoEncoder } from "./encoding/WorldEntityInfoEncoder";
 import {
     Cs2ModalManager,
@@ -1390,18 +1388,6 @@ export class WSServer {
         } catch (err) {
             logger.warn("[bot] test bot spawn failed", err);
         }
-    }
-
-    private serializeAppearancePayload(
-        view: import("./encoding/types").PlayerViewSnapshot,
-    ): Uint8Array {
-        const player = this.players?.getById(view.id);
-        return encodeAppearanceBinary(view, {
-            combatLevel: player?.skillSystem.combatLevel ?? 3,
-            skillLevel: player?.skillSystem.skillTotal ?? 32,
-            isHidden: player?.isHidden === true,
-            actions: ["", "", ""],
-        });
     }
 
     private withDirectSendBypass<T>(context: string, fn: () => T): T {

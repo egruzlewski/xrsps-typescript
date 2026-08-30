@@ -6,7 +6,7 @@ import { STAGE } from "./constants";
 
 export function buildObservatoryQuestJournal(
     player: PlayerState,
-    services: ScriptServices,
+    _services: ScriptServices,
     quest: QuestDefinition,
 ): string[] {
     const stage = getQuestStage(player, quest);

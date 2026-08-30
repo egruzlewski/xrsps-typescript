@@ -17,7 +17,6 @@ import { PlayerState } from "../player";
 import { type DropEligibility, damageTracker, multiCombatSystem } from "../scripts/types";
 
 type Npc = NpcState;
-type Player = PlayerState;
 
 export interface BossPhase {
     name: string;

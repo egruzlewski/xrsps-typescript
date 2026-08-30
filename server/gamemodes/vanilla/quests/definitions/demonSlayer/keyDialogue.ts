@@ -22,7 +22,6 @@ import {
     SIR_PRYSIN_NPC_IDS,
     SPINACH_ROLL_ITEM_ID,
     STAGE_COLLECTING_BONES,
-    STAGE_COMPLETE,
     STAGE_KEY_HUNT,
     STAGE_SILVERLIGHT,
     STAGE_TRAIBORN_KEY,
@@ -264,7 +263,7 @@ export function createSirPrysinTalkHandler(quest: QuestDefinition) {
     };
 }
 
-function rovinGenericSteps(questAvailable: boolean, event: NpcInteractionEvent): DialogueStep[] {
+function rovinGenericSteps(questAvailable: boolean, _event: NpcInteractionEvent): DialogueStep[] {
     return [
         sayNpc("What are you doing up here? Only palace guards are allowed."),
         choose([

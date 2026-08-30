@@ -3,7 +3,6 @@ import { MIN_PASSWORD_LENGTH } from "../../../client/common/authentication";
 import { VARBIT_ACCOUNT_TYPE } from "../../../client/common/vars";
 import type { GamemodeDefinition } from "../game/gamemodes/GamemodeDefinition";
 import type { PlayerState } from "../game/player";
-import { logger } from "../utils/logger";
 import { AccountStore, normalizeAccountName } from "./AccountStore";
 import { type PlayerPermission, hasPermission } from "./PlayerPermission";
 

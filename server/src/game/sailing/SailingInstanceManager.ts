@@ -1,7 +1,5 @@
-import type { CollisionMap } from "../../../../client/rs/scene/CollisionMap";
 import { logger } from "../../utils/logger";
 import type { ServerServices } from "../ServerServices";
-import type { NpcSpawnConfig, NpcState } from "../npc";
 import type { PlayerState } from "../player";
 import {
     SAILING_INTRO_BOAT_LOCS,

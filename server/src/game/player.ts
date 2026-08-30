@@ -1,14 +1,10 @@
 import { VARBIT_ACTIVE_SPELLBOOK } from "../../../client/common/vars";
 import { EquipmentSlot } from "../../../client/rs/config/player/Equipment";
 import { PrayerName } from "../../../client/rs/prayer/prayers";
-import { SKILL_IDS, SkillId } from "../../../client/rs/skill/skills";
-import { logger } from "../utils/logger";
+import { SkillId } from "../../../client/rs/skill/skills";
 import { DisplayMode, PlayerWidgetManager } from "../widgets/WidgetManager";
-import { Actor, RUN_ENERGY_MAX, Tile } from "./actor";
+import { Actor, Tile } from "./actor";
 import type { AttackType } from "./combat/AttackType";
-import type { ChargeTracker } from "./combat/DegradationSystem";
-import type { StatusHitsplat } from "./combat/HitEffects";
-import type { PlayerAggressionState } from "./combat/NpcAggression";
 import {
     type CombatEntityRef,
     npcCombatEntityRef,
@@ -54,12 +50,6 @@ import {
     type PlayerSkillPersistentEntry,
     PlayerSkillSystem,
     type SkillEntry,
-    type SkillSyncState,
-    type SkillSyncUpdate,
-    computeCombatLevel,
-    computeTotalLevel,
-    createInitialSkills,
-    normalizeSkillXpValue,
 } from "./state/PlayerSkillSystem";
 import { PlayerSpecialEnergyState } from "./state/PlayerSpecialEnergyState";
 import {
@@ -1086,14 +1076,6 @@ export class PlayerState extends Actor {
             equip[slot] = entry.itemId;
             equipQty[slot] = slot === EquipmentSlot.AMMO ? Math.max(1, entry.quantity ?? 1) : 1;
         }
-    }
-
-    private exportSkillSnapshot(): PlayerSkillPersistentEntry[] {
-        return this.skillSystem.exportSkillSnapshot();
-    }
-
-    private applySkillSnapshot(entries: Iterable<PlayerSkillPersistentEntry>): void {
-        this.skillSystem.applySkillSnapshot(entries);
     }
 
     applyLocationSnapshot(snapshot?: PlayerLocationSnapshot): void {

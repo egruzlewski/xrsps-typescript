@@ -22,7 +22,7 @@ import type { BoatLoc } from "../game/sailing/SailingInstance";
 import type { ScriptDialogRequest, WidgetOpenHandler } from "../game/scripts/types";
 import type { InterfaceService } from "../widgets/InterfaceService";
 import type { WidgetAction } from "../widgets/WidgetManager";
-import type { MessagePayload, MessageRouter } from "./MessageRouter";
+import type { MessagePayload } from "./MessageRouter";
 import type { WorldEntityMaskUpdate, WorldEntityPosition } from "./encoding/WorldEntityInfoEncoder";
 import type { IndexedMenuRequest } from "./managers/Cs2ModalManager";
 import type { NotificationPayload, ServerToClient } from "./messages";

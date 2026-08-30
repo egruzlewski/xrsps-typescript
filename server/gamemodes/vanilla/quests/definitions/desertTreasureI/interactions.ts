@@ -24,7 +24,6 @@ import {
     ITEM,
     LOC,
     NPC,
-    QUEST_KEYS,
     VARP_DESERT_TREASURE_DIAMONDS,
 } from "./constants";
 

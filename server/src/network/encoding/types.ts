@@ -1,8 +1,6 @@
 import type { Huffman } from "../../../../client/rs/chat/Huffman";
 import type { NpcState, NpcUpdateDelta } from "../../game/npc";
 import type { PlayerAppearance, PlayerState } from "../../game/player";
-import type { NpcSyncSession } from "../NpcSyncSession";
-import type { PlayerSyncSession } from "../PlayerSyncSession";
 
 /**
  * Hitsplat block used in update masks.

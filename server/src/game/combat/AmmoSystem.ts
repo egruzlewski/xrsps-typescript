@@ -10,7 +10,6 @@
  *
  * Reference: RSMod RangedCombatStrategy, OSRS Wiki
  */
-import { EquipmentSlot } from "../../../../client/rs/config/player/Equipment";
 import { getProviderRegistry } from "../providers/ProviderRegistry";
 import type { AmmoDataProvider } from "./AmmoDataProvider";
 

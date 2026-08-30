@@ -16,7 +16,7 @@
  * In this cache, 162:567 is the unclamped CHATMODAL slot and 162:566 is the overlay sibling.
  */
 import type { PlayerState } from "../../game/player";
-import type { InterfaceHookContext, InterfaceService } from "../InterfaceService";
+import type { InterfaceService } from "../InterfaceService";
 import {
     DIALOG_DOUBLE_SPRITE_ID,
     DIALOG_NPC_ID,

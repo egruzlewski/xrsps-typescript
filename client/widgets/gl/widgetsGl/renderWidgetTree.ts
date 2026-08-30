@@ -1,5 +1,4 @@
 import { ClientState } from "../../../game/ClientState";
-import type { InputManager } from "../../../game/InputManager";
 import { profiler } from "../../../render/PerformanceProfiler";
 import { packWorldMapCoord } from "../../../rs/map/WorldMapArea";
 import { menuAction } from "../../../ui/menu/MenuAction";

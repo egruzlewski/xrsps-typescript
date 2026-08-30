@@ -5,7 +5,6 @@
 import { EquipmentSlot } from "../../../../client/rs/config/player/Equipment";
 import type { PrayerName } from "../../../../client/rs/prayer/prayers";
 import { restoreAutocastState } from "../combat/AutocastState";
-import { DEFAULT_EQUIP_SLOT_COUNT } from "../equipment";
 import type { PlayerPersistentVars, PlayerState } from "../player";
 import { DEFAULT_BANK_CAPACITY } from "./PlayerBankSystem";
 

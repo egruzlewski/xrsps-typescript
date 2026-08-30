@@ -20,7 +20,6 @@ import {
     type ItemOnPlayerEvent,
     type ItemOnPlayerHandler,
     type LocInteractionEvent,
-    type LocInteractionHandler,
     type NpcInteractionEvent,
     type NpcInteractionHandler,
     type NpcMagicHitEvent,

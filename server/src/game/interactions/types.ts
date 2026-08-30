@@ -1,5 +1,4 @@
 import { NpcState } from "../npc";
-import { PlayerState } from "../player";
 
 export const FollowInteractionKind = {
     Follow: "follow",

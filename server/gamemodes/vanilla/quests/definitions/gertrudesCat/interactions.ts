@@ -30,10 +30,6 @@ function setVarp(player: PlayerState, services: ScriptServices, id: number, valu
     services.variables.sendVarp(player, id, value);
 }
 
-function has(player: PlayerState, services: ScriptServices, itemId: number): boolean {
-    return services.inventory.playerHasItem(player, itemId);
-}
-
 function owns(player: PlayerState, services: ScriptServices, itemId: number): boolean {
     return services.inventory.findOwnedItemLocation(player, itemId) !== undefined;
 }

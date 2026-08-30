@@ -1,4 +1,3 @@
-import type { MessageHandlerServices } from "../MessageHandlers";
 import type { MessageRouter } from "../MessageRouter";
 import { type BinaryHandlerExtServices, registerBinaryHandlers } from "./binaryMessageHandlers";
 import { registerChatHandler } from "./chatHandler";

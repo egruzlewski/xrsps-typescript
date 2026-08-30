@@ -11,7 +11,6 @@ import {
     type MenuEntry,
     MenuTargetType,
     OsrsMenuEntry,
-    SpellCastMetadata,
 } from "../../rs/MenuEntry";
 import type { LocType } from "../../rs/config/loctype/LocType";
 import type { NpcType } from "../../rs/config/npctype/NpcType";

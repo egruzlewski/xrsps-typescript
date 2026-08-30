@@ -1,4 +1,4 @@
-import type { ShopServerPayload, ShopWindowState } from "../types";
+import type { ShopServerPayload } from "../types";
 import { cloneShopState, createDefaultShopState } from "./defaults";
 import { state } from "../state";
 import { sanitizeShopStockEntryMessage } from "../utils/sanitize";

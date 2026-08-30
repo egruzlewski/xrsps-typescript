@@ -8,12 +8,6 @@
  * - Most boss arenas are multi-combat
  */
 import { Actor } from "../actor";
-import { NpcState } from "../npc";
-import { PlayerState } from "../player";
-
-// Type aliases for compatibility
-type Npc = NpcState;
-type Player = PlayerState;
 
 // Rectangle-based zone definition
 interface CombatZone {

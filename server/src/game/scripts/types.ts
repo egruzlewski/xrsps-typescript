@@ -1,11 +1,10 @@
 import {
-    type ActionEffect,
     type ActionEnqueueResult,
     type ActionExecutionResult,
     type ActionKind,
     type ActionRequest,
 } from "../actions";
-import { type NpcSpawnConfig, type NpcState } from "../npc";
+import { type NpcState } from "../npc";
 import { type PlayerState } from "../player";
 import type { CombatAttack } from "../combat/model/CombatAttack";
 import type {

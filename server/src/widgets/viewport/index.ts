@@ -2,11 +2,9 @@ import { SIDE_JOURNAL_GROUP_ID } from "../../../../client/common/ui/sideJournal"
 import type { ViewportEnumService } from "./ViewportEnumService";
 import { BaseComponentUids } from "./ViewportEnumService";
 import {
-    getDesktopInterfaces,
     getRemainingTabInterfaces as getDesktopRemainingTabInterfaces,
 } from "./desktop";
 import {
-    getMobileInterfaces,
     getMobileQuestTabUid,
     getMobileRemainingTabInterfaces,
 } from "./mobile";

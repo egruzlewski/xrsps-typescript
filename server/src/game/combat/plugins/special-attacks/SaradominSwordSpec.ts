@@ -4,7 +4,6 @@ import { AttackType } from "../../AttackType";
 import type { CombatAttack } from "../../model/CombatAttack";
 import type { AppliedCombatHit } from "../../engine/DeferredHitQueue";
 import {
-    type CombatEntityRef,
     npcCombatEntityRef,
     playerCombatEntityRef,
 } from "../../model/CombatEntityRef";

@@ -12,7 +12,6 @@
  * - Each state lasts 250 shots, total 2,500 shots
  * - Stats decrease linearly: Ranged atk 100→64, Ranged str 70→52
  */
-import type { PlayerState } from "../player";
 
 // =============================================================================
 // Types

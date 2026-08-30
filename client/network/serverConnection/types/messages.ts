@@ -54,8 +54,6 @@ export type GroundItemsServerPayload =
           removes: number[];
       };
 
-type GroundItemsSnapshotPayload = Extract<GroundItemsServerPayload, { kind: "snapshot" }>;
-
 export type GroundItemActionPayload = {
     stackId: number;
     tile: { x: number; y: number; level?: number };

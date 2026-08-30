@@ -3,8 +3,6 @@
  *
  * Extracted from wsServer.ts for better organization and testability.
  */
-import type { WebSocket } from "ws";
-
 import {
     MUSIC_GROUP_ID,
     MUSIC_JUKEBOX_CHILD_ID,

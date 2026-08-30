@@ -2,7 +2,7 @@ import type { PlayerState } from "../../../../../src/game/player";
 import type { ScriptServices } from "../../../../../src/game/scripts/types";
 import { STAGE_COMPLETE, STAGE_STARTED, VARP_SHEEP_SHEARER, getRemainingWool } from "./constants";
 
-export function buildSheepShearerJournal(player: PlayerState, services: ScriptServices): string[] {
+export function buildSheepShearerJournal(player: PlayerState, _services: ScriptServices): string[] {
     const stage = player.varps.getVarpValue(VARP_SHEEP_SHEARER);
     if (stage >= STAGE_COMPLETE) {
         return [

@@ -2,7 +2,6 @@ import { getOrientation, isMobileMode, isTouchDevice } from "../../../../common/
 import { LoginIndex } from "../../GameState";
 import type { LoginState } from "../../LoginState";
 import type { LoginRendererHost, RenderContext } from "../host";
-import type { LoginLayoutConfig } from "../types";
 
 export function computeLayoutConfig(host: LoginRendererHost, canvasWidth: number, canvasHeight: number) {
 

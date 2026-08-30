@@ -41,7 +41,6 @@ import { handleExaminePacket as handleExaminePacketFn } from "./handlers/examine
 import { encodeMessage } from "./messages";
 import {
     type AppearanceSetPacket,
-    type DecodedPacket,
     isBinaryData,
     isNewProtocolPacket,
     parsePacketsAsMessages,
@@ -54,14 +53,6 @@ export const PENDING_LOGIN_RESERVATION_MS = 60_000;
 const DEBUG_NPC_STREAM =
     (process?.env?.DEBUG_NPC_STREAM ?? "").toString().toLowerCase() === "1" ||
     (process?.env?.DEBUG_NPC_STREAM ?? "").toString().toLowerCase() === "true";
-
-type PlayerAppearanceState = NonNullable<PlayerState["appearance"]>;
-
-interface HandshakeAppearance {
-    gender?: number;
-    kits?: number[];
-    colors?: number[];
-}
 
 type PendingLoginReservation = {
     name: string;

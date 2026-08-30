@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 
 import { EquipmentSlot } from "../../../../client/rs/config/player/Equipment";
-import { MAX_XP, SKILL_IDS } from "../../../../client/rs/skill/skills";
+import { SKILL_IDS } from "../../../../client/rs/skill/skills";
 import { DEFAULT_EQUIP_SLOT_COUNT } from "../equipment";
 import {
     type BankSnapshotEntry,

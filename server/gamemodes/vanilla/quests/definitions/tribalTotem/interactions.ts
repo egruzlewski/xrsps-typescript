@@ -12,7 +12,7 @@ import {
     meetsQuestRequirements,
     setQuestStage,
 } from "../../QuestService";
-import { choose, option, run, sayNpc, sayPlayer, showItem, startConversation } from "../../dialogue";
+import { choose, option, run, sayNpc, sayPlayer, startConversation } from "../../dialogue";
 import type { QuestDefinition } from "../../types";
 import {
     ITEM,

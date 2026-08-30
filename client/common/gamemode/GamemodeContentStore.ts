@@ -324,7 +324,7 @@ export function getCustomEnumCountOverride(enumId: number): number {
 export function getCustomEnumValueOverride(
     enumId: number,
     key: number,
-    baseCount: number,
+    _baseCount: number,
 ): { custom: number } | { shiftedKey: number } | undefined {
     const customCount = customEnumOverrides?.get(enumId)?.length ?? 0;
     if (customCount === 0) return undefined;

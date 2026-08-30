@@ -6,7 +6,6 @@
  */
 import { WebSocket } from "ws";
 
-import type { ProjectileLaunch } from "../../../../../client/common/projectiles/ProjectileLaunch";
 import { PLAYER_TAKE_DAMAGE_SOUND, PLAYER_ZERO_DAMAGE_SOUND } from "../../../network/wsServerTypes";
 import { logger } from "../../../utils/logger";
 import type { ServerServices } from "../../ServerServices";

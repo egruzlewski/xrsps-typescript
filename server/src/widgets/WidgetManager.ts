@@ -1,18 +1,11 @@
 import { logger } from "../utils/logger";
 import type { QuestListWidgetGroup } from "../../../client/common/ui/questList";
 import {
-    ContainerChildIds,
     type DesktopInterfaceOptions,
     DisplayMode,
-    InterfaceDestination,
     InterfaceMount,
-    getChildId,
     getDesktopInterfaces,
-    getInventoryTabUid,
-    getMainmodalUid,
     getMobileInterfaces,
-    getRemainingTabInterfaces,
-    getRootInterfaceId,
 } from "./viewport";
 
 // Re-export viewport types and constants for backwards compatibility

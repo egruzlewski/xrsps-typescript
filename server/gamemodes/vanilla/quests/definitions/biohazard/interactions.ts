@@ -3,7 +3,7 @@ import { SkillId } from "../../../../../../client/rs/skill/skills";
 import type { PlayerState } from "../../../../../src/game/player";
 import type { IScriptRegistry, NpcInteractionEvent, ScriptServices } from "../../../../../src/game/scripts/types";
 import { completeQuest, countCarriedItem, getQuestStage, setQuestStage } from "../../QuestService";
-import { choose, option, run, sayNpc, sayPlayer, showItem, startConversation, type DialogueOption } from "../../dialogue";
+import { choose, option, run, sayNpc, sayPlayer, startConversation, type DialogueOption } from "../../dialogue";
 import type { QuestDefinition } from "../../types";
 import {
     DANCING_DONKEY_ZONE,
@@ -237,7 +237,7 @@ function createChemistHandler(quest: QuestDefinition) {
     };
 }
 
-function courierOptions(event: NpcInteractionEvent, quest: QuestDefinition, courier: Courier): DialogueOption[] {
+function courierOptions(event: NpcInteractionEvent, _quest: QuestDefinition, courier: Courier): DialogueOption[] {
     const choices = [
         { itemId: ITEM.ethenea, text: "Give him the ethenea." },
         { itemId: ITEM.liquidHoney, text: "Give him the liquid honey." },

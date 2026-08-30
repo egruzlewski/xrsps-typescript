@@ -5,9 +5,7 @@
 import type { WebSocket } from "ws";
 
 import { CustomItemRegistry } from "../../../../client/custom/items";
-import { SkillId } from "../../../../client/rs/skill/skills";
 import type { WidgetDialogHandler } from "../../game/actions";
-import type { PlayerState } from "../../game/player";
 import type { ScriptRegistry } from "../../game/scripts";
 import type { ScriptRuntime } from "../../game/scripts";
 import type { MessageHandlerServices } from "../MessageHandlers";

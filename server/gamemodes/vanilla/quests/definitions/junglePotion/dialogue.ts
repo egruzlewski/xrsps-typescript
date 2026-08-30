@@ -1,7 +1,6 @@
 import type {
     ItemOnNpcEvent,
     NpcInteractionEvent,
-    ScriptServices,
 } from "../../../../../src/game/scripts/types";
 import {
     completeQuest,
@@ -16,7 +15,6 @@ import {
     option,
     run,
     sayNpc,
-    sayPlayer,
     showItem,
     startConversation,
     type DialogueStep,
