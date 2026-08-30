@@ -26,7 +26,7 @@ Extend **VanillaGamemode** unless you're building something radically different 
 
 ### How do I switch which gamemode the server runs?
 
-Set the `GAMEMODE` environment variable or `"gamemode"` in `server/config.json`. Resolution is `process.env.GAMEMODE`, then `config.json`, then the code fallback `"vanilla"` (`server/src/config/index.ts`). The committed `server/config.json` in this repo currently selects `leagues-v`.
+Set the `GAMEMODE` environment variable or `"gamemode"` in `server/config.json`. Resolution is `process.env.GAMEMODE`, then `config.json`, then the code fallback `"vanilla"` (`server/src/config/index.ts`). The committed `server/config.json` in this repo currently selects `vanilla`.
 
 ### Can I use vanilla's combat system without extending VanillaGamemode?
 

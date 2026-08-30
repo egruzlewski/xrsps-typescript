@@ -21,7 +21,7 @@ Do not invent JSON WebSocket APIs for UI. Drive existing widgets with **varps/va
 ## Verified facts (do not “simplify” these)
 
 - **Tick:** default `tickMs` is 600 (`server/src/config/index.ts`, `TICK_MS` override). Phase order is `TickPhaseOrchestrator`, not a 4-step sketch.
-- **Gamemode selection:** `GAMEMODE` env → `server/config.json` → code fallback `"vanilla"`. This repo’s committed config currently uses `leagues-v`.
+- **Gamemode selection:** `GAMEMODE` env → `server/config.json` → code fallback `"vanilla"`. This repo’s committed config currently uses `vanilla`.
 - **Discovery:** gamemode = `server/gamemodes/{id}/index.ts` exporting `createGamemode()`. Extrascript = `server/extrascripts/{id}/index.ts` exporting `register`.
 - **Load order:** `bootstrapScripts` runs `gamemode.registerHandlers` then extrascrpts, **then** `gamemode.initialize()`. `leagues-v` snapshots custom content in `initialize()`.
 - **Handler stacks:** newest registration wins (`ScriptRegistry`). Extrascripts shadow gamemode handlers unless they wrap the previous one.

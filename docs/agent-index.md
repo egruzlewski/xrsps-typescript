@@ -19,6 +19,6 @@ Routing table for this repository. Operating rules are in **`AGENTS.md` at the r
 ## Easy to get wrong
 
 - Tick order is `TickPhaseOrchestrator`, not a generic “actions, then NPCs, then packets” list.
-- Code fallback gamemode is `vanilla`; this repo’s `server/config.json` currently sets `leagues-v`.
+- Code fallback gamemode is `vanilla`; this repo’s `server/config.json` currently sets `vanilla`.
 - `yarn --cwd server test` is not the full `server/tests/` tree.
 - Custom items are not delivered to vanilla clients unless that gamemode implements `getContentDataPacket()`.
