@@ -1,0 +1,13 @@
+---
+description: Shared client/server types and opcodes live in client/common and client/custom
+globs: client/common/**/*.ts,client/custom/**/*.ts
+alwaysApply: false
+---
+
+# Shared `client/common` and `client/custom`
+
+- `client/common` is imported by the server (`tsconfig` include). Prefer extending these helpers over duplicating constants in `server/src` or `client/game`.
+- Packet opcodes: `network/ClientPacketId.ts`, `packets/ServerPacketId.ts`. Lengths and names follow the OSRS protocol; do not reuse an opcode.
+- Varp/varbit IDs used on both sides belong here (see `client/common/vars`), not as magic numbers in one package.
+- Custom items: `CustomItemRegistry` / `CustomItemBuilder`. New IDs start at **50000** (`CUSTOM_ID_START`). `ServerCustomItemRegistry` merges those defs into server `ItemDefinition` lookups.
+- This code is non-UI. Widget chrome belongs in `client/widgets` or `client/components`.

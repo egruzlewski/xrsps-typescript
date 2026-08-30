@@ -32,6 +32,12 @@ export default defineConfig({
                     { text: 'Extrascripts', link: '/extrascripts' },
                 ],
             },
+            {
+                text: 'Development',
+                items: [
+                    { text: 'Agent index', link: '/agent-index' },
+                ],
+            },
         ],
         socialLinks: [
             { icon: 'discord', link: 'https://discord.gg/3dzttF2q73' },

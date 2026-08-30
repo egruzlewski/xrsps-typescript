@@ -45,11 +45,13 @@ Extrascripts have access to the same `IScriptRegistry` and `ScriptServices` as g
 1. Gamemode calls `registerHandlers()` first
 2. All extrascripts call `register()` after
 
-Extrascript handlers run alongside gamemode handlers. If both register a handler for the same interaction, both will be evaluated — the registry determines priority.
+`ScriptRegistry` keeps a **stack per key**; `find*` returns the **newest** registration. Extrascripts therefore **shadow** a gamemode handler for the same NPC/loc/item/widget key unless the extrascrpt wraps the previous handler (see `server/tests/script-registry-handler-stacks.test.ts`). Both handlers do not run automatically.
 
 ## Hot Reload
 
-Extrascripts support hot-reload during development. Set the `SCRIPT_HOT_RELOAD=1` environment variable and the server will watch for file changes, reloading extrascripts without a full restart.
+Extrascripts support hot-reload during development. Set `SCRIPT_HOT_RELOAD=1`; `bootstrapScripts` watches `server/extrascripts/` recursively. **Gamemodes are not hot-reloaded.**
+
+Custom items/widgets registered in an extrascrpt reach the **client** only if the active gamemode implements `getContentDataPacket()` and includes the registries. Today **`leagues-v` does** (`LeagueContentProvider.build()` runs in `initialize()`, after extrascrpt `register()`). **`vanilla` does not** send `GAMEMODE_DATA`.
 
 ## Gamemodes vs Extrascripts
 
@@ -64,15 +66,15 @@ Extrascripts support hot-reload during development. Set the `SCRIPT_HOT_RELOAD=1
 
 ## Custom Content
 
-Both gamemodes and extrascripts can define **custom items** and **custom widgets** using the built-in registries. These are automatically sent to the client at login and resolved seamlessly alongside cache data.
+Both gamemodes and extrascripts can define **custom items** and **custom widgets** using the built-in registries. The server resolves them immediately. The client receives them only if the active gamemode implements `getContentDataPacket()` and includes the registries in that packet.
 
 ### Custom Items
 
 Use `CustomItemBuilder` and `CustomItemRegistry` to define items that don't exist in the OSRS cache. Custom items use IDs starting at **50000+** to avoid conflicts.
 
 ```typescript
-import { CustomItemBuilder } from "../../client/custom/items/CustomItemBuilder";
-import { CustomItemRegistry } from "../../client/custom/items/CustomItemRegistry";
+import { CustomItemBuilder } from "../../../client/custom/items/CustomItemBuilder";
+import { CustomItemRegistry } from "../../../client/custom/items/CustomItemRegistry";
 
 CustomItemRegistry.register(
     CustomItemBuilder.create(50100)
@@ -84,7 +86,7 @@ CustomItemRegistry.register(
 );
 ```
 
-The client resolves custom items via `CustomObjTypeLoader`, which wraps the base cache loader. No client-side changes needed — registered items appear in inventories, shops, and tooltips like any cache item.
+The client resolves custom items via `CustomObjTypeLoader` **after** the gamemode content packet has registered them. Without that packet, they exist only on the server.
 
 ### Custom Widgets
 
@@ -97,7 +99,7 @@ const widgetGroup = buildMyWidgetGroup(); // your widget definition
 CustomWidgetRegistry.register(widgetGroup);
 ```
 
-Custom widgets are serialized into the gamemode content data packet and delivered to the client at login.
+Custom widgets are included in the client payload only when the gamemode’s `getContentDataPacket()` serializes `CustomWidgetRegistry` (`leagues-v` does this).
 
 ### Content Data Packet
 

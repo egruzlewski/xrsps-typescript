@@ -1,0 +1,14 @@
+---
+description: Extrascripts are drop-in register() modules for any gamemode
+globs: server/extrascripts/**/*.ts
+alwaysApply: false
+---
+
+# Extrascripts (`server/extrascripts/{id}`)
+
+- Export `register(registry: IScriptRegistry, services: ScriptServices)` from `index.ts`. Discovery skips folders without that export.
+- Use extrascrpts for tools that should work on **any** gamemode. Server identity (XP, tutorial, progression) belongs in a gamemode.
+- Load order: gamemode `registerHandlers`, then extrascrpts. `ScriptRegistry` is newest-wins; wrap the previous handler if you must chain.
+- Canonical example: `server/extrascripts/item-spawner/`.
+- `SCRIPT_HOT_RELOAD=1` watches this directory only. Gamemodes do not hot-reload.
+- Custom items (50000+) registered here reach the **client** only if the running gamemode sends `getContentDataPacket()` (`leagues-v` does; `vanilla` does not).

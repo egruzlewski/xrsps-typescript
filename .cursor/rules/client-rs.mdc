@@ -1,0 +1,12 @@
+---
+description: client/rs is Jagex-port cache/engine code; mechanical changes only
+globs: client/rs/**/*.ts,client/rs/**/*.js
+alwaysApply: false
+---
+
+# `client/rs` (cache and engine ports)
+
+- This tree is a port of OSRS cache loaders, CS2, scene, and models. The server compiles much of it (`server/tsconfig.json` include, CS2 excluded).
+- Change it only to match cache/protocol behavior or to fix a proven loader bug. Do not rename, reformat, or “modernize” for style.
+- ESLint already relaxes unused-vars / eqeqeq here. Do not “fix” those to satisfy general TypeScript taste.
+- Client app behavior belongs in `client/game`, `client/network`, `client/widgets`, or `client/render`, not by wrapping new gameplay inside `rs/`.

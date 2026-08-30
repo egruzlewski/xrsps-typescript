@@ -1,0 +1,14 @@
+---
+description: Server engine (tick, packets, persistence) stays gamemode-agnostic
+globs: server/src/**/*.ts
+alwaysApply: false
+---
+
+# Server engine (`server/src`)
+
+- Keep this tree free of a specific gamemode’s content. Content and rules belong in `server/gamemodes/` or `server/extrascripts/`.
+- Tick interval is `config.tickMs` (default 600). Add work to the correct phase in `TickPhaseOrchestrator` / `TickPhaseService`, not “somewhere in the tick.”
+- After decode, messages are `RoutedMessage` objects handled by `MessageRouter`. The socket still sends **binary** (`BinaryProtocol` / `encodeMessage`). Do not add JSON text frames.
+- Opcodes live in `client/common` (`ClientPacketId`, `ServerPacketId`). Change those files when adding a packet; do not fork IDs in `server/src`.
+- Persistence goes through `PersistenceProvider`. Default store is `game.sqlite` via `getGamemodeDataDir(id)`.
+- Player actions go through `ActionScheduler` and tick `actions`/`combat` phases, not ad-hoc `setTimeout` gameplay.

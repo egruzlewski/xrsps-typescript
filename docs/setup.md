@@ -79,14 +79,11 @@ The server will:
 
 You should see log output confirming the server is ready.
 
-By default, the server runs the **vanilla** gamemode. To run a different gamemode:
+By default the **code** falls back to the **vanilla** gamemode. This repository’s `server/config.json` currently sets `"gamemode": "leagues-v"`. Override with:
 
 ```bash
-# Environment variable
-GAMEMODE=leagues-v yarn start
-
-# Or set it in server/config.json
-{ "gamemode": "leagues-v" }
+# Environment variable (wins over config.json)
+GAMEMODE=vanilla yarn start
 ```
 
 ## Client Startup

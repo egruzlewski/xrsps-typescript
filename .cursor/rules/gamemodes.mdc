@@ -1,0 +1,14 @@
+---
+description: Gamemode content extends vanilla; register via IScriptRegistry
+globs: server/gamemodes/**/*.ts
+alwaysApply: false
+---
+
+# Gamemodes (`server/gamemodes/{id}`)
+
+- A gamemode is a directory with `index.ts` exporting `createGamemode()`. `GamemodeRegistry` loads it by id (`GAMEMODE` / `server/config.json` / fallback `"vanilla"`).
+- Extend `VanillaGamemode` unless the server truly has no banking/skills/widgets. Extend `BaseGamemode` only for a from-scratch ruleset.
+- Register gameplay in `registerHandlers(registry, services)` using `IScriptRegistry` / `ScriptServices`. Do not import `wsServer` internals.
+- `registerHandlers` runs before extrascrpts; `initialize()` runs after. `leagues-v` builds `getContentDataPacket()` in `initialize()` so extrascrpt custom items are included.
+- Clone `vanilla/skills/` or `vanilla/quests/definitions/cooksAssistant/`, not a slice of `leagues-v` task/relic code, unless the change is league-specific.
+- `yarn --cwd server typecheck` does not cover most skill/content files here. Prefer a focused `server/tests/*.test.ts` run with `tsx`.

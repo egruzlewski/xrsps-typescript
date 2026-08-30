@@ -13,6 +13,7 @@ client/                 # @xrsps/client — browser CRA/craco app
   public/
   scripts/cache/        # Cache export tooling
   common/               # Shared protocol/types (imported by server)
+  custom/               # Custom items (IDs 50000+) shared with the server
   game/                 # Game domains: chat, combat, ecs, login, input, sync…
   render/               # WebGL + overlays
   widgets/              # Widget tree, CS2 glue, GL widget draw
@@ -37,7 +38,7 @@ docs/                   # @xrsps/docs — VitePress documentation
 
 Use `yarn setup` and `yarn start` from the repository root for local development. Package-specific commands can still be run from their package directory.
 
-Shared protocol/cache code lives in `client/common` and `client/rs`; the server TypeScript project includes those paths.
+Shared protocol/cache code lives in `client/common` and `client/rs` (server `tsconfig.json` includes those paths). Custom item builders live in `client/custom` and are imported by the server even though that folder is not in the server `include` list.
 
 ### Where code lives
 
@@ -50,12 +51,13 @@ Shared protocol/cache code lives in `client/common` and `client/rs`; the server 
 | **Gamemodes**    | `server/gamemodes/{id}/`    | Server identity — rules, progression, content handlers, providers. Each gamemode is a self-contained directory.   |
 | **Extrascripts** | `server/extrascripts/{id}/` | Universal modules that work on any server regardless of gamemode.                                                 |
 | **Common**       | `client/common/`            | Types, constants, and utilities used by both client and server.                                                   |
+| **Custom items** | `client/custom/`            | Item defs outside the cache (IDs 50000+); server also uses `server/src/custom/items/`.                            |
 
 ### Client code conventions
 
 Adopted from our Vite site discipline, adapted for a game client:
 
-- **File size:** Prefer **100–150** lines for app/domain code; **hard cap 400**. Exceptions: `client/rs/**` Jagex ports, generated/static data, opcode/ID tables, shaders.
+- **File size:** Prefer **100–150** lines for **new** app/domain modules. Treat **400** as a preference, not a reason to split existing ports. Exceptions: `client/rs/**`, generated/static data, opcode/ID tables, shaders, and large orchestrators (`client/game/OsrsClient.ts`).
 - **`client/common`:** Non-UI code shared by **2+** domains (or by client + server). Prefer extending shared helpers over rewriting.
 - **`client/components`:** React shell only. PascalCase folder = single component; lowercase folder = group with barrel; nested pieces under `ComponentName/components/`. Prefer `components/common` bases.
 - **Game domains** (`game/`, `render/`, `widgets/`): lowercase folders for groups (`chat/`, `combat/`); PascalCase files for one class/module (`EnterToTypeChat.ts`). Groups may use `index.ts` barrels when stable.
@@ -63,18 +65,18 @@ Adopted from our Vite site discipline, adapted for a game client:
 
 ## Game Loop
 
-The server runs a **600ms tick loop** — the same as OSRS. Each tick:
+The server tick interval is **`config.tickMs`**, default **600ms** (override with `TICK_MS`). `TickPhaseOrchestrator.processTick` (`server/src/game/tick/TickPhaseOrchestrator.ts`) runs:
 
-1. Process queued player actions (combat, skills, interactions)
-2. Tick NPCs (AI, combat, movement)
-3. Encode updates into binary packets
-4. Send sync packets to all connected clients
+1. Drain queued client packets (`client_input`)
+2. Snapshot the tick frame
+3. Phases, in order: `broadcast` → `pre_movement` → `movement` → `music` → `scripts` → `actions` → `combat` → `death` → `post_scripts` → `post_effects` → `orphaned_players` → `scheduled_scripts` → `broadcast_phase`
+4. Maybe autosave (`DEFAULT_AUTOSAVE_SECONDS` is 120, overridable with `PLAYER_AUTOSAVE_TICKS`)
 
-The client receives `PLAYER_SYNC` and `NPC_INFO` packets each tick, decodes them, and renders the updated world state on the next frame.
+The client decodes sync packets such as `PLAYER_SYNC` and `NPC_INFO` and renders on the next frame.
 
 ## Networking
 
-Communication is over **WebSocket** with a **binary protocol**. No JSON at runtime.
+Communication is over **WebSocket** with **binary frames** (`binaryType = "arraybuffer"`). Do not send JSON text frames. A few packets (notably `GAMEMODE_DATA`) carry compressed JSON *inside* the binary envelope.
 
 - Client packets: `client/common/network/ClientPacketId.ts`
 - Server packets: `client/common/packets/ServerPacketId.ts`
@@ -160,14 +162,14 @@ For backends that need setup/teardown (database connections), implement `Managed
 
 ## Custom Content
 
-Gamemodes and extrascripts can define content that doesn't exist in the OSRS cache. The custom content pipeline handles registration, serialization, and client-side resolution automatically.
+Gamemodes and extrascripts can define content that doesn't exist in the OSRS cache. Registration is process-wide on the server. Client delivery is **not** automatic: it requires `getContentDataPacket()`.
 
 ### Custom Items
 
 `CustomItemRegistry` (`client/custom/items/`) stores item definitions keyed by ID (50000+). Items can clone properties from existing cache items via `basedOn` and override specific fields.
 
-- **Server:** `ServerCustomItemRegistry` merges custom definitions with base cache lookups
-- **Client:** `CustomObjTypeLoader` wraps the base `ObjTypeLoader` and injects custom items transparently
+- **Server:** `CustomItemRegistry` holds definitions; `ServerCustomItemRegistry` (`server/src/custom/items/`) merges them into `ItemDefinition` lookups
+- **Client:** `CustomObjTypeLoader` wraps the base `ObjTypeLoader` after the login content packet has been applied
 
 ### Custom Widgets
 
@@ -175,9 +177,9 @@ Gamemodes and extrascripts can define content that doesn't exist in the OSRS cac
 
 ### Delivery
 
-Custom content reaches the client via the **gamemode content data packet** (`getContentDataPacket()` on `GamemodeDefinition`). The engine calls this during login and sends the result over WebSocket. The client unpacks it in `GamemodeContentStore` and re-registers items/widgets into their respective client-side registries.
+Custom content reaches the client via optional **`getContentDataPacket()`** on `GamemodeDefinition`. `LoginHandshakeService` sends the result during login. The client unpacks it in `GamemodeContentStore`.
 
-This is a generic pipeline — any gamemode can use it to deliver arbitrary datasets alongside custom items and widgets.
+Today **`leagues-v` implements this** (`LeagueContentProvider`). **`vanilla` does not.** Any gamemode can implement the same hook to deliver datasets, custom items, and custom widgets.
 
 ## Content Systems
 

@@ -1,0 +1,13 @@
+---
+description: Client app domains, React shell, and binary network
+globs: client/game/**/*.ts,client/game/**/*.tsx,client/components/**/*.ts,client/components/**/*.tsx,client/widgets/**/*.ts,client/widgets/**/*.tsx,client/render/**/*.ts,client/render/**/*.tsx,client/ui/**/*.ts,client/ui/**/*.tsx,client/network/**/*.ts,client/network/**/*.tsx
+alwaysApply: false
+---
+
+# Client app (not `rs/`)
+
+- WebSocket is binary (`binaryType = "arraybuffer"`). Encode with `client/network/packet`; decode with `ServerBinaryDecoder`.
+- `client/components`: React shell only (PascalCase folder = one component). Gameplay is not React.
+- Domain folders under `game/`, `render/`, `widgets/`: lowercase groups; PascalCase for a single class/module. Keep orchestrators (`OsrsClient`, renderer facades) as wiring; put new feature logic in a domain module.
+- Architecture prefers **100–150** lines for **new** domain files (hard preference 400). That is not a license to split existing ports such as `client/game/OsrsClient.ts`.
+- Drive OSRS widgets with varps/varbits from the server. Do not add a parallel JSON UI channel.

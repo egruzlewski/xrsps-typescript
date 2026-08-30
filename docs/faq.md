@@ -8,7 +8,7 @@ No. XRSPS is a self-hosted project — you clone the repo and run it locally. Se
 
 ### What cache version is supported?
 
-Check the `target.txt` file in the repo root for the current target. The cache is downloaded automatically from the OpenRS2 Archive.
+Check `server/target.txt` for the current cache target. The cache is downloaded automatically from the OpenRS2 Archive.
 
 ### Where can I see what's being worked on?
 
@@ -26,7 +26,7 @@ Extend **VanillaGamemode** unless you're building something radically different 
 
 ### How do I switch which gamemode the server runs?
 
-Set the `GAMEMODE` environment variable or add `"gamemode": "my-gamemode"` to `server/config.json`. The default is `vanilla`.
+Set the `GAMEMODE` environment variable or `"gamemode"` in `server/config.json`. Resolution is `process.env.GAMEMODE`, then `config.json`, then the code fallback `"vanilla"` (`server/src/config/index.ts`). The committed `server/config.json` in this repo currently selects `leagues-v`.
 
 ### Can I use vanilla's combat system without extending VanillaGamemode?
 
@@ -50,11 +50,11 @@ Use `CustomItemBuilder` and `CustomItemRegistry`. Custom items use IDs 50000+ an
 
 ### Do custom items work on any gamemode?
 
-Yes. `CustomItemRegistry` is a core system — both gamemodes and extrascripts can register items, and they're resolved automatically on both client and server.
+On the **server**, yes: `CustomItemRegistry` is process-wide. On the **client**, only if the running gamemode sends them through `getContentDataPacket()`. `leagues-v` does; `vanilla` currently does not.
 
 ### How does custom content reach the client?
 
-Via `getContentDataPacket()` on `GamemodeDefinition`. The engine sends this packet during login. The client unpacks it and registers items/widgets into their respective client-side registries. See [Architecture — Custom Content](ARCHITECTURE.md#custom-content).
+Via optional `getContentDataPacket()` on `GamemodeDefinition`. The engine sends that packet during login (`LoginHandshakeService`). The client unpacks it in `GamemodeContentStore`. See [Architecture — Custom Content](ARCHITECTURE.md#custom-content).
 
 ## Development
 
