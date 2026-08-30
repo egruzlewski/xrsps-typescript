@@ -1096,7 +1096,6 @@ export class OsrsClient {
             getVarManager: () => this.varManager,
             playerEcs: this.playerEcs,
             getControlledPlayerServerId: () => this.controlledPlayerServerId,
-            getCombatWeaponCategory: () => this.combatWeaponCategory,
         });
     }
 

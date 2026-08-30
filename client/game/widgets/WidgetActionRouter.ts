@@ -1,9 +1,7 @@
 import { sendWidgetAction } from "../../network/ServerConnection";
 import type { WidgetActionClientPayload } from "../../network/ServerConnection";
-import type { Cs2Vm, ScriptEvent } from "../../rs/cs2/Cs2Vm";
+import type { ScriptEvent } from "../../rs/cs2/Cs2Vm";
 import { createScriptEvent } from "../../rs/cs2/Cs2Vm";
-import type { VarManager } from "../../rs/config/vartype/VarManager";
-import type { Inventory } from "../../rs/inventory/Inventory";
 import type { WidgetManager } from "../../widgets/WidgetManager";
 import { shouldTransmitAction } from "../../widgets/WidgetFlags";
 import type { InputManager } from "../InputManager";

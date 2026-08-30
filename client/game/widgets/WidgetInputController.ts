@@ -1,6 +1,3 @@
-import type { WidgetManager } from "../../widgets/WidgetManager";
-import type { InputManager } from "../InputManager";
-import type { WidgetInteractionController } from "./WidgetInteractionController";
 import {
     isQuestListScrollbarWidget,
     processQuestListScrollbarInput,

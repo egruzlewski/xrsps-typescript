@@ -51,6 +51,10 @@
     "extends": [
       "react-app"
     ],
+    "ignorePatterns": [
+      "public/**",
+      "**/*.d.ts"
+    ],
     "overrides": [
       {
         "files": [

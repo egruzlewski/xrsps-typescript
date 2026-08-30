@@ -2,7 +2,6 @@ import { chatHistory } from "../../../rs/cs2/ChatHistory";
 import type { ScriptEvent } from "../../../rs/cs2/Cs2Vm";
 import { collectWidgetsWithKeyHandlers } from "../../../widgets/menu/utils";
 import type { WidgetInputControllerDeps, WidgetInputFrame } from "./widgetInputTypes";
-import type { WidgetInteractionController } from "../WidgetInteractionController";
 import type { WidgetManager } from "../../../widgets/WidgetManager";
 
 export function processWidgetKeyboardInput(

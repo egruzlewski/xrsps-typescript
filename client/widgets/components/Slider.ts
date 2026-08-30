@@ -59,7 +59,6 @@ export function computeSlider(
     const trackX = x + Math.floor((width - trackW) / 2);
 
     // Bobble position - first and last segments are end caps
-    const usableSegments = segmentCount - 2; // Exclude end caps
     const bobbleTrackStart = trackX + segW; // After left cap
     const bobbleTrackW = trackW - segW * 2; // Exclude both caps
 
@@ -141,15 +140,15 @@ export function drawSlider(
     // Draw track segments with exact OSRS pattern from CS2 scripts:
     // 0=left cap, 1=left notch, 3=middle (x5), 4=right notch, 5=right cap
     const trackPattern = [
-        "settings_slider,0", // position 0 - left cap
-        "settings_slider,1", // position 1 - left notch
-        "settings_slider,3", // position 2 - middle
-        "settings_slider,3", // position 3 - middle
-        "settings_slider,3", // position 4 - middle
-        "settings_slider,3", // position 5 - middle
-        "settings_slider,3", // position 6 - middle
-        "settings_slider,4", // position 7 - right notch
-        "settings_slider,5", // position 8 - right cap
+        sprites.leftCap,
+        sprites.leftNotch,
+        sprites.middle,
+        sprites.middle,
+        sprites.middle,
+        sprites.middle,
+        sprites.middle,
+        sprites.rightNotch,
+        sprites.rightCap,
     ];
 
     let curX = trackX;
@@ -175,7 +174,7 @@ export function drawSlider(
 
     // Draw tick marks at all value positions (0 through maxValue)
     // These are drawn ON TOP of the track using settings_slider,11
-    const tickSprite = resolve("settings_slider,11");
+    const tickSprite = resolve(sprites.tickMark);
     if (tickSprite && maxValue > 0) {
         for (let tickVal = 0; tickVal <= maxValue; tickVal++) {
             const tickX = bobbleAreaX + Math.floor((tickVal / maxValue) * bobbleRange);
@@ -193,11 +192,11 @@ export function drawSlider(
     // 6=normal, 7=disabled, 12=muted
     let bobbleSprite: Texture | undefined;
     if (muted) {
-        bobbleSprite = resolve("settings_slider,12"); // muted bobble
+        bobbleSprite = resolve(sprites.bobbleMuted);
     } else if (!enabled) {
-        bobbleSprite = resolve("settings_slider,7"); // disabled bobble
+        bobbleSprite = resolve(sprites.bobbleDisabled);
     } else {
-        bobbleSprite = resolve("settings_slider,6"); // normal/enabled bobble
+        bobbleSprite = resolve(sprites.bobble);
     }
 
     if (bobbleSprite) {
