@@ -43,7 +43,7 @@ Start here if you want a development path. Ordered roughly by “missing entire 
 
 - **Agility** — full Gnome Stronghold (110.5/lap), Barbarian Outpost (153.3 Agility + 41.3 Strength/lap), Wilderness (571.4/lap, dispenser tickets), Draynor Village rooftop (120/lap), Al Kharid rooftop (216/lap), Varrock rooftop (270/lap), and Canifis rooftop (240/lap; Marks of Grace not spawned). Other rooftops and courses still missing.
 - **Runecraft** — F2P plus members ruins altars (Air–Body, Cosmic, Chaos, Nature, Law, Death, Blood, Wrath), walk-up Astral (Lunar Diplomacy is not registered, so no quest lock), walk-up Kourend Blood and Arceuus Soul (dark essence fragments; dense mine / Dark Altar / chisel skipped), combination runes (Mist–Lava; 50% bind per essence, 100% with a worn binding necklace 5521 that spends 1 of 16 charges per craft), and tiara imbuing at those ruins altars. The Abyss is still missing.
-- **Crafting** — flax, shearing, spinning, jewellery (gold/silver + gems including onyx/zenyte), gem cutting (opal/jade/topaz crush chance), leather/dragonhide/snakeskin armour, pottery, glassblowing, battlestaves (charged orb + staff), weaving (loom: cloth/sack/basket/drift net/fabric bolts). Silver gem jewellery (opal/jade/topaz) still missing.
+- **Crafting** — flax, shearing, spinning, jewellery (gold/silver + gems including onyx/zenyte and opal/jade/topaz), gem cutting (opal/jade/topaz crush chance), leather/dragonhide/snakeskin armour, pottery, glassblowing, battlestaves (charged orb + staff), weaving (loom: cloth/sack/basket/drift net/fabric bolts).
 - **Sailing** — engine world-views + Pandemonium content, not a full skill.
 - **World content** — hubs listed under vanilla scripts, not the whole map. Unscripted locs/NPCs fall through to default talk / nothing interesting.
 - **Quests** — 64 registered. Ten of those are compressed “preservation remainder” implementations, not full-folder ports. Many later F2P/P2P quests are absent entirely.
@@ -361,7 +361,7 @@ Combat skills (Attack, Strength, Defence, Hitpoints, Ranged, Magic) are **engine
 | Fletching | Partial | [`skills/fletching/`](../server/gamemodes/vanilla/skills/fletching/) | Logs + stringing + combine recipes | [`fletching-handler-registration.test.ts`](../server/tests/fletching-handler-registration.test.ts) |
 | Fishing | Partial | [`skills/fishing/`](../server/gamemodes/vanilla/skills/fishing/) | Spots/methods/tools, minnows, echo harpoon IDs | Missing spots |
 | Firemaking | Partial | [`skills/firemaking/`](../server/gamemodes/vanilla/skills/firemaking/) | Tinderbox + log defs, ash | — |
-| Crafting | Partial | [`skills/crafting/`](../server/gamemodes/vanilla/skills/crafting/) | flax, shearing, spinning, jewellery (gold/silver + gems including onyx/zenyte), gem cutting (opal/jade/topaz crush chance), leather/dragonhide/snakeskin armour, pottery, glassblowing, battlestaves (charged orb + staff), weaving (loom: cloth/sack/basket/drift net/fabric bolts). [`crafting-jewellery-leather.test.ts`](../server/tests/crafting-jewellery-leather.test.ts), [`crafting-pottery-glassblowing.test.ts`](../server/tests/crafting-pottery-glassblowing.test.ts), [`crafting-battlestaves.test.ts`](../server/tests/crafting-battlestaves.test.ts), [`crafting-weaving.test.ts`](../server/tests/crafting-weaving.test.ts) | Silver gem jewellery (opal/jade/topaz) |
+| Crafting | Partial | [`skills/crafting/`](../server/gamemodes/vanilla/skills/crafting/) | flax, shearing, spinning, jewellery (gold/silver + gems including onyx/zenyte and opal/jade/topaz), gem cutting (opal/jade/topaz crush chance), leather/dragonhide/snakeskin armour, pottery, glassblowing, battlestaves (charged orb + staff), weaving (loom: cloth/sack/basket/drift net/fabric bolts). [`crafting-jewellery-leather.test.ts`](../server/tests/crafting-jewellery-leather.test.ts), [`crafting-pottery-glassblowing.test.ts`](../server/tests/crafting-pottery-glassblowing.test.ts), [`crafting-battlestaves.test.ts`](../server/tests/crafting-battlestaves.test.ts), [`crafting-weaving.test.ts`](../server/tests/crafting-weaving.test.ts) | Exotic leftovers (unholy symbols, conducting rods) |
 | Smithing | Partial | smelt + smith UI/modals | Data-driven bars/items | Remaining recipes |
 | Mining | Partial | [`skills/mining/`](../server/gamemodes/vanilla/skills/mining/) | Rock loc map, pickaxes | Missing rocks |
 | Herblore | Partial | clean / unf / finish / stamina | Data lists in `herblore/index.ts` | Missing potions |
@@ -584,7 +584,7 @@ There are ~90 individual test files: heavy on quests and combat specials; light 
 ## Suggested development order (from this audit)
 
 1. Decide whether **remainder quests** stay compressed or get full ports.
-2. Fill **skill holes you care about first** (Crafting still lacks silver gem jewellery (opal/jade/topaz); Slayer/Hunter/Farming/Construction are absent).
+2. Fill **skill holes you care about first** (Slayer/Hunter/Farming/Construction are absent).
 3. **World scripts** for hubs you actually play (default talk is the symptom of missing loc/NPC handlers).
 4. **Boss scripts**: implement or unregister Zulrah empty venom/snakeling mechanics (Mole dig is wired).
 5. **Protocol**: opcode 50 / `OPNPC5` is decoded; unused `MAP_EDIT` (195) was removed.

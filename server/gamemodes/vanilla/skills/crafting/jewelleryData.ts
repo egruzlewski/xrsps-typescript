@@ -86,13 +86,13 @@ export interface AmuletStringRecipe {
     delayTicks: number;
 }
 
-type GoldShapeSeed = {
+type JewelleryShapeSeed = {
     shape: JewelleryShape;
     mouldItemId: number;
     noun: string;
 };
 
-const GOLD_SHAPES: GoldShapeSeed[] = [
+const JEWELLERY_SHAPES: JewelleryShapeSeed[] = [
     { shape: "ring", mouldItemId: RING_MOULD_ITEM_ID, noun: "ring" },
     { shape: "necklace", mouldItemId: NECKLACE_MOULD_ITEM_ID, noun: "necklace" },
     { shape: "bracelet", mouldItemId: BRACELET_MOULD_ITEM_ID, noun: "bracelet" },
@@ -174,27 +174,73 @@ const GOLD_GEM_SEEDS: GemSeed[] = [
     },
 ];
 
-const GOLD_RECIPES: JewelleryRecipe[] = GOLD_GEM_SEEDS.flatMap((gem) =>
-    GOLD_SHAPES.map((shape) => ({
-        id: `${gem.key}_${shape.shape}`,
-        name:
-            gem.key === "gold"
-                ? `gold ${shape.noun}`
-                : shape.shape === "amulet"
-                  ? `${gem.adjective} amulet`
-                  : `${gem.adjective} ${shape.noun}`,
-        barItemId: GOLD_BAR_ITEM_ID,
-        mouldItemId: shape.mouldItemId,
-        gemItemId: gem.gemItemId,
-        productItemId: gem.products[shape.shape],
-        level: gem.levels[shape.shape],
-        xp: gem.xp[shape.shape],
-        animation: JEWELLERY_FURNACE_ANIMATION_ID,
-        delayTicks: JEWELLERY_DELAY_TICKS,
-    })),
+/** Silver bar + cut opal/jade/red topaz (OSRS silver gem jewellery). */
+const SILVER_GEM_SEEDS: GemSeed[] = [
+    {
+        key: "opal",
+        adjective: "opal",
+        gemItemId: 1609,
+        levels: { ring: 1, necklace: 16, bracelet: 22, amulet: 27 },
+        xp: { ring: 10, necklace: 35, bracelet: 45, amulet: 55 },
+        products: { ring: 21081, necklace: 21090, bracelet: 21117, amulet: 21099 },
+    },
+    {
+        key: "jade",
+        adjective: "jade",
+        gemItemId: 1611,
+        levels: { ring: 13, necklace: 25, bracelet: 29, amulet: 34 },
+        xp: { ring: 32, necklace: 54, bracelet: 60, amulet: 70 },
+        products: { ring: 21084, necklace: 21093, bracelet: 21120, amulet: 21102 },
+    },
+    {
+        key: "topaz",
+        adjective: "topaz",
+        gemItemId: 1613,
+        levels: { ring: 16, necklace: 32, bracelet: 38, amulet: 45 },
+        xp: { ring: 35, necklace: 70, bracelet: 75, amulet: 80 },
+        products: { ring: 21087, necklace: 21096, bracelet: 21123, amulet: 21105 },
+    },
+];
+
+function recipesFromGemSeeds(
+    seeds: GemSeed[],
+    barItemId: number,
+    plainKey?: string,
+): JewelleryRecipe[] {
+    return seeds.flatMap((gem) =>
+        JEWELLERY_SHAPES.map((shape) => ({
+            id: `${gem.key}_${shape.shape}`,
+            name:
+                gem.key === plainKey
+                    ? `${gem.adjective} ${shape.noun}`
+                    : shape.shape === "amulet"
+                      ? `${gem.adjective} amulet`
+                      : `${gem.adjective} ${shape.noun}`,
+            barItemId,
+            mouldItemId: shape.mouldItemId,
+            gemItemId: gem.gemItemId,
+            productItemId: gem.products[shape.shape],
+            level: gem.levels[shape.shape],
+            xp: gem.xp[shape.shape],
+            animation: JEWELLERY_FURNACE_ANIMATION_ID,
+            delayTicks: JEWELLERY_DELAY_TICKS,
+        })),
+    );
+}
+
+const GOLD_RECIPES: JewelleryRecipe[] = recipesFromGemSeeds(
+    GOLD_GEM_SEEDS,
+    GOLD_BAR_ITEM_ID,
+    "gold",
+);
+
+const SILVER_GEM_RECIPES: JewelleryRecipe[] = recipesFromGemSeeds(
+    SILVER_GEM_SEEDS,
+    SILVER_BAR_ITEM_ID,
 );
 
 const SILVER_RECIPES: JewelleryRecipe[] = [
+    ...SILVER_GEM_RECIPES,
     {
         id: "unstrung_symbol",
         name: "unstrung symbol",
@@ -428,6 +474,36 @@ export const AMULET_STRING_RECIPES: AmuletStringRecipe[] = [
         unstrungItemId: 19501,
         productItemId: 19541,
         level: 98,
+        xp: 4,
+        animation: AMULET_STRING_ANIMATION_ID,
+        delayTicks: AMULET_STRING_DELAY_TICKS,
+    },
+    {
+        id: "string_opal_amulet",
+        name: "opal amulet",
+        unstrungItemId: 21099,
+        productItemId: 21108,
+        level: 27,
+        xp: 4,
+        animation: AMULET_STRING_ANIMATION_ID,
+        delayTicks: AMULET_STRING_DELAY_TICKS,
+    },
+    {
+        id: "string_jade_amulet",
+        name: "jade amulet",
+        unstrungItemId: 21102,
+        productItemId: 21111,
+        level: 34,
+        xp: 4,
+        animation: AMULET_STRING_ANIMATION_ID,
+        delayTicks: AMULET_STRING_DELAY_TICKS,
+    },
+    {
+        id: "string_topaz_amulet",
+        name: "topaz amulet",
+        unstrungItemId: 21105,
+        productItemId: 21114,
+        level: 45,
         xp: 4,
         animation: AMULET_STRING_ANIMATION_ID,
         delayTicks: AMULET_STRING_DELAY_TICKS,

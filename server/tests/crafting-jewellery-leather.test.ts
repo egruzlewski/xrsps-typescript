@@ -22,12 +22,16 @@ import {
     GOLD_BAR_ITEM_ID,
     ONYX_ITEM_ID,
     RING_MOULD_ITEM_ID,
+    NECKLACE_MOULD_ITEM_ID,
     BRACELET_MOULD_ITEM_ID,
+    AMULET_MOULD_ITEM_ID,
+    SILVER_BAR_ITEM_ID,
     UNCUT_ONYX_ITEM_ID,
     UNCUT_ZENYTE_ITEM_ID,
     ZENYTE_FUSE_RECIPE,
     ZENYTE_ITEM_ID,
     ZENYTE_SHARD_ITEM_ID,
+    getAmuletStringRecipeById,
     getGemCutRecipeByUncutId,
     getJewelleryRecipeById,
     getZenyteFuseRecipeById,
@@ -58,6 +62,15 @@ const ZENYTE_AMULET_U = 19501;
 const ZENYTE_AMULET = 19541;
 const UNCUT_OPAL = 1625;
 const OPAL = 1609;
+const JADE = 1611;
+const RED_TOPAZ = 1613;
+const OPAL_RING = 21081;
+const JADE_NECKLACE = 21093;
+const TOPAZ_BRACELET = 21123;
+const OPAL_AMULET_U = 21099;
+const OPAL_AMULET = 21108;
+const JADE_AMULET_U = 21102;
+const TOPAZ_AMULET_U = 21105;
 const LEATHER_GLOVES = 1059;
 const GREEN_D_LEATHER = 1745;
 const GREEN_DHIDE_BODY = 1135;
@@ -141,6 +154,144 @@ assert(zenyteAmulet);
 assert.equal(zenyteAmulet.productItemId, ZENYTE_AMULET_U);
 assert.equal(zenyteAmulet.level, 98);
 assert.equal(zenyteAmulet.xp, 200);
+
+const silverGemPieces = [
+    {
+        id: "opal_ring",
+        product: OPAL_RING,
+        gem: OPAL,
+        bar: SILVER_BAR_ITEM_ID,
+        mould: RING_MOULD_ITEM_ID,
+        level: 1,
+        xp: 10,
+    },
+    {
+        id: "opal_necklace",
+        product: 21090,
+        gem: OPAL,
+        bar: SILVER_BAR_ITEM_ID,
+        mould: NECKLACE_MOULD_ITEM_ID,
+        level: 16,
+        xp: 35,
+    },
+    {
+        id: "opal_bracelet",
+        product: 21117,
+        gem: OPAL,
+        bar: SILVER_BAR_ITEM_ID,
+        mould: BRACELET_MOULD_ITEM_ID,
+        level: 22,
+        xp: 45,
+    },
+    {
+        id: "opal_amulet",
+        product: OPAL_AMULET_U,
+        gem: OPAL,
+        bar: SILVER_BAR_ITEM_ID,
+        mould: AMULET_MOULD_ITEM_ID,
+        level: 27,
+        xp: 55,
+    },
+    {
+        id: "jade_ring",
+        product: 21084,
+        gem: JADE,
+        bar: SILVER_BAR_ITEM_ID,
+        mould: RING_MOULD_ITEM_ID,
+        level: 13,
+        xp: 32,
+    },
+    {
+        id: "jade_necklace",
+        product: JADE_NECKLACE,
+        gem: JADE,
+        bar: SILVER_BAR_ITEM_ID,
+        mould: NECKLACE_MOULD_ITEM_ID,
+        level: 25,
+        xp: 54,
+    },
+    {
+        id: "jade_bracelet",
+        product: 21120,
+        gem: JADE,
+        bar: SILVER_BAR_ITEM_ID,
+        mould: BRACELET_MOULD_ITEM_ID,
+        level: 29,
+        xp: 60,
+    },
+    {
+        id: "jade_amulet",
+        product: JADE_AMULET_U,
+        gem: JADE,
+        bar: SILVER_BAR_ITEM_ID,
+        mould: AMULET_MOULD_ITEM_ID,
+        level: 34,
+        xp: 70,
+    },
+    {
+        id: "topaz_ring",
+        product: 21087,
+        gem: RED_TOPAZ,
+        bar: SILVER_BAR_ITEM_ID,
+        mould: RING_MOULD_ITEM_ID,
+        level: 16,
+        xp: 35,
+    },
+    {
+        id: "topaz_necklace",
+        product: 21096,
+        gem: RED_TOPAZ,
+        bar: SILVER_BAR_ITEM_ID,
+        mould: NECKLACE_MOULD_ITEM_ID,
+        level: 32,
+        xp: 70,
+    },
+    {
+        id: "topaz_bracelet",
+        product: TOPAZ_BRACELET,
+        gem: RED_TOPAZ,
+        bar: SILVER_BAR_ITEM_ID,
+        mould: BRACELET_MOULD_ITEM_ID,
+        level: 38,
+        xp: 75,
+    },
+    {
+        id: "topaz_amulet",
+        product: TOPAZ_AMULET_U,
+        gem: RED_TOPAZ,
+        bar: SILVER_BAR_ITEM_ID,
+        mould: AMULET_MOULD_ITEM_ID,
+        level: 45,
+        xp: 80,
+    },
+] as const;
+for (const piece of silverGemPieces) {
+    const recipe = getJewelleryRecipeById(piece.id);
+    assert(recipe, `expected jewellery recipe ${piece.id}`);
+    assert.equal(recipe.productItemId, piece.product);
+    assert.equal(recipe.gemItemId, piece.gem);
+    assert.equal(recipe.barItemId, piece.bar);
+    assert.equal(recipe.mouldItemId, piece.mould);
+    assert.equal(recipe.level, piece.level);
+    assert.equal(recipe.xp, piece.xp);
+}
+
+const stringOpal = getAmuletStringRecipeById("string_opal_amulet");
+assert(stringOpal);
+assert.equal(stringOpal.unstrungItemId, OPAL_AMULET_U);
+assert.equal(stringOpal.productItemId, OPAL_AMULET);
+assert.equal(stringOpal.level, 27);
+assert.equal(stringOpal.xp, 4);
+
+const stringJade = getAmuletStringRecipeById("string_jade_amulet");
+assert(stringJade);
+assert.equal(stringJade.unstrungItemId, JADE_AMULET_U);
+assert.equal(stringJade.productItemId, 21111);
+
+const stringTopaz = getAmuletStringRecipeById("string_topaz_amulet");
+assert(stringTopaz);
+assert.equal(stringTopaz.unstrungItemId, TOPAZ_AMULET_U);
+assert.equal(stringTopaz.productItemId, 21114);
 
 const cutOnyx = getGemCutRecipeByUncutId(UNCUT_ONYX_ITEM_ID);
 assert(cutOnyx);
@@ -404,6 +555,7 @@ function useOnItem(first: number, second: number) {
 registerCrafting(registry, services);
 
 assert(itemOnLoc.has(`${GOLD_BAR_ITEM_ID}:-1`), "gold bar should register on any furnace loc");
+assert(itemOnLoc.has(`${SILVER_BAR_ITEM_ID}:-1`), "silver bar should register on any furnace loc");
 assert(itemOnLoc.has(`${RING_MOULD_ITEM_ID}:-1`), "ring mould should register on any furnace loc");
 assert(itemOnItem.has(`${CHISEL_ITEM_ID}:${UNCUT_SAPPHIRE}`));
 assert(itemOnItem.has(`${CHISEL_ITEM_ID}:${UNCUT_ONYX_ITEM_ID}`));
@@ -412,6 +564,9 @@ assert(itemOnItem.has(`${CHISEL_ITEM_ID}:${UNCUT_OPAL}`));
 assert(itemOnItem.has(`${ZENYTE_SHARD_ITEM_ID}:${ONYX_ITEM_ID}`));
 assert(itemOnItem.has(`${BALL_OF_WOOL_ITEM_ID}:${ONYX_AMULET_U}`));
 assert(itemOnItem.has(`${BALL_OF_WOOL_ITEM_ID}:${ZENYTE_AMULET_U}`));
+assert(itemOnItem.has(`${BALL_OF_WOOL_ITEM_ID}:${OPAL_AMULET_U}`));
+assert(itemOnItem.has(`${BALL_OF_WOOL_ITEM_ID}:${JADE_AMULET_U}`));
+assert(itemOnItem.has(`${BALL_OF_WOOL_ITEM_ID}:${TOPAZ_AMULET_U}`));
 assert(itemOnItem.has(`${NEEDLE_ITEM_ID}:${LEATHER_ITEM_ID}`));
 assert(itemOnItem.has(`${NEEDLE_ITEM_ID}:${SNAKESKIN_ITEM_ID}`));
 assert(itemOnItem.has(`${BALL_OF_WOOL_ITEM_ID}:${GOLD_AMULET_U}`));
@@ -587,6 +742,76 @@ resetState(99, [
 ]);
 runAction("skill.string_amulet", { recipeId: "string_zenyte_amulet", count: 1 });
 assert.equal(count(ZENYTE_AMULET), 1);
+assert.deepEqual(xp, [4]);
+
+resetState(1, [
+    { itemId: SILVER_BAR_ITEM_ID, quantity: 1 },
+    { itemId: RING_MOULD_ITEM_ID, quantity: 1 },
+    { itemId: OPAL, quantity: 1 },
+]);
+useOnLoc(SILVER_BAR_ITEM_ID, FURNACE_LOC);
+assert.equal(skillMultis.length, 1);
+assert(skillMultis[0].products.some((product) => product.itemId === OPAL_RING));
+assert(!skillMultis[0].products.some((product) => product.itemId === GOLD_RING));
+
+resetState(1, [
+    { itemId: SILVER_BAR_ITEM_ID, quantity: 1 },
+    { itemId: NECKLACE_MOULD_ITEM_ID, quantity: 1 },
+    { itemId: OPAL, quantity: 1 },
+]);
+useOnLoc(SILVER_BAR_ITEM_ID, FURNACE_LOC);
+assert.equal(skillMultis.length, 0);
+assert.match(messages[0] ?? "", /Crafting level 16/);
+
+resetState(99, [
+    { itemId: SILVER_BAR_ITEM_ID, quantity: 1 },
+    { itemId: RING_MOULD_ITEM_ID, quantity: 1 },
+    { itemId: OPAL, quantity: 1 },
+]);
+runAction("skill.jewellery", { recipeId: "opal_ring", count: 1 });
+assert.equal(count(OPAL_RING), 1);
+assert.equal(count(SILVER_BAR_ITEM_ID), 0);
+assert.equal(count(OPAL), 0);
+assert.equal(count(RING_MOULD_ITEM_ID), 1);
+assert.deepEqual(xp, [10]);
+
+resetState(99, [
+    { itemId: SILVER_BAR_ITEM_ID, quantity: 1 },
+    { itemId: NECKLACE_MOULD_ITEM_ID, quantity: 1 },
+    { itemId: JADE, quantity: 1 },
+]);
+runAction("skill.jewellery", { recipeId: "jade_necklace", count: 1 });
+assert.equal(count(JADE_NECKLACE), 1);
+assert.deepEqual(xp, [54]);
+
+resetState(99, [
+    { itemId: SILVER_BAR_ITEM_ID, quantity: 1 },
+    { itemId: BRACELET_MOULD_ITEM_ID, quantity: 1 },
+    { itemId: RED_TOPAZ, quantity: 1 },
+]);
+runAction("skill.jewellery", { recipeId: "topaz_bracelet", count: 1 });
+assert.equal(count(TOPAZ_BRACELET), 1);
+assert.deepEqual(xp, [75]);
+
+resetState(99, [
+    { itemId: SILVER_BAR_ITEM_ID, quantity: 1 },
+    { itemId: AMULET_MOULD_ITEM_ID, quantity: 1 },
+    { itemId: OPAL, quantity: 1 },
+]);
+runAction("skill.jewellery", { recipeId: "opal_amulet", count: 1 });
+assert.equal(count(OPAL_AMULET_U), 1);
+assert.deepEqual(xp, [55]);
+
+resetState(99, [
+    { itemId: OPAL_AMULET_U, quantity: 1 },
+    { itemId: BALL_OF_WOOL_ITEM_ID, quantity: 1 },
+]);
+useOnItem(OPAL_AMULET_U, BALL_OF_WOOL_ITEM_ID);
+assert.equal(actions[0]?.kind, "skill.string_amulet");
+runAction("skill.string_amulet", { recipeId: "string_opal_amulet", count: 1 });
+assert.equal(count(OPAL_AMULET), 1);
+assert.equal(count(OPAL_AMULET_U), 0);
+assert.equal(count(BALL_OF_WOOL_ITEM_ID), 0);
 assert.deepEqual(xp, [4]);
 
 {
