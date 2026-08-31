@@ -3,8 +3,6 @@ import type { WebSocket } from "ws";
 import { SkillId } from "../../../../client/rs/skill/skills";
 import { resolveSelectedSpellPayload } from "../../../../client/common/spells/selectedSpellPayload";
 import { SPELL_BUTTON_PARAM_ID } from "../../data/spellWidgetLoader";
-import { getItemDefinition } from "../../data/items";
-import { logger } from "../../utils/logger";
 import type { ServerServices } from "../ServerServices";
 import type { PlayerState } from "../player";
 import { SpellCaster } from "../spells/SpellCaster";
@@ -119,97 +117,6 @@ export class SpellCastingService {
             }
         }
 
-        const HIGH_ALCH_ID = 9111;
-        const LOW_ALCH_ID = 9110;
-        const COINS_ID = 995;
-
-        if (spellId === HIGH_ALCH_ID || spellId === LOW_ALCH_ID) {
-            const itemDef = getItemDefinition(targetItemId);
-            if (!itemDef) {
-                this.svc.messagingService.queueChatMessage({
-                    messageType: "game",
-                    playerId: player.id,
-                    text: "You cannot alchemise this item.",
-                });
-                this.sendSpellFailure(player, spellId, "alch_invalid_item");
-                return;
-            }
-
-            const alchValue = spellId === HIGH_ALCH_ID ? itemDef.highAlch : itemDef.lowAlch;
-            if (alchValue <= 0) {
-                this.svc.messagingService.queueChatMessage({
-                    messageType: "game",
-                    playerId: player.id,
-                    text: "You cannot alchemise this item.",
-                });
-                this.sendSpellFailure(player, spellId, "alch_invalid_item");
-                return;
-            }
-
-            if (targetItemId === COINS_ID) {
-                this.svc.messagingService.queueChatMessage({
-                    messageType: "game",
-                    playerId: player.id,
-                    text: "You cannot alchemise coins.",
-                });
-                this.sendSpellFailure(player, spellId, "alch_invalid_item");
-                return;
-            }
-
-            if (spellData.runeCosts) {
-                const outcome = SpellCaster.execute(
-                    { player, spellId },
-                    { success: true, spellData },
-                );
-                if (!outcome.success) {
-                    this.sendSpellFailure(player, spellId, "out_of_runes");
-                    return;
-                }
-            }
-
-            if (invSlot.quantity > 1) {
-                this.svc.inventoryService.setInventorySlot(
-                    player,
-                    slot,
-                    targetItemId,
-                    invSlot.quantity - 1,
-                );
-            } else {
-                this.svc.inventoryService.setInventorySlot(player, slot, 0, 0);
-            }
-
-            this.svc.inventoryService.addItemToInventory(player, COINS_ID, alchValue);
-
-            const xpAward = spellId === HIGH_ALCH_ID ? 65 : 31;
-            this.svc.skillService.awardSkillXp(player, SkillId.Magic, xpAward);
-
-            const animId = spellId === HIGH_ALCH_ID ? 713 : 712;
-            player.queueOneShotSeq(animId);
-            const tick = this.svc.activeFrame?.tick ?? this.svc.ticker.currentTick();
-            this.svc.broadcastService.enqueueSpotAnimation({
-                tick: tick,
-                playerId: player.id,
-                spotId: spellData.castSpotAnim ?? 113,
-                delay: 0,
-                height: 100,
-            });
-
-            const sock = this.svc.players?.getSocketByPlayerId(player.id);
-            if (sock) this.svc.inventoryService.sendInventorySnapshot(sock, player);
-
-            this.svc.broadcastService.queueSpellResult(player.id, {
-                casterId: player.id,
-                spellId: spellId,
-                outcome: "success",
-                targetType: "item",
-            });
-
-            logger.info(
-                `[magic] Player ${player.id} cast ${spellData.name} on item ${targetItemId} for ${alchValue} coins`,
-            );
-            return;
-        }
-
         const invSpellHandler = this.svc.scriptRegistry?.findSpellOnItem(spellId);
         if (invSpellHandler) {
             const services = this.svc.scriptRuntime?.getServices();
@@ -321,6 +228,9 @@ export class SpellCastingService {
                 break;
             case "alch_invalid_item":
                 text = "You cannot alchemise this item.";
+                break;
+            case "alch_coins":
+                text = "Coins are already made of gold.";
                 break;
             case "superheat_invalid_item":
                 text = "You need to cast superheat item on ore.";

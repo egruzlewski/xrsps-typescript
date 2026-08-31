@@ -415,6 +415,7 @@ const ENTRIES: SpellDataEntry[] = [
         baseMaxHit: 0,
         castSpotAnim: 112,
         levelRequired: 21,
+        experienceGained: 31,
         spellbook: "standard",
         category: "utility",
         runeCosts: [
@@ -428,6 +429,7 @@ const ENTRIES: SpellDataEntry[] = [
         baseMaxHit: 0,
         castSpotAnim: 113,
         levelRequired: 55,
+        experienceGained: 65,
         spellbook: "standard",
         category: "utility",
         runeCosts: [

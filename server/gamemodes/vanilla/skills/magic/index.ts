@@ -1,4 +1,5 @@
 import type { IScriptRegistry, ScriptServices } from "../../../../src/game/scripts/types";
+import { register as registerAlchemy } from "./alchemy";
 import { register as registerBonesToBananas } from "./bonesToBananas";
 import { register as registerChargeOrb } from "./chargeOrb";
 import { register as registerEnchantJewellery } from "./enchantJewellery";
@@ -9,4 +10,5 @@ export function register(registry: IScriptRegistry, services: ScriptServices): v
     registerEnchantJewellery(registry, services);
     registerSuperheatItem(registry, services);
     registerBonesToBananas(registry, services);
+    registerAlchemy(registry, services);
 }
