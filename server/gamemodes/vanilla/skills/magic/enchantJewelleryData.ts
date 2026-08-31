@@ -1,6 +1,8 @@
 // Enchant Lvl-1–7 Jewellery. Spell object IDs from the OSRS cache spell items
-// (`_07_ENCHANT_AMULET_LVL1` … `_93_ENCHANT_AMULET_LVL7`). Gold jewellery only
-// (sapphire through onyx, plus zenyte as Lvl-7). Strung amulets, not (u).
+// (`_07_ENCHANT_AMULET_LVL1` … `_93_ENCHANT_AMULET_LVL7`). Gold jewellery
+// (sapphire through onyx, plus zenyte as Lvl-7) and silver jewellery on the
+// same Lvl-1–3 spells (opal / jade / red topaz). Strung amulets, not (u).
+// Charged silver products use the full-charge id (returning/passage/burning 5).
 
 export const COSMIC_RUNE_ID = 564;
 export const WATER_RUNE_ID = 555;
@@ -172,18 +174,30 @@ export const ENCHANT_JEWELLERY_RECIPES: readonly EnchantJewelleryRecipe[] = [
         ["sapphire_necklace", "sapphire necklace", 1656, 3853],
         ["sapphire_bracelet", "sapphire bracelet", 11072, 11074],
         ["sapphire_amulet", "sapphire amulet", 1694, 1727],
+        ["opal_ring", "opal ring", 21081, 21126],
+        ["opal_necklace", "opal necklace", 21090, 21143],
+        ["opal_bracelet", "opal bracelet", 21117, 21177],
+        ["opal_amulet", "opal amulet", 21108, 21160],
     ]),
     ...recipesFor(ENCHANT_LVL2_SPELL_ID, [
         ["emerald_ring", "emerald ring", 1639, 2552],
         ["emerald_necklace", "emerald necklace", 1658, 5521],
         ["emerald_bracelet", "emerald bracelet", 11076, 11079],
         ["emerald_amulet", "emerald amulet", 1696, 1729],
+        ["jade_ring", "jade ring", 21084, 21129],
+        ["jade_necklace", "jade necklace", 21093, 21146],
+        ["jade_bracelet", "jade bracelet", 21120, 21180],
+        ["jade_amulet", "jade amulet", 21111, 21163],
     ]),
     ...recipesFor(ENCHANT_LVL3_SPELL_ID, [
         ["ruby_ring", "ruby ring", 1641, 2568],
         ["ruby_necklace", "ruby necklace", 1660, 11194],
         ["ruby_bracelet", "ruby bracelet", 11085, 11088],
         ["ruby_amulet", "ruby amulet", 1698, 1725],
+        ["topaz_ring", "topaz ring", 21087, 21140],
+        ["topaz_necklace", "topaz necklace", 21096, 21157],
+        ["topaz_bracelet", "topaz bracelet", 21123, 21183],
+        ["topaz_amulet", "topaz amulet", 21114, 21166],
     ]),
     ...recipesFor(ENCHANT_LVL4_SPELL_ID, [
         ["diamond_ring", "diamond ring", 1643, 2570],

@@ -378,4 +378,96 @@ assert.equal(countItem(2550), 1);
 assert.equal(countItem(1637), 1);
 assert.equal(actions.some((action) => action.kind === "skill.enchant_jewellery"), true);
 
+assert.equal(getEnchantJewelleryRecipe(ENCHANT_LVL1_SPELL_ID, 21081)?.productItemId, 21126);
+assert.equal(getEnchantJewelleryRecipe(ENCHANT_LVL2_SPELL_ID, 21084)?.productItemId, 21129);
+assert.equal(getEnchantJewelleryRecipe(ENCHANT_LVL3_SPELL_ID, 21087)?.productItemId, 21140);
+assert.equal(getEnchantJewelleryRecipe(ENCHANT_LVL1_SPELL_ID, 21099), undefined);
+assert.equal(getEnchantJewelleryRecipe(ENCHANT_LVL2_SPELL_ID, 21081), undefined);
+
+resetState(99, [
+    { itemId: 21081, quantity: 1 },
+    { itemId: COSMIC_RUNE_ID, quantity: 1 },
+    { itemId: WATER_RUNE_ID, quantity: 1 },
+]);
+castOnItem(ENCHANT_LVL1_SPELL_ID, 0, 21081);
+runAction("skill.enchant_jewellery", { recipeId: "opal_ring", count: 1, preferredSlot: 0 });
+assert.equal(countItem(21126), 1);
+assert.equal(countItem(21081), 0);
+assert.deepEqual(xp, [17.5]);
+
+resetState(99, [
+    { itemId: 21090, quantity: 1 },
+    { itemId: COSMIC_RUNE_ID, quantity: 1 },
+    { itemId: WATER_RUNE_ID, quantity: 1 },
+]);
+castOnItem(ENCHANT_LVL1_SPELL_ID, 0, 21090);
+runAction("skill.enchant_jewellery", { recipeId: "opal_necklace", count: 1, preferredSlot: 0 });
+assert.equal(countItem(21143), 1);
+
+resetState(99, [
+    { itemId: 21108, quantity: 1 },
+    { itemId: COSMIC_RUNE_ID, quantity: 1 },
+    { itemId: WATER_RUNE_ID, quantity: 1 },
+]);
+castOnItem(ENCHANT_LVL1_SPELL_ID, 0, 21108);
+runAction("skill.enchant_jewellery", { recipeId: "opal_amulet", count: 1, preferredSlot: 0 });
+assert.equal(countItem(21160), 1);
+
+resetState(99, [
+    { itemId: 21081, quantity: 1 },
+    { itemId: COSMIC_RUNE_ID, quantity: 1 },
+    { itemId: AIR_RUNE_ID, quantity: 3 },
+]);
+const opalWrongSpell = castOnItem(ENCHANT_LVL2_SPELL_ID, 0, 21081);
+assert.equal(opalWrongSpell.outcome, "failure");
+assert.equal(opalWrongSpell.reason, "enchant_invalid_item");
+assert.equal(countItem(21081), 1);
+
+resetState(99, [
+    { itemId: 21084, quantity: 1 },
+    { itemId: COSMIC_RUNE_ID, quantity: 1 },
+    { itemId: AIR_RUNE_ID, quantity: 3 },
+]);
+castOnItem(ENCHANT_LVL2_SPELL_ID, 0, 21084);
+runAction("skill.enchant_jewellery", { recipeId: "jade_ring", count: 1, preferredSlot: 0 });
+assert.equal(countItem(21129), 1);
+assert.deepEqual(xp, [37]);
+
+resetState(99, [
+    { itemId: 21111, quantity: 1 },
+    { itemId: COSMIC_RUNE_ID, quantity: 1 },
+    { itemId: AIR_RUNE_ID, quantity: 3 },
+]);
+castOnItem(ENCHANT_LVL2_SPELL_ID, 0, 21111);
+runAction("skill.enchant_jewellery", { recipeId: "jade_amulet", count: 1, preferredSlot: 0 });
+assert.equal(countItem(21163), 1);
+
+resetState(99, [
+    { itemId: 21087, quantity: 1 },
+    { itemId: COSMIC_RUNE_ID, quantity: 1 },
+    { itemId: FIRE_RUNE_ID, quantity: 5 },
+]);
+castOnItem(ENCHANT_LVL3_SPELL_ID, 0, 21087);
+runAction("skill.enchant_jewellery", { recipeId: "topaz_ring", count: 1, preferredSlot: 0 });
+assert.equal(countItem(21140), 1);
+assert.deepEqual(xp, [59]);
+
+resetState(99, [
+    { itemId: 21114, quantity: 1 },
+    { itemId: COSMIC_RUNE_ID, quantity: 1 },
+    { itemId: FIRE_RUNE_ID, quantity: 5 },
+]);
+castOnItem(ENCHANT_LVL3_SPELL_ID, 0, 21114);
+runAction("skill.enchant_jewellery", { recipeId: "topaz_amulet", count: 1, preferredSlot: 0 });
+assert.equal(countItem(21166), 1);
+
+resetState(99, [
+    { itemId: 21099, quantity: 1 },
+    { itemId: COSMIC_RUNE_ID, quantity: 1 },
+    { itemId: WATER_RUNE_ID, quantity: 1 },
+]);
+const unstrungOpal = castOnItem(ENCHANT_LVL1_SPELL_ID, 0, 21099);
+assert.equal(unstrungOpal.outcome, "failure");
+assert.equal(unstrungOpal.reason, "enchant_invalid_item");
+
 console.log("magic-enchant-jewellery.test.ts: all assertions passed");
