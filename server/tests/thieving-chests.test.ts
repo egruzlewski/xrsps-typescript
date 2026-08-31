@@ -20,6 +20,7 @@ import {
     computeChestTrapDamage,
     getChestByLocId,
     register,
+    rollOsrsSkillingSuccess,
 } from "../gamemodes/vanilla/skills/thieving/chests";
 
 const locHandlers = new Map<string, LocInteractionHandler>();
@@ -56,7 +57,7 @@ const gathering = {
 
 register(registry, { gathering } as unknown as ScriptServices);
 
-assert.equal(CHESTS.length, 8);
+assert.equal(CHESTS.length, 15);
 assert.equal(getChestByLocId(11735)?.id, "coins-10");
 assert.equal(getChestByLocId(11736)?.reqLevel, 28);
 assert.equal(getChestByLocId(11737)?.xp, 125);
@@ -65,11 +66,29 @@ assert.equal(getChestByLocId(22697)?.id, "dorgesh-average");
 assert.equal(getChestByLocId(11738)?.xp, 250);
 assert.equal(getChestByLocId(11739)?.reqLevel, 72);
 assert.equal(getChestByLocId(22681)?.xp, 650);
+assert.equal(getChestByLocId(26757)?.id, "rogues-castle");
+assert.equal(getChestByLocId(26757)?.xp, 701.7);
+assert.equal(getChestByLocId(34429)?.reqLevel, 64);
+assert.equal(getChestByLocId(60511)?.xp, 90);
+assert.equal(getChestByLocId(60514)?.reqLevel, 54);
+assert.equal(getChestByLocId(60517)?.xp, 182.5);
+assert.equal(getChestByLocId(30971)?.xp, 4.5);
+assert.equal(getChestByLocId(52008)?.reqLevel, 50);
 assert(locHandlers.has("11736:search for traps"));
 assert(locHandlers.has("11736:open"));
 assert(locHandlers.has("22697:pick-lock"));
+assert(locHandlers.has("26757:search for traps"));
+assert(locHandlers.has("26757:open"));
+assert(locHandlers.has("34429:pick-lock"));
+assert(locHandlers.has("60511:pick-lock"));
+assert(locHandlers.has("30971:search"));
+assert(locHandlers.has("52008:search"));
+assert.equal(locHandlers.has("34429:open"), false);
+assert.equal(locHandlers.has("30971:open"), false);
 assert(actionHandlers.has("skill.steal-chest"));
 assert(itemOnLocHandlers.has(`${LOCKPICK_ITEM_ID}:11742`));
+assert(itemOnLocHandlers.has(`${LOCKPICK_ITEM_ID}:34429`));
+assert(itemOnLocHandlers.has(`${LOCKPICK_ITEM_ID}:60511`));
 assert(chestTracker, "chest tracker should register with gathering");
 
 assert.equal(computeChestTrapDamage({ kind: "percent", numerator: 12, plus: 3 }, 50), 9);
@@ -91,6 +110,7 @@ function makeSession(opts: {
     hasLockpick?: boolean;
 }) {
     const xp: number[] = [];
+    const extraXp: Array<{ skillId: number; amount: number }> = [];
     const added: Array<{ itemId: number; quantity: number }> = [];
     const seqs: number[] = [];
     const sounds: number[] = [];
@@ -114,8 +134,11 @@ function makeSession(opts: {
         skills: {
             getSkill: () => ({ baseLevel: opts.level, boost: 0 }),
             addSkillXp: (_p: PlayerState, skillId: number, amount: number) => {
-                assert.equal(skillId, SkillId.Thieving);
-                xp.push(amount);
+                if (skillId === SkillId.Thieving) {
+                    xp.push(amount);
+                    return;
+                }
+                extraXp.push({ skillId, amount });
             },
         },
         inventory: {
@@ -200,12 +223,22 @@ function makeSession(opts: {
         } as ScriptActionHandlerContext);
     };
 
-    return { player, xp, added, seqs, sounds, hitsplats, teleports, runLoc, runPending };
+    return { player, xp, extraXp, added, seqs, sounds, hitsplats, teleports, runLoc, runPending };
 }
 
 const originalRandom = Math.random;
 function withRandom(value: number, fn: () => void): void {
     Math.random = () => value;
+    try {
+        fn();
+    } finally {
+        Math.random = originalRandom;
+    }
+}
+
+function withRandomSeq(values: number[], fn: () => void): void {
+    let i = 0;
+    Math.random = () => values[Math.min(i++, values.length - 1)];
     try {
         fn();
     } finally {
@@ -358,5 +391,77 @@ withRandom(0, () => {
 const rich = getChestByLocId(22681)!;
 assert.equal(rich.lootTable.length, 15);
 assert.equal(rich.respawnTicks, 500);
+
+withRandom(0, () => {
+    assert.equal(rollOsrsSkillingSuccess(64, -56, 154), true);
+    const rogues = makeSession({ level: 84 });
+    rogues.runLoc(26757, "search for traps", { x: 3283, y: 3946 });
+    rogues.runPending();
+    rogues.runPending(81);
+    assert.deepEqual(rogues.xp, [701.7]);
+    assert.deepEqual(rogues.added, [{ itemId: ChestItems.NATURE_RUNE, quantity: 50 }]);
+    assert.equal(rogues.teleports.length, 0);
+});
+
+withRandom(0, () => {
+    const trap = makeSession({ level: 84, hp: 50 });
+    trap.runLoc(26757, "open", { x: 3287, y: 3946 });
+    trap.runPending();
+    trap.runPending(81);
+    assert.equal(trap.xp.length, 0);
+    assert.deepEqual(trap.hitsplats, [15]);
+});
+
+withRandom(0, () => {
+    const stone = makeSession({ level: 64, hasLockpick: false });
+    stone.runLoc(34429, "pick-lock", { x: 1300, y: 10085 });
+    stone.runPending();
+    stone.runPending(81);
+    assert.deepEqual(stone.xp, [280]);
+    assert.equal(stone.added[0]?.itemId, ChestItems.OPAL_BOLT_TIPS);
+    assert.equal(stone.added[0]?.quantity, 4);
+    assert.equal(chestTracker?.has("0:1300:10085"), false);
+});
+
+withRandomSeq([0.999, 0], () => {
+    const fail = makeSession({ level: 64 });
+    fail.runLoc(34429, "pick-lock", { x: 1300, y: 10086 });
+    fail.runPending();
+    const failOut = fail.runPending(81);
+    assert.equal(fail.xp.length, 0);
+    assert(failOut.effects?.some((e) => e.type === "message" && /fail to pick/.test(e.message)));
+    assert.deepEqual(fail.teleports, [{ x: 1304, y: 3663, level: 0 }]);
+});
+
+withRandom(0, () => {
+    const rusty = makeSession({ level: 33 });
+    rusty.runLoc(60511, "pick-lock", { x: 3054, y: 2650 });
+    rusty.runPending();
+    rusty.runPending(81);
+    assert.deepEqual(rusty.xp, [90]);
+    assert.deepEqual(rusty.added, [{ itemId: ChestItems.STEEL_DAGGER, quantity: 1 }]);
+});
+
+withRandom(0, () => {
+    const swim = makeSession({ level: 1 });
+    swim.runLoc(30971, "search", { x: 3783, y: 10254 });
+    swim.runPending();
+    swim.runPending(81);
+    assert.deepEqual(swim.xp, [4.5]);
+    assert.deepEqual(swim.extraXp, [{ skillId: SkillId.Agility, amount: 4.5 }]);
+    assert.deepEqual(swim.added, [
+        { itemId: ChestItems.MERMAIDS_TEAR, quantity: 1 },
+        { itemId: ChestItems.GLISTENING_TEAR, quantity: 1 },
+    ]);
+});
+
+withRandom(0, () => {
+    const varl = makeSession({ level: 50 });
+    varl.runLoc(52008, "search", { x: 1633, y: 3103 });
+    varl.runPending();
+    varl.runPending(81);
+    assert.deepEqual(varl.xp, [45]);
+    assert.deepEqual(varl.added, [{ itemId: ChestItems.VALUABLES, quantity: 1 }]);
+});
 
 console.log("thieving-chests.test.ts: all assertions passed");
