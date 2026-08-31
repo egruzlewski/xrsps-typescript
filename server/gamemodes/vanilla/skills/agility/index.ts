@@ -18,6 +18,7 @@ import { register as registerCanifis } from "./canifis";
 import { register as registerDraynor } from "./draynor";
 import { register as registerFalador } from "./falador";
 import { register as registerPollnivneach } from "./pollnivneach";
+import { register as registerPrifddinas } from "./prifddinas";
 import { register as registerPyramid } from "./pyramid";
 import { register as registerRellekka } from "./rellekka";
 import { register as registerSeers } from "./seers";
@@ -221,6 +222,7 @@ export function register(registry: IScriptRegistry): void {
     registerPyramid(registry);
     registerArdougne(registry);
     registerApeAtoll(registry);
+    registerPrifddinas(registry);
 }
 
 /** Test helper: clear lap tracking for one player or all players. */
@@ -293,3 +295,7 @@ export {
     getApeAtollCourseStage,
     resetApeAtollCourseProgress,
 } from "./apeAtoll";
+export {
+    getPrifddinasCourseStage,
+    resetPrifddinasCourseProgress,
+} from "./prifddinas";
