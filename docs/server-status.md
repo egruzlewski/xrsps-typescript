@@ -36,8 +36,6 @@ Start here if you want a development path. Ordered roughly by “missing entire 
 ### Scaffold or hollow mechanics
 
 - **Boss scripts** — [`BossScriptFramework`](../server/src/game/combat/BossScriptFramework.ts) plus Giant Mole, Dagannoth Kings, Graardor, Zulrah in [`BossCombatScript.ts`](../server/gamemodes/vanilla/combat/BossCombatScript.ts). Giant Mole `dig_escape` teleports the mole to a random lair chamber (player stays put). Zulrah venom clouds/snakelings `execute` bodies are still empty comments.
-- **Item-on-target with no script** — arrives, then “Nothing interesting happens.” ([`InventoryActionHandler`](../server/src/game/actions/handlers/InventoryActionHandler.ts)).
-- **Default NPC talk** — “Content not implemented yet.” ([`defaultTalk.ts`](../server/gamemodes/vanilla/scripts/content/defaultTalk.ts)).
 - **Achievement diary journal UI** — widget opens and can show static/varbit-driven text; no diary *task engine* that completes tasks from gameplay.
 - **Custom widgets** — [`CustomWidgetRegistry`](../server/src/game/scripts/CustomWidgetRegistry.ts) can serialize groups; vanilla does not deliver them to the client.
 
@@ -189,8 +187,8 @@ Server→client opcodes: [`ServerPacketId.ts`](../client/common/packets/ServerPa
 | **Status** | Wired |
 | **Path** | [`game/actions/`](../server/src/game/actions/), [`game/interactions/`](../server/src/game/interactions/), [`game/scripts/`](../server/src/game/scripts/) — `ScriptRegistry`, `ScriptRuntime`, `bootstrap.ts`, `ZoneTriggerService`, `serviceInterfaces.ts` |
 | **Wired** | Action scheduler + combat/spell/inventory/widget-dialog handlers. NPC/loc/item/item-on-\*/ground/zone/button/command/client-message registration. Newest handler wins. Zone enter/leave. Script services facade for gamemodes. |
-| **Gaps** | Unhandled item-on-target placeholder message. Default NPC talk. |
-| **Tests** | [`script-registry-handler-stacks.test.ts`](../server/tests/script-registry-handler-stacks.test.ts), [`zone-trigger-script.test.ts`](../server/tests/zone-trigger-script.test.ts), [`item-on-npc-script.test.ts`](../server/tests/item-on-npc-script.test.ts), [`item-on-player-script.test.ts`](../server/tests/item-on-player-script.test.ts) |
+| **Gaps** | Unscripted loc *click* is still silent. Remaining item-on-\* work is per-item content, not the dispatcher. |
+| **Tests** | [`script-registry-handler-stacks.test.ts`](../server/tests/script-registry-handler-stacks.test.ts), [`zone-trigger-script.test.ts`](../server/tests/zone-trigger-script.test.ts), [`item-on-npc-script.test.ts`](../server/tests/item-on-npc-script.test.ts), [`item-on-player-script.test.ts`](../server/tests/item-on-player-script.test.ts), [`item-on-target-default.test.ts`](../server/tests/item-on-target-default.test.ts), [`default-npc-talk.test.ts`](../server/tests/default-npc-talk.test.ts) |
 
 ### Combat (engine)
 
@@ -259,7 +257,7 @@ Server→client opcodes: [`ServerPacketId.ts`](../client/common/packets/ServerPa
 | --- | --- | --- | --- | --- |
 | Movement queue / processor | Wired | [`game/movement/`](../server/src/game/movement/), [`MovementService.ts`](../server/src/game/services/MovementService.ts) | Walk packets, forced movement, run energy state | — |
 | Equipment | Wired | [`EquipmentHandler.ts`](../server/src/game/systems/EquipmentHandler.ts), [`EquipmentService.ts`](../server/src/game/services/EquipmentService.ts), vanilla `equipment/` | Equip/unequip, stats UI hooks | — |
-| Inventory | Wired | [`InventoryService.ts`](../server/src/game/services/InventoryService.ts), [`InventoryActionHandler.ts`](../server/src/game/actions/handlers/InventoryActionHandler.ts) | Moves, use, use-on | [`inventory-service.test.ts`](../server/tests/inventory-service.test.ts), [`inventory-move-immediate.test.ts`](../server/tests/inventory-move-immediate.test.ts) |
+| Inventory | Wired | [`InventoryService.ts`](../server/src/game/services/InventoryService.ts), [`InventoryActionHandler.ts`](../server/src/game/actions/handlers/InventoryActionHandler.ts) | Moves, use, use-on; unhandled use-on → “Nothing interesting happens.” | [`inventory-service.test.ts`](../server/tests/inventory-service.test.ts), [`inventory-move-immediate.test.ts`](../server/tests/inventory-move-immediate.test.ts), [`item-on-target-default.test.ts`](../server/tests/item-on-target-default.test.ts) |
 | Trade | Wired | [`TradeManager.ts`](../server/src/game/trade/TradeManager.ts) | Two-screen trade, escrow/refund in SQLite | [`trade-dupe-safety.test.ts`](../server/tests/trade-dupe-safety.test.ts), [`trade-inventory-*.test.ts`](../server/tests/) |
 | Gathering manager | Wired | [`GatheringSystemManager.ts`](../server/src/game/systems/GatheringSystemManager.ts) | Used by WC/mining depletion | — |
 | Projectiles | Wired | [`ProjectileSystem.ts`](../server/src/game/systems/ProjectileSystem.ts) | Combat/spell projectiles | — |
@@ -441,8 +439,9 @@ Registered from vanilla `index.ts`: Lumbridge, Varrock, Falador, Draynor, Port S
 | --- | --- |
 | **Status** | Partial |
 | **Path** | [`vanilla/npcs/`](../server/gamemodes/vanilla/npcs/) |
-| **Wired** | Dialogue registration entry; quests and shops register many NPCs. |
-| **Gaps** | Catch-all default talk. |
+| **Wired** | Dialogue registration entry; quests and shops register many NPCs. Unscripted Talk-to opens a generic “Hello.” chatbox ([`defaultTalk.ts`](../server/gamemodes/vanilla/scripts/content/defaultTalk.ts)); Man/Woman use [`generic/person.ts`](../server/gamemodes/vanilla/npcs/generic/person.ts). |
+| **Gaps** | Most named NPCs still lack dedicated lines. |
+| **Tests** | [`default-npc-talk.test.ts`](../server/tests/default-npc-talk.test.ts) |
 
 ---
 
@@ -542,8 +541,6 @@ Infrastructure tests: `quest-completion-safety`, `quest-registry-validation`, `q
 | [`shopInteractions.ts`](../server/gamemodes/vanilla/shops/shopInteractions.ts) | Members world |
 | [`DegradationSystem.ts`](../server/src/game/combat/DegradationSystem.ts) | Crystal bow charge varbit |
 | [`thieving/pickpocket.ts`](../server/gamemodes/vanilla/skills/thieving/pickpocket.ts) | Verify cave goblin wire item ID |
-| [`InventoryActionHandler.ts`](../server/src/game/actions/handlers/InventoryActionHandler.ts) | Unscripted use-on |
-| [`defaultTalk.ts`](../server/gamemodes/vanilla/scripts/content/defaultTalk.ts) | Unscripted NPC talk |
 | [`PoisonVenomSystem.ts`](../server/src/game/combat/PoisonVenomSystem.ts) | `processTick` stub |
 | [`BossCombatScript.ts`](../server/gamemodes/vanilla/combat/BossCombatScript.ts) | Zulrah venom/snakeling `execute` still empty (Mole dig teleport is wired) |
 | [`agility/index.ts`](../server/gamemodes/vanilla/skills/agility/index.ts) | Other agility courses (Wilderness, rooftops, etc.) |

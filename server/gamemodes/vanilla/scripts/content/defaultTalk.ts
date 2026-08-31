@@ -1,38 +1,24 @@
 import { type IScriptRegistry, type ScriptServices } from "../../../../src/game/scripts/types";
+import { sayNpc, sayPlayer } from "../../npcs/dialogue";
+import { startNpcConversation } from "../../npcs/helpers";
 
 /**
- * Fallback Talk-to handler so NPCs without bespoke scripts still respond.
- * This keeps client-side interactions working while content is fleshed out.
+ * Catch-all Talk-to for NPCs that have no dedicated script.
+ * Specific `registerNpcScript` / `registerTalkTo` handlers win because
+ * ScriptRuntime looks up per-NPC handlers before `registerNpcAction`.
  */
 export function registerDefaultTalkHandlers(
     registry: IScriptRegistry,
     services: ScriptServices,
 ): void {
     registry.registerNpcAction("talk-to", (event) => {
-        const npc = event.npc;
-        const npcName =
-            npc?.name && npc.name !== "null"
-                ? String(npc.name)
-                : `NPC ${npc?.typeId ?? npc?.id ?? ""}`.trim();
-
         services.system.logger.info?.(
-            `[script:default-talk] fallback dialog npc=${npc?.id} type=${npc?.typeId}`,
+            `[script:default-talk] fallback dialog npc=${event.npc?.id} type=${event.npc?.typeId}`,
         );
 
-        services.dialog.openDialog(event.player, {
-            kind: "npc",
-            id: `npc_${npc?.id ?? "unknown"}`,
-            npcId: npc?.typeId,
-            npcName,
-            lines: [
-                `${npcName} doesn't seem to have anything to say right now.`,
-                "Content not implemented yet.",
-            ],
-            clickToContinue: true,
-            closeOnContinue: true,
-            onContinue: () => {
-                services.dialog.closeDialog(event.player, `npc_${npc?.id ?? "unknown"}`);
-            },
-        });
+        const started = startNpcConversation(event, [sayPlayer("Hello."), sayNpc("Hello.")]);
+        if (!started) {
+            event.services.messaging.sendGameMessage(event.player, "Nothing interesting happens.");
+        }
     });
 }

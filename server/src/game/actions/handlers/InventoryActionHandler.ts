@@ -187,11 +187,7 @@ export class InventoryActionHandler {
                 return handledItemOnItem;
             }
             if (target?.kind === "inv") {
-                this.svc.messagingService.queueChatMessage({
-                    messageType: "game",
-                    text: "Nothing interesting happens.",
-                    targetPlayerIds: [player.id],
-                });
+                this.sendNothingInteresting(player);
                 return { ok: true, groups: ["inventory"] };
             }
 
@@ -328,12 +324,8 @@ export class InventoryActionHandler {
                 return handledItemOnPlayer;
             }
 
-            // Arrived: perform item-on-target effect (placeholder)
-            this.svc.messagingService.queueChatMessage({
-                messageType: "game",
-                text: "Nothing interesting happens.",
-                targetPlayerIds: [player.id],
-            });
+            // Arrived, no item-on-npc/loc/player/ground script: OSRS default.
+            this.sendNothingInteresting(player);
             return { ok: true, groups: ["inventory"] };
         } catch (err) {
             logger.error(err);
@@ -630,6 +622,14 @@ export class InventoryActionHandler {
     // ========================================================================
     // Private Helper Methods
     // ========================================================================
+
+    private sendNothingInteresting(player: PlayerState): void {
+        this.svc.messagingService.queueChatMessage({
+            messageType: "game",
+            text: "Nothing interesting happens.",
+            targetPlayerIds: [player.id],
+        });
+    }
 
     private tryHandleScriptedItemOnLoc(
         player: PlayerState,
