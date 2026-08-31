@@ -5,8 +5,8 @@
  * Varrock rooftop, Canifis rooftop, Falador rooftop, Seers' Village rooftop,
  * Pollnivneach rooftop, Agility Pyramid, Ardougne rooftop, Ape Atoll,
  * Colossal Wyrm Agility Course, Shayzien Agility Course, Penguin Agility Course,
- * Dorgesh-Kaan Agility Course, and Meiyerditch floor jumps are registered
- * from sibling files.
+ * Dorgesh-Kaan Agility Course, Meiyerditch floor jumps, and Hallowed Sepulchre
+ * floor obstacles are registered from sibling files.
  */
 import { SkillId } from "../../../../../client/rs/skill/skills";
 import type { PlayerState } from "../../../../src/game/player";
@@ -28,6 +28,7 @@ import { register as registerPrifddinas } from "./prifddinas";
 import { register as registerPyramid } from "./pyramid";
 import { register as registerRellekka } from "./rellekka";
 import { register as registerSeers } from "./seers";
+import { register as registerSepulchre } from "./sepulchre";
 import { register as registerShayzien } from "./shayzien";
 import { register as registerVarrock } from "./varrock";
 import { register as registerWilderness } from "./wilderness";
@@ -235,6 +236,7 @@ export function register(registry: IScriptRegistry): void {
     registerPenguin(registry);
     registerDorgeshKaan(registry);
     registerMeiyerditch(registry);
+    registerSepulchre(registry);
 }
 
 /** Test helper: clear lap tracking for one player or all players. */
@@ -329,3 +331,7 @@ export {
     getDorgeshKaanCourseStage,
     resetDorgeshKaanCourseProgress,
 } from "./dorgeshKaan";
+export {
+    getSepulchreFloor,
+    resetSepulchreProgress,
+} from "./sepulchre";
