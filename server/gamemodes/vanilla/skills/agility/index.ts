@@ -2,7 +2,7 @@
  * Gnome Stronghold agility course (LostCity gnome_course.rs2, soft exact-move port).
  * Fail-proof; lap bonus only if obstacles are completed in order.
  * Barbarian Outpost, Wilderness, Draynor Village rooftop, Al Kharid rooftop,
- * Varrock rooftop, and Canifis rooftop are registered from sibling files.
+ * Varrock rooftop, Canifis rooftop, and Falador rooftop are registered from sibling files.
  */
 import { SkillId } from "../../../../../client/rs/skill/skills";
 import type { PlayerState } from "../../../../src/game/player";
@@ -11,6 +11,7 @@ import { register as registerAlKharid } from "./alkharid";
 import { register as registerBarbarian } from "./barbarian";
 import { register as registerCanifis } from "./canifis";
 import { register as registerDraynor } from "./draynor";
+import { register as registerFalador } from "./falador";
 import { register as registerVarrock } from "./varrock";
 import { register as registerWilderness } from "./wilderness";
 
@@ -203,6 +204,7 @@ export function register(registry: IScriptRegistry): void {
     registerAlKharid(registry);
     registerVarrock(registry);
     registerCanifis(registry);
+    registerFalador(registry);
 }
 
 /** Test helper: clear lap tracking for one player or all players. */
@@ -234,6 +236,10 @@ export {
     getCanifisCourseStage,
     resetCanifisCourseProgress,
 } from "./canifis";
+export {
+    getFaladorCourseStage,
+    resetFaladorCourseProgress,
+} from "./falador";
 export {
     getVarrockCourseStage,
     resetVarrockCourseProgress,
