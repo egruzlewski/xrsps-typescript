@@ -382,7 +382,9 @@ export function getBossScript(npcId: number): (new (npc: Npc) => BossScript) | u
 }
 
 export function createBossScript(npc: Npc): BossScript | null {
-    const ScriptClass = bossScriptRegistry.get(npc.typeId);
+    // Transmogged bosses (Zulrah 2043/2044) keep the spawn-type script.
+    const ScriptClass =
+        bossScriptRegistry.get(npc.typeId) ?? bossScriptRegistry.get(npc.spawnTypeId);
     if (ScriptClass) {
         return new ScriptClass(npc);
     }

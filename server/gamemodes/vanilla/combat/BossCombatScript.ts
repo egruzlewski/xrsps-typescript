@@ -107,6 +107,12 @@ export function executeGiantMoleDig(
 // the shrine. The player is not moved. Venom clouds spawn on the target tile.
 
 export const ZULRAH_NPC_ID = 2042;
+/** Green / ranged form. Same id as the world spawn. */
+export const ZULRAH_RANGE_ID = 2042;
+/** Blue / magic form. */
+export const ZULRAH_MAGE_ID = 2043;
+/** Red / melee form. */
+export const ZULRAH_MELEE_ID = 2044;
 export const ZULRAH_SNAKELING_MELEE_ID = 2045;
 export const ZULRAH_SNAKELING_MAGE_ID = 2046;
 
@@ -395,7 +401,7 @@ class ZulrahScript extends BossScript {
             attackPatterns: ["magic_attack", "venom_cloud"],
             hpThresholdPercent: 75,
             onEnter: (boss) => {
-                // boss.getNpc().setTransformation(2043);
+                boss.getNpc().setTransformation(ZULRAH_MAGE_ID);
             },
         });
 
@@ -404,7 +410,7 @@ class ZulrahScript extends BossScript {
             attackPatterns: ["melee_attack"],
             hpThresholdPercent: 50,
             onEnter: (boss) => {
-                // boss.getNpc().setTransformation(2044);
+                boss.getNpc().setTransformation(ZULRAH_MELEE_ID);
             },
         });
 
@@ -413,7 +419,7 @@ class ZulrahScript extends BossScript {
             attackPatterns: ["ranged_attack", "venom_cloud", "snakeling"],
             hpThresholdPercent: 25,
             onEnter: (boss) => {
-                // boss.getNpc().setTransformation(2042);
+                boss.getNpc().setTransformation(ZULRAH_RANGE_ID);
             },
         });
 
@@ -481,4 +487,6 @@ registerBossScript(2265, DagannothRexScript); // Dagannoth Rex
 registerBossScript(2266, DagannothPrimeScript); // Dagannoth Prime
 registerBossScript(2267, DagannothSupremeScript); // Dagannoth Supreme
 registerBossScript(2215, GeneralGraardorScript); // General Graardor
-registerBossScript(2042, ZulrahScript); // Zulrah
+registerBossScript(ZULRAH_RANGE_ID, ZulrahScript);
+registerBossScript(ZULRAH_MAGE_ID, ZulrahScript);
+registerBossScript(ZULRAH_MELEE_ID, ZulrahScript);

@@ -35,7 +35,7 @@ Start here if you want a development path. Ordered roughly by “missing entire 
 
 ### Scaffold or hollow mechanics
 
-- **Boss scripts** — [`BossScriptFramework`](../server/src/game/combat/BossScriptFramework.ts) plus Giant Mole, Dagannoth Kings, Graardor, Zulrah in [`BossCombatScript.ts`](../server/gamemodes/vanilla/combat/BossCombatScript.ts). Giant Mole `dig_escape` teleports the mole to a random lair chamber (player stays put). Zulrah snakeling `execute` spawns melee/mage snakelings (2045/2046) on shrine tiles (player stays put). Zulrah venom-cloud `execute` drops tile gfx 1045 on the combat target and applies venom (player stays put). Phase `onEnter` `setTransformation` is still commented.
+- **Boss scripts** — [`BossScriptFramework`](../server/src/game/combat/BossScriptFramework.ts) plus Giant Mole, Dagannoth Kings, Graardor, Zulrah in [`BossCombatScript.ts`](../server/gamemodes/vanilla/combat/BossCombatScript.ts). Giant Mole `dig_escape` teleports the mole to a random lair chamber (player stays put). Zulrah snakeling `execute` spawns melee/mage snakelings (2045/2046) on shrine tiles (player stays put). Zulrah venom-cloud `execute` drops tile gfx 1045 on the combat target and applies venom (player stays put). Zulrah phase `onEnter` transmogs range/mage/melee forms (2042/2043/2044) via `NpcState.setTransformation`. `defaultAttackExecution` telegraph/AoE/`dealDamage` is still empty.
 - **Achievement diary journal UI** — widget opens and can show static/varbit-driven text; no diary *task engine* that completes tasks from gameplay.
 - **Custom widgets** — [`CustomWidgetRegistry`](../server/src/game/scripts/CustomWidgetRegistry.ts) can serialize groups; vanilla does not deliver them to the client.
 
@@ -197,9 +197,9 @@ Server→client opcodes: [`ServerPacketId.ts`](../client/common/packets/ServerPa
 | **Status** | Partial (engine is large and used; world/PvP-type and bosses incomplete) |
 | **Path** | [`game/combat/`](../server/src/game/combat/) — tick engine, formulas, ammo, dragonfire, multi-combat, damage tracker, specials (~80 plugin files), `PvpCombatHandler`, `CombatActionHandler` |
 | **Wired** | Melee/ranged/magic vs NPC and player, autocast, specials, poison/venom utilities, wilderness/multi helpers, loot eligibility via `DamageTracker`. Combat XP. Equipment bonus *provider* (vanilla fills slayer-helm style bonuses even without a Slayer skill). |
-| **Gaps** | `MultiCombatZones`: TODO PvP world and Duel Arena. `PoisonVenomSystem.processTick` is an empty compatibility stub (real ticks on actor state). `DegradationSystem` crystal varbit TODO. Boss scripts still scaffold Zulrah phase `onEnter` transformations (Mole dig, Zulrah snakelings, and venom clouds are wired). |
-| **Tests** | Many `combat-*.test.ts`, weapon specials, dragonfire, engagement, farcast, granite maul, ballista, claws, etc. [`giant-mole-dig.test.ts`](../server/tests/giant-mole-dig.test.ts), [`zulrah-snakeling.test.ts`](../server/tests/zulrah-snakeling.test.ts), [`zulrah-venom-cloud.test.ts`](../server/tests/zulrah-venom-cloud.test.ts). |
-| **Next step** | PvP world flag if you need it; fill remaining boss phase transformations or delete unused registrations. |
+| **Gaps** | `MultiCombatZones`: TODO PvP world and Duel Arena. `PoisonVenomSystem.processTick` is an empty compatibility stub (real ticks on actor state). `DegradationSystem` crystal varbit TODO. Boss `defaultAttackExecution` telegraph/AoE/`dealDamage` is still empty (Mole dig, Zulrah snakelings, venom clouds, and phase forms are wired). |
+| **Tests** | Many `combat-*.test.ts`, weapon specials, dragonfire, engagement, farcast, granite maul, ballista, claws, etc. [`giant-mole-dig.test.ts`](../server/tests/giant-mole-dig.test.ts), [`zulrah-snakeling.test.ts`](../server/tests/zulrah-snakeling.test.ts), [`zulrah-venom-cloud.test.ts`](../server/tests/zulrah-venom-cloud.test.ts), [`zulrah-phase-transform.test.ts`](../server/tests/zulrah-phase-transform.test.ts). |
+| **Next step** | PvP world flag if you need it; fill boss `defaultAttackExecution` or delete unused registrations. |
 
 ### Spells
 
@@ -542,7 +542,7 @@ Infrastructure tests: `quest-completion-safety`, `quest-registry-validation`, `q
 | [`DegradationSystem.ts`](../server/src/game/combat/DegradationSystem.ts) | Crystal bow charge varbit |
 | [`thieving/pickpocket.ts`](../server/gamemodes/vanilla/skills/thieving/pickpocket.ts) | Verify cave goblin wire item ID |
 | [`PoisonVenomSystem.ts`](../server/src/game/combat/PoisonVenomSystem.ts) | `processTick` stub |
-| [`BossCombatScript.ts`](../server/gamemodes/vanilla/combat/BossCombatScript.ts) | Zulrah phase `onEnter` transformations still commented (Mole dig, snakelings, and venom clouds are wired) |
+| [`BossCombatScript.ts`](../server/gamemodes/vanilla/combat/BossCombatScript.ts) | `defaultAttackExecution` telegraph/AoE/`dealDamage` still empty (Mole dig, snakelings, venom clouds, and Zulrah phase forms are wired) |
 | [`agility/index.ts`](../server/gamemodes/vanilla/skills/agility/index.ts) | Remaining rooftops (Pollnivneach onward) and other agility courses |
 | [`weapons.ts`](../server/gamemodes/vanilla/data/weapons.ts) | Some specs placeholders |
 
@@ -586,7 +586,7 @@ There are ~90 individual test files: heavy on quests and combat specials; light 
 1. Decide whether **remainder quests** stay compressed or get full ports.
 2. Fill **skill holes you care about first** (Slayer/Hunter/Farming/Construction are absent).
 3. **World scripts** for hubs you actually play (default talk is the symptom of missing loc/NPC handlers).
-4. **Boss scripts**: Zulrah phase `onEnter` transformations (Mole dig, snakelings, and venom clouds are wired).
+4. **Boss scripts**: `defaultAttackExecution` telegraph/AoE/`dealDamage` (Mole dig, snakelings, venom clouds, and Zulrah phase forms are wired).
 5. **Protocol**: opcode 50 / `OPNPC5` is decoded; unused `MAP_EDIT` (195) was removed.
 6. **Vanilla `getContentDataPacket()`** only if custom items must show on vanilla.
 7. Expand `yarn --cwd server test` or CI to the quest/combat files you rely on.

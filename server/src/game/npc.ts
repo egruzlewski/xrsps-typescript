@@ -178,7 +178,13 @@ type RegenerationEffectState = {
 };
 
 export class NpcState extends Actor {
-    readonly typeId: number;
+    /**
+     * Current NPC type id. May change at runtime via {@link setTransformation}
+     * (Zulrah forms, transmogs). Client visuals update on the next snap/re-add.
+     */
+    typeId: number;
+    /** Type id at spawn; restored by {@link resetToSpawn}. */
+    readonly spawnTypeId: number;
     readonly name?: string;
     pendingSay?: string;
     readonly spawnX: number;
@@ -284,6 +290,7 @@ export class NpcState extends Actor {
     ) {
         super(id, spawn.x, spawn.y, spawn.level, size);
         this.typeId = typeId;
+        this.spawnTypeId = typeId;
         this.name = options.name;
         this.spawnX = spawn.x;
         this.spawnY = spawn.y;
@@ -428,7 +435,24 @@ export class NpcState extends Actor {
         );
     }
 
+    /**
+     * Change this NPC's type id (OSRS transmog). The movement snap flag is set
+     * so NPC sync remove+re-adds the entity with the new 14-bit type, which is
+     * how this client learns a visual form change.
+     */
+    setTransformation(typeId: number): void {
+        const next = typeId | 0;
+        if (next < 0 || next === this.typeId) {
+            return;
+        }
+        this.typeId = next;
+        this.movementQueue.teleported = true;
+    }
+
     resetToSpawn(): void {
+        if (this.typeId !== this.spawnTypeId) {
+            this.typeId = this.spawnTypeId;
+        }
         this.teleport(this.spawnX, this.spawnY, this.spawnLevel);
         this.rot = 0;
         this.orientation = this.rot;
