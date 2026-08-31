@@ -43,7 +43,7 @@ Start here if you want a development path. Ordered roughly by “missing entire 
 
 - **Agility** — full Gnome Stronghold (110.5/lap) and Barbarian Outpost (153.3 Agility + 41.3 Strength/lap) courses. Other courses still missing.
 - **Runecraft** — F2P plus members ruins altars (Air–Body, Cosmic, Chaos, Nature, Law, Death, Blood, Wrath). Tiara imbuing, combination runes, Astral/Soul/Kourend, and the Abyss are still missing.
-- **Crafting** — flax, shearing, spinning, jewellery (gold/silver + gems), gem cutting, leather/dragonhide armour. Pottery, glassblowing, and battlestaves still missing.
+- **Crafting** — flax, shearing, spinning, jewellery (gold/silver + gems), gem cutting, leather/dragonhide armour, pottery, glassblowing. Battlestaves, weaving, snakeskin, onyx/zenyte, and opal crush chance still missing.
 - **Sailing** — engine world-views + Pandemonium content, not a full skill.
 - **World content** — hubs listed under vanilla scripts, not the whole map. Unscripted locs/NPCs fall through to default talk / nothing interesting.
 - **Quests** — 64 registered. Ten of those are compressed “preservation remainder” implementations, not full-folder ports. Many later F2P/P2P quests are absent entirely.
@@ -361,7 +361,7 @@ Combat skills (Attack, Strength, Defence, Hitpoints, Ranged, Magic) are **engine
 | Fletching | Partial | [`skills/fletching/`](../server/gamemodes/vanilla/skills/fletching/) | Logs + stringing + combine recipes | [`fletching-handler-registration.test.ts`](../server/tests/fletching-handler-registration.test.ts) |
 | Fishing | Partial | [`skills/fishing/`](../server/gamemodes/vanilla/skills/fishing/) | Spots/methods/tools, minnows, echo harpoon IDs | Missing spots |
 | Firemaking | Partial | [`skills/firemaking/`](../server/gamemodes/vanilla/skills/firemaking/) | Tinderbox + log defs, ash | — |
-| Crafting | Partial | [`skills/crafting/`](../server/gamemodes/vanilla/skills/crafting/) | flax, shearing, spinning, jewellery (gold/silver + gems), gem cutting, leather/dragonhide armour. [`crafting-jewellery-leather.test.ts`](../server/tests/crafting-jewellery-leather.test.ts) | Pottery, glassblowing, battlestaves |
+| Crafting | Partial | [`skills/crafting/`](../server/gamemodes/vanilla/skills/crafting/) | flax, shearing, spinning, jewellery (gold/silver + gems), gem cutting, leather/dragonhide armour, pottery, glassblowing. [`crafting-jewellery-leather.test.ts`](../server/tests/crafting-jewellery-leather.test.ts), [`crafting-pottery-glassblowing.test.ts`](../server/tests/crafting-pottery-glassblowing.test.ts) | Battlestaves, weaving, snakeskin, onyx/zenyte, opal crush chance |
 | Smithing | Partial | smelt + smith UI/modals | Data-driven bars/items | Remaining recipes |
 | Mining | Partial | [`skills/mining/`](../server/gamemodes/vanilla/skills/mining/) | Rock loc map, pickaxes | Missing rocks |
 | Herblore | Partial | clean / unf / finish / stamina | Data lists in `herblore/index.ts` | Missing potions |
@@ -584,7 +584,7 @@ There are ~90 individual test files: heavy on quests and combat specials; light 
 ## Suggested development order (from this audit)
 
 1. Decide whether **remainder quests** stay compressed or get full ports.
-2. Fill **skill holes you care about first** (Crafting still lacks pottery, glassblowing, and battlestaves; Slayer/Hunter/Farming/Construction are absent).
+2. Fill **skill holes you care about first** (Crafting still lacks battlestaves, weaving, snakeskin, onyx/zenyte, and opal crush chance; Slayer/Hunter/Farming/Construction are absent).
 3. **World scripts** for hubs you actually play (default talk is the symptom of missing loc/NPC handlers).
 4. **Boss scripts**: implement or unregister Zulrah empty venom/snakeling mechanics (Mole dig is wired).
 5. **Protocol**: opcode 50 / `OPNPC5` is decoded; unused `MAP_EDIT` (195) was removed.
