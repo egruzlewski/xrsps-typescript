@@ -41,7 +41,7 @@ Start here if you want a development path. Ordered roughly by “missing entire 
 
 ### Partial (high-leverage)
 
-- **Agility** — full Gnome Stronghold (110.5/lap) and Barbarian Outpost (153.3 Agility + 41.3 Strength/lap) courses. Other courses still missing.
+- **Agility** — full Gnome Stronghold (110.5/lap), Barbarian Outpost (153.3 Agility + 41.3 Strength/lap), and Wilderness (571.4/lap, dispenser tickets) courses. Other courses still missing.
 - **Runecraft** — F2P plus members ruins altars (Air–Body, Cosmic, Chaos, Nature, Law, Death, Blood, Wrath). Tiara imbuing, combination runes, Astral/Soul/Kourend, and the Abyss are still missing.
 - **Crafting** — flax, shearing, spinning, jewellery (gold/silver + gems), gem cutting, leather/dragonhide armour, pottery, glassblowing. Battlestaves, weaving, snakeskin, onyx/zenyte, and opal crush chance still missing.
 - **Sailing** — engine world-views + Pandemonium content, not a full skill.
@@ -365,8 +365,8 @@ Combat skills (Attack, Strength, Defence, Hitpoints, Ranged, Magic) are **engine
 | Smithing | Partial | smelt + smith UI/modals | Data-driven bars/items | Remaining recipes |
 | Mining | Partial | [`skills/mining/`](../server/gamemodes/vanilla/skills/mining/) | Rock loc map, pickaxes | Missing rocks |
 | Herblore | Partial | clean / unf / finish / stamina | Data lists in `herblore/index.ts` | Missing potions |
-| Agility | Partial | [`skills/agility/`](../server/gamemodes/vanilla/skills/agility/) | Gnome Stronghold (110.5/lap) and Barbarian Outpost (153.3 Agility + 41.3 Strength/lap; in-order lap bonus). [`agility-gnome-course.test.ts`](../server/tests/agility-gnome-course.test.ts), [`agility-barbarian-course.test.ts`](../server/tests/agility-barbarian-course.test.ts) | Wilderness, rooftops, etc. |
-| Thieving | Partial | pickpocket + picklock + stalls + chests | NPC pickpocket tables, HAM trapdoor picklock, market stalls (veg through gem, plus tea/wine/fish/crafting), classic chests (Ardougne 10/nature/50-coin + castle, Yanille blood, steel arrowtips, Dorgesh-Kaan average/rich). [`thieving-stalls.test.ts`](../server/tests/thieving-stalls.test.ts), [`thieving-chests.test.ts`](../server/tests/thieving-chests.test.ts) | Seed/fruit/Ape Atoll remaining stalls, guard LOS catch, leftover chests (Rogues' Castle, stone, pirate, underwater, Varlamore) |
+| Agility | Partial | [`skills/agility/`](../server/gamemodes/vanilla/skills/agility/) | Gnome Stronghold (110.5/lap), Barbarian Outpost (153.3 Agility + 41.3 Strength/lap), and Wilderness (571.4/lap; in-order rocks bonus; dispenser Tag/Redeem tickets). Fail-proof. [`agility-gnome-course.test.ts`](../server/tests/agility-gnome-course.test.ts), [`agility-barbarian-course.test.ts`](../server/tests/agility-barbarian-course.test.ts), [`agility-wilderness-course.test.ts`](../server/tests/agility-wilderness-course.test.ts) | Rooftops, etc. |
+| Thieving | Partial | pickpocket + picklock + stalls + chests | NPC pickpocket tables, HAM trapdoor picklock, market stalls (veg through gem, plus tea/wine/fish/crafting, seed, fruit, Ape Atoll food/general/magic/scimitar), classic chests (Ardougne 10/nature/50-coin + castle, Yanille blood, steel arrowtips, Dorgesh-Kaan average/rich). [`thieving-stalls.test.ts`](../server/tests/thieving-stalls.test.ts), [`thieving-chests.test.ts`](../server/tests/thieving-chests.test.ts) | Guard LOS catch, leftover chests (Rogues' Castle, stone, pirate, underwater, Varlamore) |
 | Runecraft | Partial | [`skills/runecrafting/`](../server/gamemodes/vanilla/skills/runecrafting/) | F2P Air–Body plus members ruins altars (Cosmic, Chaos, Nature, Law, Death, Blood, Wrath; tiara/talisman enter, craft, portal exit). [`runecrafting-f2p-altars.test.ts`](../server/tests/runecrafting-f2p-altars.test.ts), [`runecrafting-members-altars.test.ts`](../server/tests/runecrafting-members-altars.test.ts) | Tiara imbuing, combination runes, Astral/Soul/Kourend, Abyss |
 | Sailing | Partial | Pandemonium + engine instances | Restore on login | Rest of skill |
 | Consumables | Partial | large food/potion tables | Eat/drink actions | Remaining items |
@@ -543,7 +543,7 @@ Infrastructure tests: `quest-completion-safety`, `quest-registry-validation`, `q
 | [`thieving/pickpocket.ts`](../server/gamemodes/vanilla/skills/thieving/pickpocket.ts) | Verify cave goblin wire item ID |
 | [`PoisonVenomSystem.ts`](../server/src/game/combat/PoisonVenomSystem.ts) | `processTick` stub |
 | [`BossCombatScript.ts`](../server/gamemodes/vanilla/combat/BossCombatScript.ts) | Zulrah venom/snakeling `execute` still empty (Mole dig teleport is wired) |
-| [`agility/index.ts`](../server/gamemodes/vanilla/skills/agility/index.ts) | Other agility courses (Wilderness, rooftops, etc.) |
+| [`agility/index.ts`](../server/gamemodes/vanilla/skills/agility/index.ts) | Other agility courses (rooftops, etc.) |
 | [`weapons.ts`](../server/gamemodes/vanilla/data/weapons.ts) | Some specs placeholders |
 
 ---

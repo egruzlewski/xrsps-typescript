@@ -69,12 +69,22 @@ const gathering = {
 
 register(registry, { gathering } as unknown as ScriptServices);
 
-assert.equal(STALLS.length, 11);
+assert.equal(STALLS.length, 17);
 assert.equal(getStallByLocId(11730)?.id, "baker");
 assert.equal(getStallByLocId(635)?.id, "tea");
 assert.equal(getStallByLocId(11731)?.reqLevel, 75);
+assert.equal(getStallByLocId(7053)?.id, "seed");
+assert.equal(getStallByLocId(28823)?.id, "fruit");
+assert.equal(getStallByLocId(4875)?.id, "food");
+assert.equal(getStallByLocId(4876)?.id, "general");
+assert.equal(getStallByLocId(4877)?.id, "magic");
+assert.equal(getStallByLocId(4878)?.id, "scimitar");
+assert.equal(getStallByLocId(27537), undefined);
 assert(locHandlers.has("11730:steal-from"));
 assert(locHandlers.has("635:steal from"));
+assert(locHandlers.has("7053:steal-from"));
+assert(locHandlers.has("28823:steal-from"));
+assert(locHandlers.has("4875:steal from"));
 assert(actionHandlers.has("skill.steal-stall"));
 assert(stallTracker, "stall tracker should register with gathering");
 
@@ -314,9 +324,51 @@ withRandom(0, () => {
     assert.deepEqual(teaSession.xp, [tea.xp]);
 });
 
+withRandom(0, () => {
+    const fruit = makeSession({ level: 25 });
+    fruit.runLoc(28823, { x: 1795, y: 3607 });
+    fruit.runPending();
+    fruit.runPending(51);
+    assert.deepEqual(fruit.xp, [28.5]);
+    assert.equal(fruit.added.length, 1);
+    assert(getStallByLocId(28823)!.lootTable.some((entry) => entry.itemId === fruit.added[0].itemId));
+});
+
+withRandom(0, () => {
+    const seed = makeSession({ level: 27 });
+    seed.runLoc(7053, { x: 3075, y: 3249 });
+    seed.runPending();
+    seed.runPending(51);
+    assert.deepEqual(seed.xp, [10]);
+    assert.deepEqual(seed.added, [{ itemId: StallItems.HAMMERSTONE_SEED, quantity: 1 }]);
+});
+
+withRandom(0, () => {
+    const food = makeSession({ level: 5 });
+    food.runLoc(4875, { x: 2768, y: 2789 });
+    food.runPending();
+    food.runPending(51);
+    assert.deepEqual(food.added, [{ itemId: StallItems.BANANA, quantity: 1 }]);
+    assert.deepEqual(food.xp, [16]);
+});
+
 const gem = getStallByLocId(11731)!;
 assert.equal(gem.xp, 408);
 assert.equal(gem.respawnTicks, 100);
+
+const seedDef = getStallByLocId(7053)!;
+assert.equal(seedDef.reqLevel, 27);
+assert.equal(seedDef.respawnTicks, 5);
+assert.equal(seedDef.lootTable.length, 17);
+
+const fruitDef = getStallByLocId(28823)!;
+assert.equal(fruitDef.reqLevel, 25);
+assert.equal(fruitDef.respawnTicks, 4);
+assert.equal(fruitDef.xp, 28.5);
+
+assert.equal(getStallByLocId(4878)?.xp, 210);
+assert.equal(getStallByLocId(4877)?.xp, 90);
+assert.equal(getStallByLocId(4876)?.xp, 25);
 assert.deepEqual(
     gem.lootTable.map((e) => e.itemId),
     [
