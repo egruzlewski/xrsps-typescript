@@ -1,5 +1,6 @@
 /**
- * Runecraft loops: F2P Air–Body plus members ruins altars, and walk-up Astral.
+ * Runecraft loops: F2P Air–Body plus members ruins altars, and walk-up
+ * Astral, Kourend Blood, and Arceuus Soul.
  * Ruins: talisman/tiara enter → craft on altar → exit portal.
  * Walk-up: click the surface altar (no ruins/portal). Same ruins altars also
  * bind blank tiaras and combination runes (Mist–Lava).
@@ -77,19 +78,43 @@ function craftRunes(altar: RuneCraftDef, player: PlayerState, services: ScriptSe
         return;
     }
 
-    const runeEss = altar.pureEssenceOnly ? 0 : player.items.getItemCount(RUNE_ESSENCE);
-    const pureEss = player.items.getItemCount(PURE_ESSENCE);
-    const totalEss = runeEss + pureEss;
-    if (totalEss <= 0) {
-        if (altar.pureEssenceOnly && player.items.getItemCount(RUNE_ESSENCE) > 0) {
-            services.messaging.sendGameMessage(
-                player,
-                `You need pure essence to craft ${altar.name} Runes.`,
-            );
+    let totalEss: number;
+    let runeEss = 0;
+    let pureEss = 0;
+    let specialEss = 0;
+
+    if (altar.essenceItemId != null) {
+        specialEss = player.items.getItemCount(altar.essenceItemId);
+        if (specialEss <= 0) {
+            if (
+                player.items.getItemCount(RUNE_ESSENCE) > 0 ||
+                player.items.getItemCount(PURE_ESSENCE) > 0
+            ) {
+                services.messaging.sendGameMessage(
+                    player,
+                    `You need dark essence fragments to craft ${altar.name} Runes.`,
+                );
+                return;
+            }
+            services.messaging.sendGameMessage(player, "You do not have any essence to bind.");
             return;
         }
-        services.messaging.sendGameMessage(player, "You do not have any essence to bind.");
-        return;
+        totalEss = specialEss;
+    } else {
+        runeEss = altar.pureEssenceOnly ? 0 : player.items.getItemCount(RUNE_ESSENCE);
+        pureEss = player.items.getItemCount(PURE_ESSENCE);
+        totalEss = runeEss + pureEss;
+        if (totalEss <= 0) {
+            if (altar.pureEssenceOnly && player.items.getItemCount(RUNE_ESSENCE) > 0) {
+                services.messaging.sendGameMessage(
+                    player,
+                    `You need pure essence to craft ${altar.name} Runes.`,
+                );
+                return;
+            }
+            services.messaging.sendGameMessage(player, "You do not have any essence to bind.");
+            return;
+        }
     }
 
     const perEss = 1 + Math.floor(level / altar.multiplierDiv);
@@ -97,6 +122,9 @@ function craftRunes(altar: RuneCraftDef, player: PlayerState, services: ScriptSe
 
     if (runeEss > 0) player.items.removeItem(RUNE_ESSENCE, runeEss, { assureFullRemoval: true });
     if (pureEss > 0) player.items.removeItem(PURE_ESSENCE, pureEss, { assureFullRemoval: true });
+    if (specialEss > 0 && altar.essenceItemId != null) {
+        player.items.removeItem(altar.essenceItemId, specialEss, { assureFullRemoval: true });
+    }
     player.items.addItem(altar.runeId, craftCount);
     services.inventory.snapshotInventory(player);
     services.skills.addSkillXp(player, SkillId.Runecraft, totalEss * altar.xpPerEssence);
@@ -252,8 +280,12 @@ function registerCraftHandlers(registry: IScriptRegistry, altar: RuneCraftDef): 
     registry.registerLocInteraction(altar.altarLocId, craftFromLoc, "craft-rune");
     registry.registerLocInteraction(altar.altarLocId, craftFromLoc, "craft rune");
     registry.registerLocInteraction(altar.altarLocId, craftFromLoc, undefined);
-    registry.registerItemOnLoc(RUNE_ESSENCE, altar.altarLocId, craftFromItem);
-    registry.registerItemOnLoc(PURE_ESSENCE, altar.altarLocId, craftFromItem);
+    if (altar.essenceItemId != null) {
+        registry.registerItemOnLoc(altar.essenceItemId, altar.altarLocId, craftFromItem);
+    } else {
+        registry.registerItemOnLoc(RUNE_ESSENCE, altar.altarLocId, craftFromItem);
+        registry.registerItemOnLoc(PURE_ESSENCE, altar.altarLocId, craftFromItem);
+    }
 }
 
 export function register(registry: IScriptRegistry): void {

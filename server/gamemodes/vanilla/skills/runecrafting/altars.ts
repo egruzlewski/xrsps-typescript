@@ -15,6 +15,8 @@ export interface RuneCraftDef {
     altarLocId: number;
     /** When true, rune essence cannot be bound (OSRS members altars). */
     pureEssenceOnly?: boolean;
+    /** When set, bind this item instead of rune/pure essence. */
+    essenceItemId?: number;
 }
 
 export interface RuneAltarDef extends RuneCraftDef {
@@ -31,6 +33,8 @@ export interface RuneAltarDef extends RuneCraftDef {
 export const RUNE_ESSENCE = 1436;
 export const PURE_ESSENCE = 7936;
 export const BLANK_TIARA = 5525;
+/** Stackable fragments used at Kourend Blood and Arceuus Soul (OSRS 7938). */
+export const DARK_ESSENCE_FRAGMENTS = 7938;
 
 export const F2P_ALTARS: readonly RuneAltarDef[] = [
     {
@@ -131,7 +135,7 @@ export const F2P_ALTARS: readonly RuneAltarDef[] = [
     },
 ];
 
-/** Members ruins altars. Soul (Arceuus) has no mysterious ruins (walk-up, unverified loc). */
+/** Members ruins altars (talisman/tiara enter). True Blood is Meiyerditch, not Kourend. */
 export const MEMBERS_ALTARS: readonly RuneAltarDef[] = [
     {
         id: "cosmic",
@@ -259,6 +263,9 @@ export const MEMBERS_ALTARS: readonly RuneAltarDef[] = [
  * Walk-up surface altars: no ruins, talisman, tiara, or portal.
  * OSRS Astral also requires Lunar Diplomacy; that quest is not registered here,
  * so craft is not quest-locked.
+ * Kourend Blood / Arceuus Soul bind dark essence fragments. Dense runestone
+ * mining, Dark Altar conversion, and chiseling blocks into fragments are not
+ * implemented; craft still works if the player already has fragments (7938).
  */
 export const WALKUP_ALTARS: readonly RuneCraftDef[] = [
     {
@@ -270,6 +277,26 @@ export const WALKUP_ALTARS: readonly RuneCraftDef[] = [
         runeId: 9075,
         altarLocId: 34771,
         pureEssenceOnly: true,
+    },
+    {
+        id: "kourend-blood",
+        name: "Blood",
+        level: 77,
+        xpPerEssence: 23.8,
+        multiplierDiv: 100,
+        runeId: 565,
+        altarLocId: 27978,
+        essenceItemId: DARK_ESSENCE_FRAGMENTS,
+    },
+    {
+        id: "soul",
+        name: "Soul",
+        level: 90,
+        xpPerEssence: 29.7,
+        multiplierDiv: 100,
+        runeId: 566,
+        altarLocId: 27980,
+        essenceItemId: DARK_ESSENCE_FRAGMENTS,
     },
 ];
 

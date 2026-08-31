@@ -32,9 +32,8 @@ const registry = {
 
 register(registry);
 
-assert.equal(WALKUP_ALTARS.length, 1);
-const astral = WALKUP_ALTARS[0];
-assert.equal(astral.id, "astral");
+const astral = WALKUP_ALTARS.find((altar) => altar.id === "astral");
+assert.ok(astral);
 assert.equal(astral.altarLocId, 34771);
 assert.equal(astral.runeId, 9075);
 assert(locHandlers.has(`${astral.altarLocId}:craft-rune`));
