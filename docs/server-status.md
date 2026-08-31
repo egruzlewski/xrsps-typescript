@@ -56,7 +56,7 @@ Start here if you want a development path. Ordered roughly by “missing entire 
 
 ### Skills with dedicated modules (still not full OSRS)
 
-Mining, woodcutting, fishing, firemaking, smithing, cooking/tanning/bolt enchant, fletching, herblore, thieving (pickpocket + picklock), prayer (bones/ashes + altars), consumables: **Partial** — data-driven for a subset of recipes/locs, not every OSRS node.
+Mining, woodcutting, fishing, firemaking, smithing, cooking/tanning/bolt enchant, fletching, herblore, thieving (pickpocket + picklock + stalls), prayer (bones/ashes + altars), consumables: **Partial** — data-driven for a subset of recipes/locs, not every OSRS node.
 
 ---
 
@@ -368,7 +368,7 @@ Combat skills (Attack, Strength, Defence, Hitpoints, Ranged, Magic) are **engine
 | Mining | Partial | [`skills/mining/`](../server/gamemodes/vanilla/skills/mining/) | Rock loc map, pickaxes | Missing rocks |
 | Herblore | Partial | clean / unf / finish / stamina | Data lists in `herblore/index.ts` | Missing potions |
 | Agility | Partial | [`skills/agility/`](../server/gamemodes/vanilla/skills/agility/) | Gnome Stronghold course (all obstacles + in-order lap bonus). XP matches current OSRS (110.5/lap). [`agility-gnome-course.test.ts`](../server/tests/agility-gnome-course.test.ts) | Other courses |
-| Thieving | Partial | pickpocket + picklock | NPC/loc tables; pickpocket item ID TODO | Stalls, chest loot breadth |
+| Thieving | Partial | pickpocket + picklock + stalls | NPC pickpocket tables, HAM trapdoor picklock, market stalls (veg through gem, plus tea/wine/fish/crafting). [`thieving-stalls.test.ts`](../server/tests/thieving-stalls.test.ts) | Chest loot, seed/fruit/Ape Atoll remaining stalls, guard LOS catch |
 | Runecraft | Partial | [`skills/runecrafting/`](../server/gamemodes/vanilla/skills/runecrafting/) | F2P altars Air–Body (ruins/tiara/talisman enter, craft, portal exit). [`runecrafting-f2p-altars.test.ts`](../server/tests/runecrafting-f2p-altars.test.ts) | Members altars, tiaras, combination runes, Abyss |
 | Sailing | Partial | Pandemonium + engine instances | Restore on login | Rest of skill |
 | Consumables | Partial | large food/potion tables | Eat/drink actions | Remaining items |
