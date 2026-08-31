@@ -15,13 +15,18 @@ import {
 } from "../gatheringPrecheck";
 import {
     type PickaxeDefinition,
+    DENSE_RUNESTONE_CHISEL,
+    DENSE_RUNESTONE_LOCS,
+    PICKAXES,
     buildMiningLocMap,
+    denseRunestonePersists,
     getMiningRockById,
     getMiningRockFromMap,
     selectPickaxeByLevel,
 } from "./miningData";
 
-const MINING_ACTIONS = ["mine", "mine rocks"];
+const MINING_ACTIONS = ["mine", "mine rocks", "chip"];
+const failMiningPrecheck = failGatheringPrecheck;
 // Trailblazer / Echo pickaxe only (league tutor tool set). Do NOT include
 // Infernal/Dragon ornament kits — those were incorrectly bank-routing ore.
 const ECHO_PICKAXE_ITEM_IDS = [25112];
@@ -91,7 +96,26 @@ function executeMineAction(ctx: ScriptActionHandlerContext): ActionExecutionResu
             "You need a pickaxe that you have the Mining level to use.",
         );
     }
-    const hasEchoPickaxePerk = ECHO_PICKAXE_ITEM_IDS.includes(pickaxe.itemId);
+    const isDense = rock.id === "dense";
+    if (isDense) {
+        const crafting = services.skills.getSkill(player, SkillId.Crafting);
+        const craftingLevel = Math.max(1, (crafting?.baseLevel ?? 1) + (crafting?.boost ?? 0));
+        const craftingReq = rock.craftingLevel ?? 38;
+        if (craftingLevel < craftingReq) {
+            return failMiningPrecheck(
+                player,
+                services,
+                `You need Crafting level ${craftingReq} to mine this rock.`,
+            );
+        }
+        const hasChisel =
+            carriedIds.includes(DENSE_RUNESTONE_CHISEL) ||
+            services.inventory.playerHasItem(player, DENSE_RUNESTONE_CHISEL);
+        if (rock.requireChisel && !hasChisel) {
+            return failMiningPrecheck(player, services, "You need a chisel to chip this rock.");
+        }
+    }
+    const hasEchoPickaxePerk = !isDense && ECHO_PICKAXE_ITEM_IDS.includes(pickaxe.itemId);
 
     if (!hasEchoPickaxePerk && !services.inventory.hasInventorySlot(player)) {
         return failMiningPrecheck(
@@ -101,7 +125,7 @@ function executeMineAction(ctx: ScriptActionHandlerContext): ActionExecutionResu
         );
     }
 
-    const swingTicks = Math.max(rock.swingTicks, pickaxe.swingTicks);
+    const swingTicks = isDense ? rock.swingTicks : Math.max(rock.swingTicks, pickaxe.swingTicks);
     const effects: ActionEffect[] = [];
 
     if (!data.started) {
@@ -141,7 +165,7 @@ function executeMineAction(ctx: ScriptActionHandlerContext): ActionExecutionResu
     const echoMinedCount = data.echoMinedCount;
     let nextEchoMinedCount = echoMinedCount;
 
-    let success = rollMiningSuccess(effectiveLevel, rock.level, pickaxe);
+    let success = rock.alwaysSucceed || rollMiningSuccess(effectiveLevel, rock.level, pickaxe);
     if (!success && hasEchoPickaxePerk && Math.random() < 0.5) {
         success = true;
     }
@@ -181,10 +205,16 @@ function executeMineAction(ctx: ScriptActionHandlerContext): ActionExecutionResu
             );
         }
         services.skills.addSkillXp(player, SkillId.Mining, rock.xp);
+        if (isDense && (rock.craftingXp ?? 0) > 0) {
+            services.skills.addSkillXp(player, SkillId.Crafting, rock.craftingXp ?? 0);
+        }
 
         if (locId > 0) {
             nextEchoMinedCount = hasEchoPickaxePerk ? echoMinedCount + 1 : 0;
-            const canDeplete = !hasEchoPickaxePerk || nextEchoMinedCount >= 4;
+            let canDeplete = !hasEchoPickaxePerk || nextEchoMinedCount >= 4;
+            if (canDeplete && isDense) {
+                canDeplete = !denseRunestonePersists(effectiveLevel);
+            }
             if (canDeplete) {
                 const depletedLocId =
                     typeof actionDepletedLocId === "number" && actionDepletedLocId > 0
@@ -282,36 +312,86 @@ export function register(registry: IScriptRegistry, services: ScriptServices): v
         console.log("[script:mining] rock lookup unavailable; module disabled");
         return;
     }
+    const requestMine = (
+        player: PlayerState,
+        actionServices: ScriptServices,
+        locId: number,
+        tile: { x: number; y: number },
+        level: number,
+        tick: number,
+    ) => {
+        const rock = services.getMiningRock?.(locId);
+        if (!rock) return;
+        const result = actionServices.combat.requestAction(
+            player,
+            {
+                kind: "skill.mine",
+                data: {
+                    rockId: rock.id,
+                    rockLocId: locId,
+                    depletedLocId: rock.depletedLocId,
+                    tile: { x: tile.x, y: tile.y },
+                    level,
+                    started: false,
+                    echoMinedCount: 0,
+                },
+                delayTicks: 0,
+                cooldownTicks: 0,
+                groups: ["skill.mine"],
+            },
+            tick,
+        );
+        if (!result.ok) {
+            actionServices.messaging.sendGameMessage(
+                player,
+                "You're too busy to do that right now.",
+            );
+        }
+    };
+
     for (const action of MINING_ACTIONS) {
         registry.registerLocAction(action, (event) => {
-            const rock = services.getMiningRock?.(event.locId);
-            if (!rock) return;
-            const delay = 0;
-            const result = services.combat.requestAction(
+            requestMine(
                 event.player,
-                {
-                    kind: "skill.mine",
-                    data: {
-                        rockId: rock.id,
-                        rockLocId: event.locId,
-                        depletedLocId: rock.depletedLocId,
-                        tile: { x: event.tile.x, y: event.tile.y },
-                        level: event.level,
-                        started: false,
-                        echoMinedCount: 0,
-                    },
-                    delayTicks: delay,
-                    cooldownTicks: delay,
-                    groups: ["skill.mine"],
-                },
+                event.services,
+                event.locId,
+                event.tile,
+                event.level,
                 event.tick,
             );
-            if (!result.ok) {
-                services.messaging.sendGameMessage(
-                    event.player,
-                    "You're too busy to do that right now.",
-                );
-            }
         });
+    }
+
+    for (const { locId } of DENSE_RUNESTONE_LOCS) {
+        const chip = (event: {
+            player: PlayerState;
+            services: ScriptServices;
+            locId: number;
+            tile: { x: number; y: number };
+            level: number;
+            tick: number;
+        }) =>
+            requestMine(
+                event.player,
+                event.services,
+                event.locId,
+                event.tile,
+                event.level,
+                event.tick,
+            );
+        registry.registerLocInteraction(locId, (event) => chip(event), "chip");
+        registry.registerLocInteraction(locId, (event) => chip(event), undefined);
+        for (const pickaxe of PICKAXES) {
+            registry.registerItemOnLoc(pickaxe.itemId, locId, (event) => {
+                requestMine(
+                    event.player,
+                    event.services,
+                    event.target.locId,
+                    event.target.tile,
+                    event.target.level,
+                    event.tick,
+                );
+            });
+        }
     }
 }

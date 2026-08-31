@@ -35,6 +35,12 @@ export const PURE_ESSENCE = 7936;
 export const BLANK_TIARA = 5525;
 /** Stackable fragments used at Kourend Blood and Arceuus Soul (OSRS 7938). */
 export const DARK_ESSENCE_FRAGMENTS = 7938;
+/** Unstackable block mined from dense runestone (OSRS 13445). */
+export const DENSE_ESSENCE_BLOCK = 13445;
+/** Infused block from the Dark Altar (OSRS 13446). */
+export const DARK_ESSENCE_BLOCK = 13446;
+/** Arceuus Dark Altar, Venerate (OSRS 27979). */
+export const DARK_ALTAR_LOC_ID = 27979;
 
 export const F2P_ALTARS: readonly RuneAltarDef[] = [
     {
@@ -264,8 +270,8 @@ export const MEMBERS_ALTARS: readonly RuneAltarDef[] = [
  * OSRS Astral also requires Lunar Diplomacy; that quest is not registered here,
  * so craft is not quest-locked.
  * Kourend Blood / Arceuus Soul bind dark essence fragments. Dense runestone
- * mining, Dark Altar conversion, and chiseling blocks into fragments are not
- * implemented; craft still works if the player already has fragments (7938).
+ * mining (Chip locs 8975/8977/8979), Dark Altar conversion (loc 27979), and
+ * chiseling dark essence blocks into fragments are implemented.
  */
 export const WALKUP_ALTARS: readonly RuneCraftDef[] = [
     {

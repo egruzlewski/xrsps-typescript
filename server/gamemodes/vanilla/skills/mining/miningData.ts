@@ -60,6 +60,37 @@ export interface MiningRockDefinition {
     depletedLocId?: number;
     respawnTicks: { min: number; max: number };
     swingTicks: number;
+    /** Extra Crafting gate used by dense runestone (OSRS 38). */
+    craftingLevel?: number;
+    craftingXp?: number;
+    requireChisel?: boolean;
+    /** Dense runestone always yields a block; pickaxe only supplies the animation. */
+    alwaysSucceed?: boolean;
+}
+
+/** Unstackable block from Arceuus dense runestone (OSRS 13445). */
+export const DENSE_ESSENCE_BLOCK = 13445;
+/** Inventory chisel required to chip dense runestone (OSRS 1755). */
+export const DENSE_RUNESTONE_CHISEL = 1755;
+
+/**
+ * Wiki scenery ids: Chip on dense runestone, Check on depleted.
+ * 8975↔8976, 8977↔8978, 8979↔8980.
+ */
+export const DENSE_RUNESTONE_LOCS: readonly { locId: number; depletedLocId: number }[] = [
+    { locId: 8975, depletedLocId: 8976 },
+    { locId: 8977, depletedLocId: 8978 },
+    { locId: 8979, depletedLocId: 8980 },
+];
+
+/** OSRS persist roll: low 210 / high 230 over 256 at levels 1–99. */
+export function denseRunestonePersistChance(level: number): number {
+    const lv = Math.max(1, Math.min(99, Math.floor(level)));
+    return (210 * (99 - lv) + 230 * (lv - 1)) / 98 / 256;
+}
+
+export function denseRunestonePersists(level: number, roll: number = Math.random()): boolean {
+    return roll < denseRunestonePersistChance(level);
 }
 
 const ROCK_DEFINITIONS: MiningRockDefinition[] = [
@@ -174,6 +205,20 @@ const ROCK_DEFINITIONS: MiningRockDefinition[] = [
         respawnTicks: { min: 110, max: 150 },
         swingTicks: 6,
     },
+    {
+        id: "dense",
+        name: "Dense runestone",
+        level: 38,
+        xp: 12,
+        craftingLevel: 38,
+        craftingXp: 8,
+        oreItemId: DENSE_ESSENCE_BLOCK,
+        requireChisel: true,
+        alwaysSucceed: true,
+        // Wiki gathering time is 9 ticks; pickaxe tier does not speed this up.
+        respawnTicks: { min: 20, max: 20 },
+        swingTicks: 9,
+    },
 ];
 
 const ROCK_BY_ID = new Map<string, MiningRockDefinition>(
@@ -203,6 +248,7 @@ const ROCK_NAME_ALIASES: Record<string, string> = {
     "runite ore rocks": "runite",
     "amethyst crystals": "amethyst",
     "amethyst rocks": "amethyst",
+    "dense runestone": "dense",
 };
 
 export function getMiningRockById(id: string): MiningRockDefinition | undefined {
@@ -224,6 +270,12 @@ export interface MiningLocMapping {
 
 export interface MiningLocMap {
     map: Map<number, MiningLocMapping>;
+}
+
+export function applyDenseRunestoneLocs(map: Map<number, MiningLocMapping>): void {
+    for (const { locId, depletedLocId } of DENSE_RUNESTONE_LOCS) {
+        map.set(locId, { rockId: "dense", depletedLocId });
+    }
 }
 
 function hasMineAction(loc: LocTypeData | undefined): boolean {
@@ -277,6 +329,7 @@ function findNearestDepletedLocId(
 
 export function buildMiningLocMap(loader?: LocTypeLoader): MiningLocMap {
     const map = new Map<number, MiningLocMapping>();
+    applyDenseRunestoneLocs(map);
     if (!loader?.getCount || !loader.load) {
         return { map };
     }
@@ -327,6 +380,7 @@ export function buildMiningLocMap(loader?: LocTypeLoader): MiningLocMap {
             depletedLocId: depletedLocId && depletedLocId > 0 ? depletedLocId : undefined,
         });
     }
+    applyDenseRunestoneLocs(map);
     return { map };
 }
 
