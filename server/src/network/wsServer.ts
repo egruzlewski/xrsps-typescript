@@ -1058,6 +1058,9 @@ export class WSServer {
             this.npcManager.setGroundItemSpawner((itemId, qty, tile, tick, opts, worldViewId) => {
                 this.groundItems.spawn(itemId, qty, tile, tick, opts, worldViewId ?? -1);
             });
+            this.npcManager.setSpotAnimationEnqueuer((anim) => {
+                this.broadcastService.enqueueSpotAnimation(anim);
+            });
         }
 
         this.actionDispatchService = new ActionDispatchService(this.svc);

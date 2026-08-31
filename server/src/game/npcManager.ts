@@ -14,7 +14,7 @@ import { PathService } from "../pathfinding/PathService";
 import { CollisionFlag } from "../pathfinding/legacy/pathfinder/flag/CollisionFlag";
 import { logger } from "../utils/logger";
 import { MapCollisionService } from "../world/MapCollisionService";
-import { BossScript, createBossScript } from "./combat/BossScriptFramework";
+import { BossScript, createBossScript, type BossTileGraphic } from "./combat/BossScriptFramework";
 import { damageTracker } from "./combat/DamageTracker";
 import { interceptFrozenCombatMovement } from "./combat/engine/CombatMovementInterceptor";
 import { StatusHitsplat } from "./combat/HitEffects";
@@ -246,6 +246,7 @@ export class NpcManager {
     };
 
     private groundItemSpawner?: GroundItemSpawner;
+    private enqueueSpotAnimationFn?: (gfx: BossTileGraphic & { tick: number }) => void;
 
     constructor(
         _mapService: MapCollisionService,
@@ -278,6 +279,12 @@ export class NpcManager {
 
     setGroundItemSpawner(spawner: GroundItemSpawner | undefined): void {
         this.groundItemSpawner = spawner;
+    }
+
+    setSpotAnimationEnqueuer(
+        fn: ((gfx: BossTileGraphic & { tick: number }) => void) | undefined,
+    ): void {
+        this.enqueueSpotAnimationFn = fn;
     }
 
     loadFromFile(filePath: string): void {
@@ -552,6 +559,9 @@ export class NpcManager {
         const bossScript = createBossScript(npc);
         if (bossScript) {
             bossScript.setSpawnNpc((config) => this.spawnTransientNpc(config));
+            bossScript.setEnqueueSpotAnimation((gfx) => {
+                this.enqueueSpotAnimationFn?.({ ...gfx, tick: this.currentTick });
+            });
             this.bossScripts.set(npc.id, bossScript);
         }
     }

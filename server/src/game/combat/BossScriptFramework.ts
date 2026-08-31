@@ -18,6 +18,16 @@ import { type DropEligibility, damageTracker, multiCombatSystem } from "../scrip
 
 type SpawnNpcFn = (config: NpcSpawnConfig) => NpcState | undefined;
 
+/** Tile-based gfx (venom clouds, etc.). Wired to BroadcastService in production. */
+export type BossTileGraphic = {
+    spotId: number;
+    tile: { x: number; y: number; level?: number };
+    height?: number;
+    delay?: number;
+};
+
+type EnqueueSpotAnimationFn = (gfx: BossTileGraphic) => void;
+
 type Npc = NpcState;
 
 export interface BossPhase {
@@ -70,6 +80,7 @@ export abstract class BossScript {
     protected state: BossState;
     protected currentTick: number = 0;
     private spawnNpcFn?: SpawnNpcFn;
+    private enqueueSpotAnimationFn?: EnqueueSpotAnimationFn;
 
     constructor(npc: Npc) {
         this.npc = npc;
@@ -334,6 +345,25 @@ export abstract class BossScript {
      */
     spawnNpc(config: NpcSpawnConfig): NpcState | undefined {
         return this.spawnNpcFn?.(config);
+    }
+
+    /**
+     * Wire BroadcastService.enqueueSpotAnimation (or a test double). Used by
+     * mechanics such as Zulrah venom clouds.
+     */
+    setEnqueueSpotAnimation(fn: EnqueueSpotAnimationFn): void {
+        this.enqueueSpotAnimationFn = fn;
+    }
+
+    /**
+     * Play a tile gfx in the same world as the boss. No-op when unwired.
+     */
+    enqueueSpotAnimation(gfx: BossTileGraphic): void {
+        this.enqueueSpotAnimationFn?.(gfx);
+    }
+
+    getCurrentTick(): number {
+        return this.currentTick;
     }
 
     getCombatTarget(): Actor | null {

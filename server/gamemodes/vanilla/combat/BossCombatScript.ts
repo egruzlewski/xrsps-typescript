@@ -1,5 +1,7 @@
 import type { Actor } from "../../../src/game/actor";
 import { BossScript, registerBossScript } from "../../../src/game/combat/BossScriptFramework";
+import { NpcState } from "../../../src/game/npc";
+import { PlayerState } from "../../../src/game/player";
 
 export {
     BossScript,
@@ -9,6 +11,7 @@ export {
     registerBossScript,
     getBossScript,
     createBossScript,
+    type BossTileGraphic,
 } from "../../../src/game/combat/BossScriptFramework";
 
 // ============================================
@@ -101,7 +104,7 @@ export function executeGiantMoleDig(
 // Zulrah snakelings (NPC 2042 summons 2045 / 2046)
 // ============================================
 // OSRS: during later rotations Zulrah summons melee and mage snakelings onto
-// the shrine. The player is not moved. Venom clouds remain unimplemented.
+// the shrine. The player is not moved. Venom clouds spawn on the target tile.
 
 export const ZULRAH_NPC_ID = 2042;
 export const ZULRAH_SNAKELING_MELEE_ID = 2045;
@@ -126,6 +129,15 @@ export const ZULRAH_SNAKELING_SPAWN_SPOTS: ReadonlyArray<{ x: number; y: number;
 
 /** Same seq as the snakeling special (Zulrah ranged/magic attack). */
 export const ZULRAH_SNAKELING_ANIM = 5069;
+
+/** Tile gfx between Zulrah ranged (1044) and magic (1046) projectiles. */
+export const ZULRAH_VENOM_CLOUD_GFX = 1045;
+
+/** Same spit seq as ranged/magic/snakeling. */
+export const ZULRAH_VENOM_CLOUD_ANIM = 5069;
+
+/** OSRS venom starts at 6 damage. */
+export const ZULRAH_VENOM_STAGE = 6;
 
 export function isInZulrahShrine(x: number, y: number, level: number): boolean {
     return (
@@ -185,6 +197,48 @@ export function executeZulrahSnakeling(
         });
     }
     return plans;
+}
+
+export type ZulrahVenomCloudSpawn = {
+    x: number;
+    y: number;
+    level: number;
+    gfxId: number;
+    venomApplied: boolean;
+};
+
+function applyZulrahVenom(target: Actor, currentTick: number): boolean {
+    if (target instanceof PlayerState) {
+        target.skillSystem.inflictVenom(ZULRAH_VENOM_STAGE, currentTick);
+        return true;
+    }
+    if (target instanceof NpcState) {
+        target.inflictVenom(ZULRAH_VENOM_STAGE, currentTick);
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Spawn a venom cloud on the combat target's tile (tile gfx + venom).
+ * No loc object API exists; this is a temporary area effect. Player stays put.
+ */
+export function executeZulrahVenomCloud(boss: BossScript, target: Actor): ZulrahVenomCloudSpawn {
+    const npc = boss.getNpc();
+    npc.queueOneShotSeq(ZULRAH_VENOM_CLOUD_ANIM);
+    const cloud: ZulrahVenomCloudSpawn = {
+        x: target.tileX,
+        y: target.tileY,
+        level: target.level,
+        gfxId: ZULRAH_VENOM_CLOUD_GFX,
+        venomApplied: applyZulrahVenom(target, boss.getCurrentTick()),
+    };
+    boss.enqueueSpotAnimation({
+        spotId: cloud.gfxId,
+        tile: { x: cloud.x, y: cloud.y, level: cloud.level },
+        height: 0,
+    });
+    return cloud;
 }
 
 // ============================================
@@ -400,7 +454,7 @@ class ZulrahScript extends BossScript {
             maxDamage: 0,
             style: "typeless",
             execute: (boss, target) => {
-                // Spawn venom cloud at target location
+                executeZulrahVenomCloud(boss, target);
             },
         });
 
