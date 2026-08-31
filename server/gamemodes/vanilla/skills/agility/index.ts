@@ -4,8 +4,8 @@
  * Barbarian Outpost, Wilderness, Draynor Village rooftop, Al Kharid rooftop,
  * Varrock rooftop, Canifis rooftop, Falador rooftop, Seers' Village rooftop,
  * Pollnivneach rooftop, Agility Pyramid, Ardougne rooftop, Ape Atoll,
- * Colossal Wyrm Agility Course, and Shayzien Agility Course are registered
- * from sibling files.
+ * Colossal Wyrm Agility Course, Shayzien Agility Course, and Penguin Agility
+ * Course are registered from sibling files.
  */
 import { SkillId } from "../../../../../client/rs/skill/skills";
 import type { PlayerState } from "../../../../src/game/player";
@@ -19,6 +19,7 @@ import { register as registerCanifis } from "./canifis";
 import { register as registerColossalWyrm } from "./colossalWyrm";
 import { register as registerDraynor } from "./draynor";
 import { register as registerFalador } from "./falador";
+import { register as registerPenguin } from "./penguin";
 import { register as registerPollnivneach } from "./pollnivneach";
 import { register as registerPrifddinas } from "./prifddinas";
 import { register as registerPyramid } from "./pyramid";
@@ -228,6 +229,7 @@ export function register(registry: IScriptRegistry): void {
     registerPrifddinas(registry);
     registerColossalWyrm(registry);
     registerShayzien(registry);
+    registerPenguin(registry);
 }
 
 /** Test helper: clear lap tracking for one player or all players. */
@@ -314,3 +316,7 @@ export {
     isShayzienAdvancedLap,
     resetShayzienCourseProgress,
 } from "./shayzien";
+export {
+    getPenguinCourseStage,
+    resetPenguinCourseProgress,
+} from "./penguin";
