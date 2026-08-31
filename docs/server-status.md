@@ -43,7 +43,7 @@ Start here if you want a development path. Ordered roughly by “missing entire 
 
 ### Partial (high-leverage)
 
-- **Agility** — one Gnome Stronghold log; comment says full course deferred.
+- **Agility** — full Gnome Stronghold course (log, nets, branches, rope, pipes + 50 XP lap bonus). Other courses still missing.
 - **Runecraft** — Air altar loop only.
 - **Crafting** — flax, shearing, spinning only (no jewellery, leather, pottery, gold, etc.).
 - **Sailing** — engine world-views + Pandemonium content, not a full skill.
@@ -369,7 +369,7 @@ Combat skills (Attack, Strength, Defence, Hitpoints, Ranged, Magic) are **engine
 | Smithing | Partial | smelt + smith UI/modals | Data-driven bars/items | Remaining recipes |
 | Mining | Partial | [`skills/mining/`](../server/gamemodes/vanilla/skills/mining/) | Rock loc map, pickaxes | Missing rocks |
 | Herblore | Partial | clean / unf / finish / stamina | Data lists in `herblore/index.ts` | Missing potions |
-| Agility | Partial | [`skills/agility/`](../server/gamemodes/vanilla/skills/agility/) | **One loc:** Gnome log 23145 | Rest of gnome course, other courses |
+| Agility | Partial | [`skills/agility/`](../server/gamemodes/vanilla/skills/agility/) | Gnome Stronghold course (all obstacles + in-order lap bonus). XP matches current OSRS (110.5/lap). [`agility-gnome-course.test.ts`](../server/tests/agility-gnome-course.test.ts) | Other courses |
 | Thieving | Partial | pickpocket + picklock | NPC/loc tables; pickpocket item ID TODO | Stalls, chest loot breadth |
 | Runecraft | Partial | Air ruins/altar/portal only | — | Other altars |
 | Sailing | Partial | Pandemonium + engine instances | Restore on login | Rest of skill |
@@ -548,7 +548,7 @@ Infrastructure tests: `quest-completion-safety`, `quest-registry-validation`, `q
 | [`defaultTalk.ts`](../server/gamemodes/vanilla/scripts/content/defaultTalk.ts) | Unscripted NPC talk |
 | [`PoisonVenomSystem.ts`](../server/src/game/combat/PoisonVenomSystem.ts) | `processTick` stub |
 | [`BossCombatScript.ts`](../server/gamemodes/vanilla/combat/BossCombatScript.ts) | Empty mechanic bodies |
-| [`agility/index.ts`](../server/gamemodes/vanilla/skills/agility/index.ts) | Full gnome course deferred |
+| [`agility/index.ts`](../server/gamemodes/vanilla/skills/agility/index.ts) | Other agility courses (Barbarian, Wilderness, rooftops, etc.) |
 | [`weapons.ts`](../server/gamemodes/vanilla/data/weapons.ts) | Some specs placeholders |
 
 ---
@@ -589,7 +589,7 @@ There are ~90 individual test files: heavy on quests and combat specials; light 
 ## Suggested development order (from this audit)
 
 1. Decide whether **remainder quests** stay compressed or get full ports.
-2. Fill **skill holes you care about first** (Agility/Runecraft/Crafting are the thinnest of the “existing” skills; Slayer/Hunter/Farming/Construction are absent).
+2. Fill **skill holes you care about first** (Runecraft/Crafting are the thinnest of the “existing” skills after Gnome Agility; Slayer/Hunter/Farming/Construction are absent).
 3. **World scripts** for hubs you actually play (default talk is the symptom of missing loc/NPC handlers).
 4. **Boss scripts**: implement or unregister Mole/Zulrah empty mechanics.
 5. **Protocol**: `MAP_EDIT` cleanup (opcode 50 / `OPNPC5` is decoded).
