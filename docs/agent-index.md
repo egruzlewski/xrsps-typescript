@@ -1,10 +1,12 @@
 # Agent index
 
-Routing table for this repository. Operating rules are in **`AGENTS.md` at the repo root** (not a VitePress page). Human guides: [Setup](/setup), [Architecture](/ARCHITECTURE), [Gamemodes](/gamemodes), [Extrascripts](/extrascripts), [FAQ](/faq).
+Routing table for this repository. Operating rules are in **`AGENTS.md` at the repo root** (not a VitePress page). Human guides: [Setup](/setup), [Architecture](/ARCHITECTURE), [Server status](/server-status), [Client status](/client-status), [Gamemodes](/gamemodes), [Extrascripts](/extrascripts), [FAQ](/faq).
 
 | If you are doing… | Read | Then open |
 | --- | --- | --- |
 | First orientation | this page + `AGENTS.md` | `docs/ARCHITECTURE.md` layout table |
+| What is implemented on the server | [Server status](/server-status) | `server/src/`, `server/gamemodes/vanilla/` |
+| What is implemented on the client | [Client status](/client-status) | `client/game/`, `client/network/`, `client/widgets/`, `client/render/` |
 | Local run / cache / ports | [Setup](/setup) | `server/src/config/index.ts`, `server/target.txt`, `server/config.json` |
 | Tick order, packets, varps, persistence | [Architecture](/ARCHITECTURE) | `server/src/game/tick/TickPhaseOrchestrator.ts`, `client/common/network/ClientPacketId.ts`, `client/common/packets/ServerPacketId.ts`, `server/src/network/MessageRouter.ts`, `server/src/game/state/PersistenceProvider.ts` |
 | New or changed game rules | [Gamemodes](/gamemodes) | `server/src/game/gamemodes/GamemodeDefinition.ts`, `server/gamemodes/vanilla/index.ts` |

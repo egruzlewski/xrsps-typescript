@@ -28,6 +28,8 @@ export default defineConfig({
                 text: 'Documentation',
                 items: [
                     { text: 'Architecture', link: '/ARCHITECTURE' },
+                    { text: 'Server status', link: '/server-status' },
+                    { text: 'Client status', link: '/client-status' },
                     { text: 'Gamemodes', link: '/gamemodes' },
                     { text: 'Extrascripts', link: '/extrascripts' },
                 ],
