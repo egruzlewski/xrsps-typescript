@@ -43,7 +43,7 @@ Start here if you want a development path. Ordered roughly by “missing entire 
 
 - **Agility** — full Gnome Stronghold (110.5/lap), Barbarian Outpost (153.3 Agility + 41.3 Strength/lap), and Wilderness (571.4/lap, dispenser tickets) courses. Other courses still missing.
 - **Runecraft** — F2P plus members ruins altars (Air–Body, Cosmic, Chaos, Nature, Law, Death, Blood, Wrath). Tiara imbuing, combination runes, Astral/Soul/Kourend, and the Abyss are still missing.
-- **Crafting** — flax, shearing, spinning, jewellery (gold/silver + gems), gem cutting, leather/dragonhide armour, pottery, glassblowing. Battlestaves, weaving, snakeskin, onyx/zenyte, and opal crush chance still missing.
+- **Crafting** — flax, shearing, spinning, jewellery (gold/silver + gems), gem cutting, leather/dragonhide armour, pottery, glassblowing, battlestaves (charged orb + staff). Weaving, snakeskin, onyx/zenyte, and opal crush chance still missing. Charge Orb at obelisks is Magic and still a stub.
 - **Sailing** — engine world-views + Pandemonium content, not a full skill.
 - **World content** — hubs listed under vanilla scripts, not the whole map. Unscripted locs/NPCs fall through to default talk / nothing interesting.
 - **Quests** — 64 registered. Ten of those are compressed “preservation remainder” implementations, not full-folder ports. Many later F2P/P2P quests are absent entirely.
@@ -187,8 +187,8 @@ Server→client opcodes: [`ServerPacketId.ts`](../client/common/packets/ServerPa
 | **Status** | Wired |
 | **Path** | [`game/actions/`](../server/src/game/actions/), [`game/interactions/`](../server/src/game/interactions/), [`game/scripts/`](../server/src/game/scripts/) — `ScriptRegistry`, `ScriptRuntime`, `bootstrap.ts`, `ZoneTriggerService`, `serviceInterfaces.ts` |
 | **Wired** | Action scheduler + combat/spell/inventory/widget-dialog handlers. NPC/loc/item/item-on-\*/ground/zone/button/command/client-message registration. Newest handler wins. Zone enter/leave. Script services facade for gamemodes. |
-| **Gaps** | Unscripted loc *click* is still silent. Remaining item-on-\* work is per-item content, not the dispatcher. |
-| **Tests** | [`script-registry-handler-stacks.test.ts`](../server/tests/script-registry-handler-stacks.test.ts), [`zone-trigger-script.test.ts`](../server/tests/zone-trigger-script.test.ts), [`item-on-npc-script.test.ts`](../server/tests/item-on-npc-script.test.ts), [`item-on-player-script.test.ts`](../server/tests/item-on-player-script.test.ts), [`item-on-target-default.test.ts`](../server/tests/item-on-target-default.test.ts), [`default-npc-talk.test.ts`](../server/tests/default-npc-talk.test.ts) |
+| **Gaps** | Unscripted loc click → “Nothing interesting happens.” Remaining item-on-\* work is per-item content, not the dispatcher. |
+| **Tests** | [`script-registry-handler-stacks.test.ts`](../server/tests/script-registry-handler-stacks.test.ts), [`zone-trigger-script.test.ts`](../server/tests/zone-trigger-script.test.ts), [`item-on-npc-script.test.ts`](../server/tests/item-on-npc-script.test.ts), [`item-on-player-script.test.ts`](../server/tests/item-on-player-script.test.ts), [`item-on-target-default.test.ts`](../server/tests/item-on-target-default.test.ts), [`default-npc-talk.test.ts`](../server/tests/default-npc-talk.test.ts), [`default-loc-click.test.ts`](../server/tests/default-loc-click.test.ts) |
 
 ### Combat (engine)
 
@@ -361,7 +361,7 @@ Combat skills (Attack, Strength, Defence, Hitpoints, Ranged, Magic) are **engine
 | Fletching | Partial | [`skills/fletching/`](../server/gamemodes/vanilla/skills/fletching/) | Logs + stringing + combine recipes | [`fletching-handler-registration.test.ts`](../server/tests/fletching-handler-registration.test.ts) |
 | Fishing | Partial | [`skills/fishing/`](../server/gamemodes/vanilla/skills/fishing/) | Spots/methods/tools, minnows, echo harpoon IDs | Missing spots |
 | Firemaking | Partial | [`skills/firemaking/`](../server/gamemodes/vanilla/skills/firemaking/) | Tinderbox + log defs, ash | — |
-| Crafting | Partial | [`skills/crafting/`](../server/gamemodes/vanilla/skills/crafting/) | flax, shearing, spinning, jewellery (gold/silver + gems), gem cutting, leather/dragonhide armour, pottery, glassblowing. [`crafting-jewellery-leather.test.ts`](../server/tests/crafting-jewellery-leather.test.ts), [`crafting-pottery-glassblowing.test.ts`](../server/tests/crafting-pottery-glassblowing.test.ts) | Battlestaves, weaving, snakeskin, onyx/zenyte, opal crush chance |
+| Crafting | Partial | [`skills/crafting/`](../server/gamemodes/vanilla/skills/crafting/) | flax, shearing, spinning, jewellery (gold/silver + gems), gem cutting, leather/dragonhide armour, pottery, glassblowing, battlestaves (charged orb + staff). [`crafting-jewellery-leather.test.ts`](../server/tests/crafting-jewellery-leather.test.ts), [`crafting-pottery-glassblowing.test.ts`](../server/tests/crafting-pottery-glassblowing.test.ts), [`crafting-battlestaves.test.ts`](../server/tests/crafting-battlestaves.test.ts) | Weaving, snakeskin, onyx/zenyte, opal crush chance. Charge Orb (Magic/obelisks) still stub |
 | Smithing | Partial | smelt + smith UI/modals | Data-driven bars/items | Remaining recipes |
 | Mining | Partial | [`skills/mining/`](../server/gamemodes/vanilla/skills/mining/) | Rock loc map, pickaxes | Missing rocks |
 | Herblore | Partial | clean / unf / finish / stamina | Data lists in `herblore/index.ts` | Missing potions |
@@ -584,7 +584,7 @@ There are ~90 individual test files: heavy on quests and combat specials; light 
 ## Suggested development order (from this audit)
 
 1. Decide whether **remainder quests** stay compressed or get full ports.
-2. Fill **skill holes you care about first** (Crafting still lacks battlestaves, weaving, snakeskin, onyx/zenyte, and opal crush chance; Slayer/Hunter/Farming/Construction are absent).
+2. Fill **skill holes you care about first** (Crafting still lacks weaving, snakeskin, onyx/zenyte, and opal crush chance; Charge Orb at obelisks is Magic and still a stub; Slayer/Hunter/Farming/Construction are absent).
 3. **World scripts** for hubs you actually play (default talk is the symptom of missing loc/NPC handlers).
 4. **Boss scripts**: implement or unregister Zulrah empty venom/snakeling mechanics (Mole dig is wired).
 5. **Protocol**: opcode 50 / `OPNPC5` is decoded; unused `MAP_EDIT` (195) was removed.

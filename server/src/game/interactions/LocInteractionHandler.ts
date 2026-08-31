@@ -269,6 +269,7 @@ export class LocInteractionHandler {
             return true;
         }
 
+        let doorToggled = false;
         try {
             const action = info.action ? ` action="${info.action}"` : "";
             logger.info(
@@ -285,6 +286,7 @@ export class LocInteractionHandler {
                 currentTick: tick,
             });
             if (doorResult?.success && doorResult.newLocId !== undefined) {
+                doorToggled = true;
                 const level = interactionLevel;
                 logger.info(
                     `[DOOR] Triggering loc change from ${info.id} to ${
@@ -325,6 +327,10 @@ export class LocInteractionHandler {
             }
         } catch (err) {
             logger.warn("[interaction] loc action handler failed", err);
+        }
+
+        if (!doorToggled) {
+            this.callbacks.onGameMessage?.(player, "Nothing interesting happens.");
         }
 
         return true;
