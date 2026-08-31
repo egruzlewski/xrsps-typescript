@@ -1,4 +1,5 @@
 import type { IScriptRegistry, ScriptServices } from "../../../../src/game/scripts/types";
+import { register as registerBattlestaves } from "./battlestaves";
 import { register as registerFlax } from "./flax";
 import { register as registerGlassblowing } from "./glassblowing";
 import { register as registerJewellery } from "./jewellery";
@@ -15,4 +16,5 @@ export function register(registry: IScriptRegistry, services: ScriptServices): v
     registerLeather(registry, services);
     registerPottery(registry, services);
     registerGlassblowing(registry, services);
+    registerBattlestaves(registry, services);
 }
