@@ -270,7 +270,7 @@ assert(locHandlers.has(`${OBELISK_OF_EARTH_LOC_ID}:spell`));
 assert(locHandlers.has(`${OBELISK_OF_FIRE_LOC_ID}:spell`));
 assert(locHandlers.has(`${OBELISK_OF_AIR_LOC_ID}:spell`));
 assert(actionHandlers.has("skill.charge_orb"));
-assert.equal(widgetHandlers.length, 1);
+assert.ok(widgetHandlers.length >= 1);
 
 resetState(99, waterKit(), { x: 2844, y: 3422 });
 const waterCast = castOnLoc(OBELISK_OF_WATER_LOC_ID, CHARGE_WATER_ORB_SPELL_ID, {

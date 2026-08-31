@@ -337,6 +337,9 @@ export class SpellCastingService {
             case "enchant_invalid_item":
                 text = "This spell cannot be used on this item.";
                 break;
+            case "bones_to_bananas_no_bones":
+                text = "You have no bones to convert.";
+                break;
             case "invalid_spell":
             default:
                 text = sd?.category === "utility" ? "Nothing interesting happens." : undefined;
