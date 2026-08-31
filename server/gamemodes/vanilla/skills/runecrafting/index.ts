@@ -4,6 +4,8 @@
  * Ruins: talisman/tiara enter → craft on altar → exit portal.
  * Walk-up: click the surface altar (no ruins/portal). Same ruins altars also
  * bind blank tiaras and combination runes (Mist–Lava).
+ * Abyss: wilderness Mage of Zamorak teleports into the inner ring; rifts
+ * there send the player to the matching ruins inner altars (Air–Blood).
  */
 import { EquipmentSlot } from "../../../../../client/rs/config/player/Equipment";
 import { SkillId } from "../../../../../client/rs/skill/skills";
@@ -23,6 +25,7 @@ import {
     type RuneAltarDef,
     type RuneCraftDef,
 } from "./altars";
+import { registerAbyss } from "./abyss";
 import {
     BINDING_NECKLACE_ID,
     combinationBindingsForAltar,
@@ -329,4 +332,5 @@ export function register(registry: IScriptRegistry): void {
     for (const altar of WALKUP_ALTARS) {
         registerCraftHandlers(registry, altar);
     }
+    registerAbyss(registry);
 }

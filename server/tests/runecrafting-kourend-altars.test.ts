@@ -30,6 +30,7 @@ const registry = {
         itemOnLocHandlers.set(`${itemId}:${locId}`, handler);
         return { unregister() {} };
     },
+    registerNpcInteraction: () => ({ unregister() {} }),
 } as unknown as IScriptRegistry;
 
 register(registry);
