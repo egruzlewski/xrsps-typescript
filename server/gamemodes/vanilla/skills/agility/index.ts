@@ -5,7 +5,8 @@
  * Varrock rooftop, Canifis rooftop, Falador rooftop, Seers' Village rooftop,
  * Pollnivneach rooftop, Agility Pyramid, Ardougne rooftop, Ape Atoll,
  * Colossal Wyrm Agility Course, Shayzien Agility Course, Penguin Agility Course,
- * and Dorgesh-Kaan Agility Course are registered from sibling files.
+ * Dorgesh-Kaan Agility Course, and Meiyerditch floor jumps are registered
+ * from sibling files.
  */
 import { SkillId } from "../../../../../client/rs/skill/skills";
 import type { PlayerState } from "../../../../src/game/player";
@@ -20,6 +21,7 @@ import { register as registerColossalWyrm } from "./colossalWyrm";
 import { register as registerDorgeshKaan } from "./dorgeshKaan";
 import { register as registerDraynor } from "./draynor";
 import { register as registerFalador } from "./falador";
+import { register as registerMeiyerditch } from "./meiyerditch";
 import { register as registerPenguin } from "./penguin";
 import { register as registerPollnivneach } from "./pollnivneach";
 import { register as registerPrifddinas } from "./prifddinas";
@@ -232,6 +234,7 @@ export function register(registry: IScriptRegistry): void {
     registerShayzien(registry);
     registerPenguin(registry);
     registerDorgeshKaan(registry);
+    registerMeiyerditch(registry);
 }
 
 /** Test helper: clear lap tracking for one player or all players. */
