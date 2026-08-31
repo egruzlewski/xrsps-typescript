@@ -1,3 +1,4 @@
+import type { Actor } from "../../../src/game/actor";
 import { BossScript, registerBossScript } from "../../../src/game/combat/BossScriptFramework";
 
 export {
@@ -94,6 +95,96 @@ export function executeGiantMoleDig(
     npc.queueOneShotSeq(GIANT_MOLE_DIG_ANIM);
     boss.teleportNpc(dest.x, dest.y, dest.level);
     return dest;
+}
+
+// ============================================
+// Zulrah snakelings (NPC 2042 summons 2045 / 2046)
+// ============================================
+// OSRS: during later rotations Zulrah summons melee and mage snakelings onto
+// the shrine. The player is not moved. Venom clouds remain unimplemented.
+
+export const ZULRAH_NPC_ID = 2042;
+export const ZULRAH_SNAKELING_MELEE_ID = 2045;
+export const ZULRAH_SNAKELING_MAGE_ID = 2046;
+
+/** Matches MultiCombatZones "Zulrah Shrine". */
+export const ZULRAH_SHRINE = {
+    minX: 2256,
+    minY: 3056,
+    maxX: 2287,
+    maxY: 3087,
+    level: 0,
+} as const;
+
+/** Pillar-adjacent tiles on the shrine where snakelings emerge. */
+export const ZULRAH_SNAKELING_SPAWN_SPOTS: ReadonlyArray<{ x: number; y: number; level: number }> = [
+    { x: 2263, y: 3072, level: ZULRAH_SHRINE.level },
+    { x: 2263, y: 3075, level: ZULRAH_SHRINE.level },
+    { x: 2273, y: 3072, level: ZULRAH_SHRINE.level },
+    { x: 2273, y: 3075, level: ZULRAH_SHRINE.level },
+];
+
+/** Same seq as the snakeling special (Zulrah ranged/magic attack). */
+export const ZULRAH_SNAKELING_ANIM = 5069;
+
+export function isInZulrahShrine(x: number, y: number, level: number): boolean {
+    return (
+        level === ZULRAH_SHRINE.level &&
+        x >= ZULRAH_SHRINE.minX &&
+        x <= ZULRAH_SHRINE.maxX &&
+        y >= ZULRAH_SHRINE.minY &&
+        y <= ZULRAH_SHRINE.maxY
+    );
+}
+
+export function pickZulrahSnakelingDestinations(
+    occupiedX: number,
+    occupiedY: number,
+    random: () => number = Math.random,
+): [{ x: number; y: number; level: number }, { x: number; y: number; level: number }] {
+    const free = ZULRAH_SNAKELING_SPAWN_SPOTS.filter(
+        (spot) => spot.x !== occupiedX || spot.y !== occupiedY,
+    );
+    const pool = free.length >= 2 ? free : ZULRAH_SNAKELING_SPAWN_SPOTS;
+    const first = pickFrom(pool, random);
+    const rest = pool.filter((spot) => spot.x !== first.x || spot.y !== first.y);
+    const second = rest.length > 0 ? pickFrom(rest, random) : first;
+    return [first, second];
+}
+
+export type ZulrahSnakelingSpawn = {
+    typeId: number;
+    x: number;
+    y: number;
+    level: number;
+};
+
+/** Spawn melee + mage snakelings on shrine tiles. Player stays put (OSRS). */
+export function executeZulrahSnakeling(
+    boss: BossScript,
+    target: Actor,
+    random: () => number = Math.random,
+): ZulrahSnakelingSpawn[] {
+    const npc = boss.getNpc();
+    npc.queueOneShotSeq(ZULRAH_SNAKELING_ANIM);
+    const dests = pickZulrahSnakelingDestinations(target.tileX, target.tileY, random);
+    const plans: ZulrahSnakelingSpawn[] = [
+        { typeId: ZULRAH_SNAKELING_MELEE_ID, ...dests[0] },
+        { typeId: ZULRAH_SNAKELING_MAGE_ID, ...dests[1] },
+    ];
+    for (const plan of plans) {
+        boss.spawnNpc({
+            id: plan.typeId,
+            name: "Snakeling",
+            x: plan.x,
+            y: plan.y,
+            level: plan.level,
+            wanderRadius: 5,
+            worldViewId: npc.worldViewId,
+            ownerPlayerId: npc.ownerPlayerId,
+        });
+    }
+    return plans;
 }
 
 // ============================================
@@ -321,7 +412,7 @@ class ZulrahScript extends BossScript {
             maxDamage: 0,
             style: "typeless",
             execute: (boss, target) => {
-                // Spawn snakeling NPCs
+                executeZulrahSnakeling(boss, target);
             },
         });
     }

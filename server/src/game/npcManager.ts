@@ -401,11 +401,7 @@ export class NpcManager {
         this.addToRegionIndex(npc);
         this.lifecycleHooks?.onReset?.(id);
 
-        // Initialize boss script if this NPC has one registered
-        const bossScript = createBossScript(npc);
-        if (bossScript) {
-            this.bossScripts.set(id, bossScript);
-        }
+        this.bindBossScript(npc);
         return npc;
     }
 
@@ -550,6 +546,14 @@ export class NpcManager {
 
     spawnTransientNpc(spawn: NpcSpawnConfig): NpcState | undefined {
         return this.spawnNpc(spawn);
+    }
+
+    private bindBossScript(npc: NpcState): void {
+        const bossScript = createBossScript(npc);
+        if (bossScript) {
+            bossScript.setSpawnNpc((config) => this.spawnTransientNpc(config));
+            this.bossScripts.set(npc.id, bossScript);
+        }
     }
 
     removeNpc(npcId: number): boolean {
@@ -1591,11 +1595,7 @@ export class NpcManager {
             this.addToRegionIndex(npc);
             this.lifecycleHooks?.onReset?.(npc.id);
 
-            // Re-initialize boss script if applicable
-            const bossScript = createBossScript(npc);
-            if (bossScript) {
-                this.bossScripts.set(npc.id, bossScript);
-            }
+            this.bindBossScript(npc);
         }
     }
 }

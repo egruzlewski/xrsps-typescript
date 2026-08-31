@@ -12,9 +12,11 @@
  * Core code creates instances via createBossScript().
  */
 import type { Actor } from "../actor";
-import { NpcState } from "../npc";
+import { NpcState, type NpcSpawnConfig } from "../npc";
 import { PlayerState } from "../player";
 import { type DropEligibility, damageTracker, multiCombatSystem } from "../scripts/types";
+
+type SpawnNpcFn = (config: NpcSpawnConfig) => NpcState | undefined;
 
 type Npc = NpcState;
 
@@ -67,6 +69,7 @@ export abstract class BossScript {
     protected mechanics: Map<string, BossMechanic> = new Map();
     protected state: BossState;
     protected currentTick: number = 0;
+    private spawnNpcFn?: SpawnNpcFn;
 
     constructor(npc: Npc) {
         this.npc = npc;
@@ -315,6 +318,22 @@ export abstract class BossScript {
     teleportNpc(tileX: number, tileY: number, level?: number): void {
         this.npc.teleport(tileX, tileY, level);
         this.target = null;
+    }
+
+    /**
+     * Wire NpcManager.spawnTransientNpc (or a test double). Used by mechanics
+     * such as Zulrah snakelings.
+     */
+    setSpawnNpc(fn: SpawnNpcFn): void {
+        this.spawnNpcFn = fn;
+    }
+
+    /**
+     * Spawn a minion in the same world as the boss. Returns undefined when no
+     * spawn function is wired.
+     */
+    spawnNpc(config: NpcSpawnConfig): NpcState | undefined {
+        return this.spawnNpcFn?.(config);
     }
 
     getCombatTarget(): Actor | null {
