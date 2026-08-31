@@ -323,7 +323,7 @@ export class SpellCastingService {
                 text = "You cannot alchemise this item.";
                 break;
             case "superheat_invalid_item":
-                text = "You can't superheat that.";
+                text = "You need to cast superheat item on ore.";
                 break;
             case "telegrab_invalid":
                 text = "You can't reach that.";
