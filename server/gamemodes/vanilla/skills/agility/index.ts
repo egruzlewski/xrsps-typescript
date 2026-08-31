@@ -3,12 +3,14 @@
  * Fail-proof; lap bonus only if obstacles are completed in order.
  * Barbarian Outpost, Wilderness, Draynor Village rooftop, Al Kharid rooftop,
  * Varrock rooftop, Canifis rooftop, Falador rooftop, Seers' Village rooftop,
- * Pollnivneach rooftop, Agility Pyramid, and Ardougne rooftop are registered from sibling files.
+ * Pollnivneach rooftop, Agility Pyramid, Ardougne rooftop, and Ape Atoll
+ * are registered from sibling files.
  */
 import { SkillId } from "../../../../../client/rs/skill/skills";
 import type { PlayerState } from "../../../../src/game/player";
 import type { IScriptRegistry, LocInteractionEvent } from "../../../../src/game/scripts/types";
 import { register as registerAlKharid } from "./alkharid";
+import { register as registerApeAtoll } from "./apeAtoll";
 import { register as registerArdougne } from "./ardougne";
 import { register as registerBarbarian } from "./barbarian";
 import { register as registerBrimhaven } from "./brimhaven";
@@ -218,6 +220,7 @@ export function register(registry: IScriptRegistry): void {
     registerRellekka(registry);
     registerPyramid(registry);
     registerArdougne(registry);
+    registerApeAtoll(registry);
 }
 
 /** Test helper: clear lap tracking for one player or all players. */
@@ -286,3 +289,7 @@ export {
     getArdougneCourseStage,
     resetArdougneCourseProgress,
 } from "./ardougne";
+export {
+    getApeAtollCourseStage,
+    resetApeAtollCourseProgress,
+} from "./apeAtoll";
