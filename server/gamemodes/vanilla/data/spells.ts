@@ -455,12 +455,12 @@ const ENTRIES: SpellDataEntry[] = [
         baseMaxHit: 0,
         castSpotAnim: 150,
         levelRequired: 66,
+        experienceGained: 76,
         spellbook: "standard",
         category: "utility",
         runeCosts: [
             { runeId: 564, quantity: 3 },
             { runeId: 556, quantity: 30 },
-            { runeId: 567, quantity: 1 },
         ],
     },
     {
@@ -469,12 +469,12 @@ const ENTRIES: SpellDataEntry[] = [
         baseMaxHit: 0,
         castSpotAnim: 151,
         levelRequired: 60,
+        experienceGained: 70,
         spellbook: "standard",
         category: "utility",
         runeCosts: [
             { runeId: 564, quantity: 3 },
             { runeId: 557, quantity: 30 },
-            { runeId: 567, quantity: 1 },
         ],
     },
     {
@@ -483,12 +483,12 @@ const ENTRIES: SpellDataEntry[] = [
         baseMaxHit: 0,
         castSpotAnim: 152,
         levelRequired: 63,
+        experienceGained: 73,
         spellbook: "standard",
         category: "utility",
         runeCosts: [
             { runeId: 564, quantity: 3 },
             { runeId: 554, quantity: 30 },
-            { runeId: 567, quantity: 1 },
         ],
     },
     {
@@ -497,12 +497,12 @@ const ENTRIES: SpellDataEntry[] = [
         baseMaxHit: 0,
         castSpotAnim: 149,
         levelRequired: 56,
+        experienceGained: 66,
         spellbook: "standard",
         category: "utility",
         runeCosts: [
             { runeId: 564, quantity: 3 },
             { runeId: 555, quantity: 30 },
-            { runeId: 567, quantity: 1 },
         ],
     },
     {

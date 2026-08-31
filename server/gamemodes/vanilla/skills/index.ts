@@ -6,6 +6,7 @@ import { register as registerFiremaking } from "./firemaking/index";
 import { register as registerFishing } from "./fishing/index";
 import { register as registerFletching } from "./fletching/index";
 import { register as registerHerblore } from "./herblore/index";
+import { register as registerMagic } from "./magic/index";
 import { register as registerMining } from "./mining/index";
 import { register as registerPrayer } from "./prayer/index";
 import { register as registerProduction } from "./production/index";
@@ -20,6 +21,7 @@ export function register(registry: IScriptRegistry, services: ScriptServices): v
     registerRunecrafting(registry);
     registerThieving(registry, services);
     registerHerblore(registry, services);
+    registerMagic(registry, services);
     registerPrayer(registry, services);
     registerFletching(registry, services);
     registerCrafting(registry, services);

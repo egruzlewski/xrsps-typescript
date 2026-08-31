@@ -74,12 +74,21 @@ export interface NpcInteractionEvent extends ScriptExecutionContext {
     option?: string;
 }
 
+export interface LocSpellResult {
+    outcome: "success" | "failure";
+    reason?: string;
+}
+
 export interface LocInteractionEvent extends ScriptExecutionContext {
     player: PlayerState;
     locId: number;
     tile: { x: number; y: number };
     level: number;
     action?: string;
+    /** Set when the loc interaction is a spell-on-loc (OPLOC_T). */
+    spellId?: number;
+    /** Optional out-param so loc scripts can report spell success/failure. */
+    spellResult?: LocSpellResult;
 }
 
 export type NpcInteractionHandler = (event: NpcInteractionEvent) => void | Promise<void>;

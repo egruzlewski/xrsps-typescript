@@ -960,6 +960,64 @@ export class SpellActionHandler {
     }
 
     /**
+     * Dispatch a loc-targeted utility spell to a script loc handler (`action: "spell"`).
+     * Charge Orb and other loc spells register here; unmatched locs stay invalid_target.
+     */
+    private dispatchLocSpell(
+        player: PlayerState,
+        request: SpellCastRequest,
+        base: SpellResultPayload,
+        tick: number,
+    ): SpellResultPayload {
+        if (request.target.type !== "loc") {
+            base.reason = "invalid_target";
+            return base;
+        }
+        const locId = request.target.locId;
+        const tile = request.target.tile;
+        const handler = this.svc.scriptRegistry?.findLocInteraction(locId, "spell");
+        if (!handler) {
+            base.reason = "invalid_target";
+            try {
+                this.svc.spellCastingService?.enqueueSpellFailureChat(
+                    player,
+                    request.spellId,
+                    "invalid_target",
+                );
+            } catch (err) {
+                logger.warn("[spell] failed to enqueue loc spell failure chat", err);
+            }
+            return base;
+        }
+
+        const spellResult: { outcome: "success" | "failure"; reason?: string } = {
+            outcome: "failure",
+            reason: "invalid_target",
+        };
+        const services = this.svc.scriptRuntime?.getServices();
+        if (!services) {
+            base.reason = "server_error";
+            return base;
+        }
+
+        handler({
+            player,
+            locId,
+            tile: { x: tile.x, y: tile.y },
+            level: tile.plane ?? player.level,
+            action: "spell",
+            spellId: request.spellId,
+            spellResult,
+            tick,
+            services,
+        });
+
+        base.outcome = spellResult.outcome;
+        base.reason = spellResult.reason;
+        return base;
+    }
+
+    /**
      * Process spell cast request.
      */
     processSpellCastRequest(
@@ -1046,6 +1104,8 @@ export class SpellActionHandler {
                 plane: opponent.level,
             };
             base.tile = { ...targetTile };
+        } else if (request.target.type === "loc") {
+            return this.dispatchLocSpell(player, request, base, tick);
         } else {
             base.reason = "invalid_target";
             return base;
