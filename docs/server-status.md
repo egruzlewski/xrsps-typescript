@@ -44,7 +44,7 @@ Start here if you want a development path. Ordered roughly by “missing entire 
 ### Partial (high-leverage)
 
 - **Agility** — full Gnome Stronghold course (log, nets, branches, rope, pipes + 50 XP lap bonus). Other courses still missing.
-- **Runecraft** — F2P altars (Air through Body). Members altars, tiara imbuing, combination runes, and the Abyss are still missing.
+- **Runecraft** — F2P plus members ruins altars (Air–Body, Cosmic, Chaos, Nature, Law, Death, Blood, Wrath). Tiara imbuing, combination runes, Astral/Soul/Kourend, and the Abyss are still missing.
 - **Crafting** — flax, shearing, spinning, jewellery (gold/silver + gems), gem cutting, leather/dragonhide armour. Pottery, glassblowing, and battlestaves still missing.
 - **Sailing** — engine world-views + Pandemonium content, not a full skill.
 - **World content** — hubs listed under vanilla scripts, not the whole map. Unscripted locs/NPCs fall through to default talk / nothing interesting.
@@ -369,7 +369,7 @@ Combat skills (Attack, Strength, Defence, Hitpoints, Ranged, Magic) are **engine
 | Herblore | Partial | clean / unf / finish / stamina | Data lists in `herblore/index.ts` | Missing potions |
 | Agility | Partial | [`skills/agility/`](../server/gamemodes/vanilla/skills/agility/) | Gnome Stronghold course (all obstacles + in-order lap bonus). XP matches current OSRS (110.5/lap). [`agility-gnome-course.test.ts`](../server/tests/agility-gnome-course.test.ts) | Other courses |
 | Thieving | Partial | pickpocket + picklock + stalls | NPC pickpocket tables, HAM trapdoor picklock, market stalls (veg through gem, plus tea/wine/fish/crafting). [`thieving-stalls.test.ts`](../server/tests/thieving-stalls.test.ts) | Chest loot, seed/fruit/Ape Atoll remaining stalls, guard LOS catch |
-| Runecraft | Partial | [`skills/runecrafting/`](../server/gamemodes/vanilla/skills/runecrafting/) | F2P altars Air–Body (ruins/tiara/talisman enter, craft, portal exit). [`runecrafting-f2p-altars.test.ts`](../server/tests/runecrafting-f2p-altars.test.ts) | Members altars, tiaras, combination runes, Abyss |
+| Runecraft | Partial | [`skills/runecrafting/`](../server/gamemodes/vanilla/skills/runecrafting/) | F2P Air–Body plus members ruins altars (Cosmic, Chaos, Nature, Law, Death, Blood, Wrath; tiara/talisman enter, craft, portal exit). [`runecrafting-f2p-altars.test.ts`](../server/tests/runecrafting-f2p-altars.test.ts), [`runecrafting-members-altars.test.ts`](../server/tests/runecrafting-members-altars.test.ts) | Tiara imbuing, combination runes, Astral/Soul/Kourend, Abyss |
 | Sailing | Partial | Pandemonium + engine instances | Restore on login | Rest of skill |
 | Consumables | Partial | large food/potion tables | Eat/drink actions | Remaining items |
 | Tanning / bolt enchant | Partial | production module | — | — |

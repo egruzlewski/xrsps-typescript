@@ -1,5 +1,5 @@
 /**
- * F2P Runecraft loops: Air through Body.
+ * Runecraft loops: F2P Air–Body plus members ruins altars.
  * Enter ruins with talisman/tiara → craft on altar → exit portal.
  */
 import { EquipmentSlot } from "../../../../../client/rs/config/player/Equipment";
@@ -12,7 +12,7 @@ import type {
     ScriptServices,
 } from "../../../../src/game/scripts/types";
 import {
-    F2P_ALTARS,
+    ALL_ALTARS,
     PURE_ESSENCE,
     RUNE_ESSENCE,
     type RuneAltarDef,
@@ -68,10 +68,17 @@ function craftRunes(altar: RuneAltarDef, player: PlayerState, services: ScriptSe
         return;
     }
 
-    const runeEss = player.items.getItemCount(RUNE_ESSENCE);
+    const runeEss = altar.pureEssenceOnly ? 0 : player.items.getItemCount(RUNE_ESSENCE);
     const pureEss = player.items.getItemCount(PURE_ESSENCE);
     const totalEss = runeEss + pureEss;
     if (totalEss <= 0) {
+        if (altar.pureEssenceOnly && player.items.getItemCount(RUNE_ESSENCE) > 0) {
+            services.messaging.sendGameMessage(
+                player,
+                `You need pure essence to craft ${altar.name} Runes.`,
+            );
+            return;
+        }
         services.messaging.sendGameMessage(player, "You do not have any essence to bind.");
         return;
     }
@@ -135,7 +142,7 @@ function registerAltar(registry: IScriptRegistry, altar: RuneAltarDef): void {
 }
 
 export function register(registry: IScriptRegistry): void {
-    for (const altar of F2P_ALTARS) {
+    for (const altar of ALL_ALTARS) {
         registerAltar(registry, altar);
     }
 }

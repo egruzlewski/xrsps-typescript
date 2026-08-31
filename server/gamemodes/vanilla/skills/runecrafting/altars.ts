@@ -1,6 +1,7 @@
 /**
- * F2P runic altars (Air through Body). Loc IDs and XP from OSRS wiki.
+ * Runic altars. Loc IDs and XP from OSRS wiki.
  * Multiplier: 1 + floor(level / multiplierDiv) runes per essence.
+ * Members altars require pure essence (`pureEssenceOnly`).
  */
 
 export interface RuneAltarDef {
@@ -17,6 +18,8 @@ export interface RuneAltarDef {
     portalLocId: number;
     altarEnter: { x: number; y: number; level: number };
     ruinsExit: { x: number; y: number; level: number };
+    /** When true, rune essence cannot be bound (OSRS members altars). */
+    pureEssenceOnly?: boolean;
 }
 
 export const RUNE_ESSENCE = 1436;
@@ -114,3 +117,122 @@ export const F2P_ALTARS: readonly RuneAltarDef[] = [
         ruinsExit: { x: 3053, y: 3445, level: 0 },
     },
 ];
+
+/** Members ruins altars. Soul (Arceuus) and Astral have no mysterious ruins. */
+export const MEMBERS_ALTARS: readonly RuneAltarDef[] = [
+    {
+        id: "cosmic",
+        name: "Cosmic",
+        level: 27,
+        xpPerEssence: 8,
+        multiplierDiv: 59,
+        runeId: 564,
+        talismanId: 1454,
+        tiaraId: 5539,
+        ruinsLocIds: [31607, 31725],
+        altarLocId: 34766,
+        portalLocId: 34754,
+        altarEnter: { x: 2141, y: 4832, level: 0 },
+        ruinsExit: { x: 2408, y: 4377, level: 0 },
+        pureEssenceOnly: true,
+    },
+    {
+        id: "chaos",
+        name: "Chaos",
+        level: 35,
+        xpPerEssence: 8.5,
+        multiplierDiv: 74,
+        runeId: 562,
+        talismanId: 1452,
+        tiaraId: 5543,
+        ruinsLocIds: [34742, 34743],
+        altarLocId: 34769,
+        portalLocId: 34757,
+        altarEnter: { x: 2270, y: 4841, level: 0 },
+        ruinsExit: { x: 3060, y: 3591, level: 0 },
+        pureEssenceOnly: true,
+    },
+    {
+        id: "nature",
+        name: "Nature",
+        level: 44,
+        xpPerEssence: 9,
+        multiplierDiv: 91,
+        runeId: 561,
+        talismanId: 1462,
+        tiaraId: 5541,
+        ruinsLocIds: [32491, 32492],
+        altarLocId: 34768,
+        portalLocId: 34756,
+        altarEnter: { x: 2399, y: 4840, level: 0 },
+        ruinsExit: { x: 2869, y: 3019, level: 0 },
+        pureEssenceOnly: true,
+    },
+    {
+        id: "law",
+        name: "Law",
+        level: 54,
+        xpPerEssence: 9.5,
+        multiplierDiv: 95,
+        runeId: 563,
+        talismanId: 1458,
+        tiaraId: 5545,
+        ruinsLocIds: [32489, 32490],
+        altarLocId: 34767,
+        portalLocId: 34755,
+        altarEnter: { x: 2463, y: 4831, level: 0 },
+        ruinsExit: { x: 2858, y: 3381, level: 0 },
+        pureEssenceOnly: true,
+    },
+    {
+        id: "death",
+        name: "Death",
+        level: 65,
+        xpPerEssence: 10,
+        multiplierDiv: 99,
+        runeId: 560,
+        talismanId: 1456,
+        tiaraId: 5547,
+        ruinsLocIds: [34744, 34745],
+        altarLocId: 34770,
+        portalLocId: 34758,
+        altarEnter: { x: 2204, y: 4835, level: 0 },
+        ruinsExit: { x: 1860, y: 4639, level: 0 },
+        pureEssenceOnly: true,
+    },
+    {
+        id: "blood",
+        name: "Blood",
+        level: 77,
+        xpPerEssence: 10.5,
+        // No extra runes from level (unlike Cosmic–Death).
+        multiplierDiv: 100,
+        runeId: 565,
+        talismanId: 1450,
+        tiaraId: 5549,
+        ruinsLocIds: [43477],
+        altarLocId: 43479,
+        portalLocId: 43478,
+        altarEnter: { x: 3231, y: 4831, level: 0 },
+        ruinsExit: { x: 3561, y: 9781, level: 0 },
+        pureEssenceOnly: true,
+    },
+    {
+        id: "wrath",
+        name: "Wrath",
+        level: 95,
+        xpPerEssence: 8,
+        multiplierDiv: 100,
+        runeId: 21880,
+        talismanId: 22118,
+        tiaraId: 22121,
+        ruinsLocIds: [34746, 34717],
+        altarLocId: 34772,
+        portalLocId: 34759,
+        altarEnter: { x: 2334, y: 4833, level: 0 },
+        ruinsExit: { x: 2446, y: 2825, level: 0 },
+        pureEssenceOnly: true,
+    },
+];
+
+export const ALL_ALTARS: readonly RuneAltarDef[] = [...F2P_ALTARS, ...MEMBERS_ALTARS];
