@@ -1,6 +1,7 @@
 /**
  * Runecraft loops: F2P Air–Body plus members ruins altars.
  * Enter ruins with talisman/tiara → craft on altar → exit portal.
+ * Same altars also bind blank tiaras and combination runes (Mist–Lava).
  */
 import { EquipmentSlot } from "../../../../../client/rs/config/player/Equipment";
 import { SkillId } from "../../../../../client/rs/skill/skills";
@@ -13,10 +14,15 @@ import type {
 } from "../../../../src/game/scripts/types";
 import {
     ALL_ALTARS,
+    BLANK_TIARA,
     PURE_ESSENCE,
     RUNE_ESSENCE,
     type RuneAltarDef,
 } from "./altars";
+import {
+    combinationBindingsForAltar,
+    type CombinationBinding,
+} from "./combination";
 
 function rcLevel(player: PlayerState, services: ScriptServices): number {
     return services.skills.getSkill(player, SkillId.Runecraft)?.baseLevel ?? 1;
@@ -97,6 +103,96 @@ function craftRunes(altar: RuneAltarDef, player: PlayerState, services: ScriptSe
     );
 }
 
+function imbueTiara(altar: RuneAltarDef, player: PlayerState, services: ScriptServices): void {
+    const tiaras = player.items.getItemCount(BLANK_TIARA);
+    const talismans = player.items.getItemCount(altar.talismanId);
+    if (tiaras <= 0) {
+        services.messaging.sendGameMessage(player, "You need a tiara to bind.");
+        return;
+    }
+    if (talismans <= 0) {
+        services.messaging.sendGameMessage(
+            player,
+            `You need a ${altar.name} Talisman to bind your tiara.`,
+        );
+        return;
+    }
+
+    player.items.removeItem(BLANK_TIARA, 1, { assureFullRemoval: true });
+    player.items.removeItem(altar.talismanId, 1, { assureFullRemoval: true });
+    player.items.addItem(altar.tiaraId, 1);
+    services.inventory.snapshotInventory(player);
+    services.skills.addSkillXp(player, SkillId.Runecraft, altar.tiaraXp);
+    services.messaging.sendGameMessage(
+        player,
+        `You bind the power of ${altar.name} into your tiara.`,
+    );
+}
+
+function craftCombination(
+    binding: CombinationBinding,
+    player: PlayerState,
+    services: ScriptServices,
+): void {
+    const { def, opposing, xpPerEssence } = binding;
+    const level = rcLevel(player, services);
+    if (level < def.level) {
+        services.messaging.sendGameMessage(
+            player,
+            `You need a Runecrafting level of at least ${def.level} to craft ${def.name} Runes.`,
+        );
+        return;
+    }
+
+    const pureEss = player.items.getItemCount(PURE_ESSENCE);
+    if (pureEss <= 0) {
+        if (player.items.getItemCount(RUNE_ESSENCE) > 0) {
+            services.messaging.sendGameMessage(
+                player,
+                `You need pure essence to craft ${def.name} Runes.`,
+            );
+            return;
+        }
+        services.messaging.sendGameMessage(player, "You do not have any essence to bind.");
+        return;
+    }
+
+    const opposingRunes = player.items.getItemCount(opposing.runeId);
+    if (opposingRunes <= 0) {
+        services.messaging.sendGameMessage(
+            player,
+            `You need ${opposing.name} Runes to bind ${def.name} Runes.`,
+        );
+        return;
+    }
+
+    const hasTalisman = player.items.getItemCount(opposing.talismanId) > 0;
+    const hasTiara = player.items.getItemCount(opposing.tiaraId) > 0;
+    if (!hasTalisman && !hasTiara) {
+        services.messaging.sendGameMessage(
+            player,
+            `You need a ${opposing.name} Talisman to bind ${def.name} Runes.`,
+        );
+        return;
+    }
+
+    const craftCount = Math.min(pureEss, opposingRunes);
+    player.items.removeItem(PURE_ESSENCE, craftCount, { assureFullRemoval: true });
+    player.items.removeItem(opposing.runeId, craftCount, { assureFullRemoval: true });
+    if (hasTalisman) {
+        player.items.removeItem(opposing.talismanId, 1, { assureFullRemoval: true });
+    } else {
+        player.items.removeItem(opposing.tiaraId, 1, { assureFullRemoval: true });
+    }
+    player.items.addItem(def.runeId, craftCount);
+    services.inventory.snapshotInventory(player);
+    services.skills.addSkillXp(player, SkillId.Runecraft, craftCount * xpPerEssence);
+    services.messaging.sendGameMessage(
+        player,
+        `You bind the temple's power into ${def.name} Runes.`,
+    );
+}
+
 function exitAltar(altar: RuneAltarDef, event: LocInteractionEvent): void {
     const { player, services } = event;
     services.messaging.sendGameMessage(player, "You step through the portal...");
@@ -135,6 +231,18 @@ function registerAltar(registry: IScriptRegistry, altar: RuneAltarDef): void {
     registry.registerLocInteraction(altar.altarLocId, craftFromLoc, undefined);
     registry.registerItemOnLoc(RUNE_ESSENCE, altar.altarLocId, craftFromItem);
     registry.registerItemOnLoc(PURE_ESSENCE, altar.altarLocId, craftFromItem);
+
+    const imbue = (event: ItemOnLocEvent) => imbueTiara(altar, event.player, event.services);
+    registry.registerItemOnLoc(BLANK_TIARA, altar.altarLocId, imbue);
+    registry.registerItemOnLoc(altar.talismanId, altar.altarLocId, imbue);
+
+    for (const binding of combinationBindingsForAltar(altar.id)) {
+        const craftCombo = (event: ItemOnLocEvent) =>
+            craftCombination(binding, event.player, event.services);
+        registry.registerItemOnLoc(binding.opposing.talismanId, altar.altarLocId, craftCombo);
+        registry.registerItemOnLoc(binding.opposing.tiaraId, altar.altarLocId, craftCombo);
+        registry.registerItemOnLoc(binding.opposing.runeId, altar.altarLocId, craftCombo);
+    }
 
     registry.registerLocInteraction(altar.portalLocId, (event) => exitAltar(altar, event), "use");
     registry.registerLocInteraction(altar.portalLocId, (event) => exitAltar(altar, event), "exit");

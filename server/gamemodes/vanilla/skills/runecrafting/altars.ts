@@ -13,6 +13,8 @@ export interface RuneAltarDef {
     runeId: number;
     talismanId: number;
     tiaraId: number;
+    /** Runecraft XP for binding a blank tiara with this altar's talisman. */
+    tiaraXp: number;
     ruinsLocIds: readonly number[];
     altarLocId: number;
     portalLocId: number;
@@ -24,6 +26,7 @@ export interface RuneAltarDef {
 
 export const RUNE_ESSENCE = 1436;
 export const PURE_ESSENCE = 7936;
+export const BLANK_TIARA = 5525;
 
 export const F2P_ALTARS: readonly RuneAltarDef[] = [
     {
@@ -35,6 +38,7 @@ export const F2P_ALTARS: readonly RuneAltarDef[] = [
         runeId: 556,
         talismanId: 1438,
         tiaraId: 5527,
+        tiaraXp: 25,
         ruinsLocIds: [28914, 29090],
         altarLocId: 34760,
         portalLocId: 34748,
@@ -50,6 +54,7 @@ export const F2P_ALTARS: readonly RuneAltarDef[] = [
         runeId: 558,
         talismanId: 1448,
         tiaraId: 5529,
+        tiaraXp: 27.5,
         ruinsLocIds: [29094, 29095],
         altarLocId: 34761,
         portalLocId: 34749,
@@ -65,6 +70,7 @@ export const F2P_ALTARS: readonly RuneAltarDef[] = [
         runeId: 555,
         talismanId: 1444,
         tiaraId: 5531,
+        tiaraXp: 30,
         ruinsLocIds: [29096, 29097],
         altarLocId: 34762,
         portalLocId: 34750,
@@ -80,6 +86,7 @@ export const F2P_ALTARS: readonly RuneAltarDef[] = [
         runeId: 557,
         talismanId: 1440,
         tiaraId: 5535,
+        tiaraXp: 32.5,
         ruinsLocIds: [29098, 29099],
         altarLocId: 34763,
         portalLocId: 34751,
@@ -95,6 +102,7 @@ export const F2P_ALTARS: readonly RuneAltarDef[] = [
         runeId: 554,
         talismanId: 1442,
         tiaraId: 5537,
+        tiaraXp: 35,
         ruinsLocIds: [30371, 30372],
         altarLocId: 34764,
         portalLocId: 34752,
@@ -110,6 +118,7 @@ export const F2P_ALTARS: readonly RuneAltarDef[] = [
         runeId: 559,
         talismanId: 1446,
         tiaraId: 5533,
+        tiaraXp: 37.5,
         ruinsLocIds: [30373, 31584],
         altarLocId: 34765,
         portalLocId: 34753,
@@ -129,6 +138,7 @@ export const MEMBERS_ALTARS: readonly RuneAltarDef[] = [
         runeId: 564,
         talismanId: 1454,
         tiaraId: 5539,
+        tiaraXp: 40,
         ruinsLocIds: [31607, 31725],
         altarLocId: 34766,
         portalLocId: 34754,
@@ -145,6 +155,7 @@ export const MEMBERS_ALTARS: readonly RuneAltarDef[] = [
         runeId: 562,
         talismanId: 1452,
         tiaraId: 5543,
+        tiaraXp: 42.5,
         ruinsLocIds: [34742, 34743],
         altarLocId: 34769,
         portalLocId: 34757,
@@ -161,6 +172,7 @@ export const MEMBERS_ALTARS: readonly RuneAltarDef[] = [
         runeId: 561,
         talismanId: 1462,
         tiaraId: 5541,
+        tiaraXp: 45,
         ruinsLocIds: [32491, 32492],
         altarLocId: 34768,
         portalLocId: 34756,
@@ -177,6 +189,7 @@ export const MEMBERS_ALTARS: readonly RuneAltarDef[] = [
         runeId: 563,
         talismanId: 1458,
         tiaraId: 5545,
+        tiaraXp: 47.5,
         ruinsLocIds: [32489, 32490],
         altarLocId: 34767,
         portalLocId: 34755,
@@ -193,6 +206,7 @@ export const MEMBERS_ALTARS: readonly RuneAltarDef[] = [
         runeId: 560,
         talismanId: 1456,
         tiaraId: 5547,
+        tiaraXp: 50,
         ruinsLocIds: [34744, 34745],
         altarLocId: 34770,
         portalLocId: 34758,
@@ -210,6 +224,7 @@ export const MEMBERS_ALTARS: readonly RuneAltarDef[] = [
         runeId: 565,
         talismanId: 1450,
         tiaraId: 5549,
+        tiaraXp: 52.5,
         ruinsLocIds: [43477],
         altarLocId: 43479,
         portalLocId: 43478,
@@ -226,6 +241,7 @@ export const MEMBERS_ALTARS: readonly RuneAltarDef[] = [
         runeId: 21880,
         talismanId: 22118,
         tiaraId: 22121,
+        tiaraXp: 52.5,
         ruinsLocIds: [34746, 34717],
         altarLocId: 34772,
         portalLocId: 34759,
