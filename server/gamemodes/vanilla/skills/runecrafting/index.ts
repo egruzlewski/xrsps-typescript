@@ -1,5 +1,5 @@
 /**
- * Air altar Runecraft loop (LostCity runecraft.rs2 air path, soft).
+ * F2P Runecraft loops: Air through Body.
  * Enter ruins with talisman/tiara → craft on altar → exit portal.
  */
 import { EquipmentSlot } from "../../../../../client/rs/config/player/Equipment";
@@ -11,71 +11,59 @@ import type {
     LocInteractionEvent,
     ScriptServices,
 } from "../../../../src/game/scripts/types";
-
-const AIR_RUINS = [28914, 29090] as const;
-const AIR_ALTAR = 34760;
-const AIR_EXIT_PORTAL = 34748;
-
-const AIR_TALISMAN = 1438;
-const AIR_TIARA = 5527;
-const RUNE_ESSENCE = 1436;
-const PURE_ESSENCE = 7936;
-const AIR_RUNE = 556;
-
-const ALTAR_ENTER = { x: 2841, y: 4830, level: 0 } as const;
-const RUINS_EXIT = { x: 2983, y: 3288, level: 0 } as const;
-
-const LEVEL_REQ = 1;
-const XP_PER_ESS = 5;
-/** OSRS air: 1 + floor(level / 11) runes per essence. */
-const MULTIPLIER_DIV = 11;
+import {
+    F2P_ALTARS,
+    PURE_ESSENCE,
+    RUNE_ESSENCE,
+    type RuneAltarDef,
+} from "./altars";
 
 function rcLevel(player: PlayerState, services: ScriptServices): number {
     return services.skills.getSkill(player, SkillId.Runecraft)?.baseLevel ?? 1;
 }
 
-function wearsAirTiara(player: PlayerState, services: ScriptServices): boolean {
+function wearsTiara(player: PlayerState, services: ScriptServices, tiaraId: number): boolean {
     const equip = services.equipment.getEquipArray(player) ?? [];
-    return (equip[EquipmentSlot.HEAD] ?? 0) === AIR_TIARA;
+    return (equip[EquipmentSlot.HEAD] ?? 0) === tiaraId;
 }
 
-function enterAirAltar(player: PlayerState, services: ScriptServices): void {
+function enterAltar(player: PlayerState, services: ScriptServices, altar: RuneAltarDef): void {
     services.messaging.sendGameMessage(
         player,
-        "You hold the Air Talisman towards the mysterious ruins.",
+        `You hold the ${altar.name} Talisman towards the mysterious ruins.`,
     );
     services.messaging.sendGameMessage(player, "You feel a powerful force take hold of you...");
     services.movement.teleportPlayer(
         player,
-        ALTAR_ENTER.x,
-        ALTAR_ENTER.y,
-        ALTAR_ENTER.level,
+        altar.altarEnter.x,
+        altar.altarEnter.y,
+        altar.altarEnter.level,
         true,
     );
 }
 
-function tryEnterFromClick(event: LocInteractionEvent): void {
-    if (!wearsAirTiara(event.player, event.services)) {
+function tryEnterFromClick(altar: RuneAltarDef, event: LocInteractionEvent): void {
+    if (!wearsTiara(event.player, event.services, altar.tiaraId)) {
         event.services.messaging.sendGameMessage(event.player, "Nothing interesting happens.");
         return;
     }
-    enterAirAltar(event.player, event.services);
+    enterAltar(event.player, event.services, altar);
 }
 
-function tryEnterWithTalisman(event: ItemOnLocEvent): void {
-    if (event.source.itemId !== AIR_TALISMAN) {
+function tryEnterWithTalisman(altar: RuneAltarDef, event: ItemOnLocEvent): void {
+    if (event.source.itemId !== altar.talismanId) {
         event.services.messaging.sendGameMessage(event.player, "Nothing interesting happens.");
         return;
     }
-    enterAirAltar(event.player, event.services);
+    enterAltar(event.player, event.services, altar);
 }
 
-function craftAirRunes(player: PlayerState, services: ScriptServices): void {
+function craftRunes(altar: RuneAltarDef, player: PlayerState, services: ScriptServices): void {
     const level = rcLevel(player, services);
-    if (level < LEVEL_REQ) {
+    if (level < altar.level) {
         services.messaging.sendGameMessage(
             player,
-            `You need a Runecrafting level of at least ${LEVEL_REQ} to craft Air Runes.`,
+            `You need a Runecrafting level of at least ${altar.level} to craft ${altar.name} Runes.`,
         );
         return;
     }
@@ -88,41 +76,66 @@ function craftAirRunes(player: PlayerState, services: ScriptServices): void {
         return;
     }
 
-    const perEss = 1 + Math.floor(level / MULTIPLIER_DIV);
+    const perEss = 1 + Math.floor(level / altar.multiplierDiv);
     const craftCount = totalEss * perEss;
 
     if (runeEss > 0) player.items.removeItem(RUNE_ESSENCE, runeEss, { assureFullRemoval: true });
     if (pureEss > 0) player.items.removeItem(PURE_ESSENCE, pureEss, { assureFullRemoval: true });
-    player.items.addItem(AIR_RUNE, craftCount);
+    player.items.addItem(altar.runeId, craftCount);
     services.inventory.snapshotInventory(player);
-    services.skills.addSkillXp(player, SkillId.Runecraft, totalEss * XP_PER_ESS);
-    services.messaging.sendGameMessage(player, "You bind the temple's power into Air Runes.");
+    services.skills.addSkillXp(player, SkillId.Runecraft, totalEss * altar.xpPerEssence);
+    services.messaging.sendGameMessage(
+        player,
+        `You bind the temple's power into ${altar.name} Runes.`,
+    );
 }
 
-function exitAltar(event: LocInteractionEvent): void {
+function exitAltar(altar: RuneAltarDef, event: LocInteractionEvent): void {
     const { player, services } = event;
     services.messaging.sendGameMessage(player, "You step through the portal...");
-    services.movement.teleportPlayer(player, RUINS_EXIT.x, RUINS_EXIT.y, RUINS_EXIT.level, true);
+    services.movement.teleportPlayer(
+        player,
+        altar.ruinsExit.x,
+        altar.ruinsExit.y,
+        altar.ruinsExit.level,
+        true,
+    );
 }
 
-export function register(registry: IScriptRegistry): void {
-    for (const ruinsId of AIR_RUINS) {
-        registry.registerLocInteraction(ruinsId, tryEnterFromClick, "enter");
-        registry.registerLocInteraction(ruinsId, tryEnterFromClick, undefined);
-        registry.registerItemOnLoc(AIR_TALISMAN, ruinsId, tryEnterWithTalisman);
+function registerAltar(registry: IScriptRegistry, altar: RuneAltarDef): void {
+    for (const ruinsId of altar.ruinsLocIds) {
+        registry.registerLocInteraction(
+            ruinsId,
+            (event) => tryEnterFromClick(altar, event),
+            "enter",
+        );
+        registry.registerLocInteraction(
+            ruinsId,
+            (event) => tryEnterFromClick(altar, event),
+            undefined,
+        );
+        registry.registerItemOnLoc(altar.talismanId, ruinsId, (event) =>
+            tryEnterWithTalisman(altar, event),
+        );
     }
 
     const craftFromLoc = (event: LocInteractionEvent) =>
-        craftAirRunes(event.player, event.services);
-    const craftFromItem = (event: ItemOnLocEvent) => craftAirRunes(event.player, event.services);
+        craftRunes(altar, event.player, event.services);
+    const craftFromItem = (event: ItemOnLocEvent) => craftRunes(altar, event.player, event.services);
 
-    registry.registerLocInteraction(AIR_ALTAR, craftFromLoc, "craft-rune");
-    registry.registerLocInteraction(AIR_ALTAR, craftFromLoc, "craft rune");
-    registry.registerLocInteraction(AIR_ALTAR, craftFromLoc, undefined);
-    registry.registerItemOnLoc(RUNE_ESSENCE, AIR_ALTAR, craftFromItem);
-    registry.registerItemOnLoc(PURE_ESSENCE, AIR_ALTAR, craftFromItem);
+    registry.registerLocInteraction(altar.altarLocId, craftFromLoc, "craft-rune");
+    registry.registerLocInteraction(altar.altarLocId, craftFromLoc, "craft rune");
+    registry.registerLocInteraction(altar.altarLocId, craftFromLoc, undefined);
+    registry.registerItemOnLoc(RUNE_ESSENCE, altar.altarLocId, craftFromItem);
+    registry.registerItemOnLoc(PURE_ESSENCE, altar.altarLocId, craftFromItem);
 
-    registry.registerLocInteraction(AIR_EXIT_PORTAL, exitAltar, "use");
-    registry.registerLocInteraction(AIR_EXIT_PORTAL, exitAltar, "exit");
-    registry.registerLocInteraction(AIR_EXIT_PORTAL, exitAltar, undefined);
+    registry.registerLocInteraction(altar.portalLocId, (event) => exitAltar(altar, event), "use");
+    registry.registerLocInteraction(altar.portalLocId, (event) => exitAltar(altar, event), "exit");
+    registry.registerLocInteraction(altar.portalLocId, (event) => exitAltar(altar, event), undefined);
+}
+
+export function register(registry: IScriptRegistry): void {
+    for (const altar of F2P_ALTARS) {
+        registerAltar(registry, altar);
+    }
 }

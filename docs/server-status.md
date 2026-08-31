@@ -44,7 +44,7 @@ Start here if you want a development path. Ordered roughly by “missing entire 
 ### Partial (high-leverage)
 
 - **Agility** — full Gnome Stronghold course (log, nets, branches, rope, pipes + 50 XP lap bonus). Other courses still missing.
-- **Runecraft** — Air altar loop only.
+- **Runecraft** — F2P altars (Air through Body). Members altars, tiara imbuing, combination runes, and the Abyss are still missing.
 - **Crafting** — flax, shearing, spinning only (no jewellery, leather, pottery, gold, etc.).
 - **Sailing** — engine world-views + Pandemonium content, not a full skill.
 - **World content** — hubs listed under vanilla scripts, not the whole map. Unscripted locs/NPCs fall through to default talk / nothing interesting.
@@ -371,7 +371,7 @@ Combat skills (Attack, Strength, Defence, Hitpoints, Ranged, Magic) are **engine
 | Herblore | Partial | clean / unf / finish / stamina | Data lists in `herblore/index.ts` | Missing potions |
 | Agility | Partial | [`skills/agility/`](../server/gamemodes/vanilla/skills/agility/) | Gnome Stronghold course (all obstacles + in-order lap bonus). XP matches current OSRS (110.5/lap). [`agility-gnome-course.test.ts`](../server/tests/agility-gnome-course.test.ts) | Other courses |
 | Thieving | Partial | pickpocket + picklock | NPC/loc tables; pickpocket item ID TODO | Stalls, chest loot breadth |
-| Runecraft | Partial | Air ruins/altar/portal only | — | Other altars |
+| Runecraft | Partial | [`skills/runecrafting/`](../server/gamemodes/vanilla/skills/runecrafting/) | F2P altars Air–Body (ruins/tiara/talisman enter, craft, portal exit). [`runecrafting-f2p-altars.test.ts`](../server/tests/runecrafting-f2p-altars.test.ts) | Members altars, tiaras, combination runes, Abyss |
 | Sailing | Partial | Pandemonium + engine instances | Restore on login | Rest of skill |
 | Consumables | Partial | large food/potion tables | Eat/drink actions | Remaining items |
 | Tanning / bolt enchant | Partial | production module | — | — |
@@ -589,7 +589,7 @@ There are ~90 individual test files: heavy on quests and combat specials; light 
 ## Suggested development order (from this audit)
 
 1. Decide whether **remainder quests** stay compressed or get full ports.
-2. Fill **skill holes you care about first** (Runecraft/Crafting are the thinnest of the “existing” skills after Gnome Agility; Slayer/Hunter/Farming/Construction are absent).
+2. Fill **skill holes you care about first** (Crafting is the thinnest remaining “existing” skill after Gnome Agility and F2P Runecraft; Slayer/Hunter/Farming/Construction are absent).
 3. **World scripts** for hubs you actually play (default talk is the symptom of missing loc/NPC handlers).
 4. **Boss scripts**: implement or unregister Mole/Zulrah empty mechanics.
 5. **Protocol**: `MAP_EDIT` cleanup (opcode 50 / `OPNPC5` is decoded).
