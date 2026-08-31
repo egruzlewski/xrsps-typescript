@@ -70,7 +70,7 @@ export const enum ClientPacketId {
     RESUME_COUNTDIALOG = 192,
     RESUME_NAMEDIALOG = 193,
     RESUME_STRINGDIALOG = 194,
-    MAP_EDIT = 195,
+    // 195 was unused MAP_EDIT (never encoded or decoded; removed)
     FRIENDS_CHAT_ACTION = 196,
 }
 
@@ -119,7 +119,6 @@ export const CLIENT_PACKET_LENGTHS: Record<ClientPacketId, number> = {
     [ClientPacketId.RESUME_COUNTDIALOG]: 4, // value(4)
     [ClientPacketId.RESUME_NAMEDIALOG]: -1, // value(string)
     [ClientPacketId.RESUME_STRINGDIALOG]: -1, // value(string)
-    [ClientPacketId.MAP_EDIT]: -1, // action(1) + tile(4) + level/type/rotation/id(var)
     [ClientPacketId.FRIENDS_CHAT_ACTION]: -1,
 
     [ClientPacketId.DEBUG]: -2,

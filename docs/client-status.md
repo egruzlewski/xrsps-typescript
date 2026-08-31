@@ -30,7 +30,6 @@ Each section lists **path**, **what is wired**, **gaps**, **tests**, and a **nex
 - **Official world-list CS2** — [`WorldListOps.ts`](../client/rs/cs2/handlers/WorldListOps.ts) pushes zeros. Login uses a **custom** world/server list in [`LoginRenderer`](../client/game/login/LoginRenderer.ts), not the cache world-list protocol.
 - **Standalone `HITSPLAT` opcode (82)** — enumerated in [`ServerPacketId`](../client/common/packets/ServerPacketId.ts) but **not decoded** in [`ServerBinaryDecoder.ts`](../client/network/packet/ServerBinaryDecoder.ts). Hitsplats actually arrive via `PLAYER_SYNC` / `NPC_INFO` update blocks.
 - **`DEBUG` opcode 250** — same: not in the decoder. Debug JSON uses `DEBUG_PACKET` (86).
-- **`MAP_EDIT` (client opcode 195)** — in the high-level packet enum; no encoder in [`ClientBinaryEncoder.ts`](../client/network/packet/ClientBinaryEncoder.ts). Matches the unused server handler.
 - **React game chrome** — inventory, minimap, orbs, and menus are **not** React. Comment in [`GameContainer.tsx`](../client/game/GameContainer.tsx): legacy CSS menu / React minimap removed. HUD is WebGL widgets + overlays.
 
 ### Scaffold or hollow
@@ -101,7 +100,7 @@ Each section lists **path**, **what is wired**, **gaps**, **tests**, and a **nex
 | **Wired** | Binary WebSocket, login/handshake/tick, player/NPC sync, inventories, bank, skills, vars, widgets, chat, Friends Chat, shops, trade, smithing, collection log, notifications, `GAMEMODE_DATA`, rebuild region/normal/world-entity, locs, camera control, sound/jingle/song, projectiles, combat state, destination, path response. Dispatch: [`handlers/dispatch.ts`](../client/network/serverConnection/handlers/dispatch.ts). |
 | **Gaps** | Opcodes **82 (`HITSPLAT`)** and **250 (`DEBUG`)** not decoded (hitsplats via sync; debug via 86). No GE packets. |
 | **Tests** | Indirect (`enter-to-type-chat`, camera). No opcode-matrix test. |
-| **Next step** | Drop unused `HITSPLAT`/`DEBUG`/`MAP_EDIT` enums or implement them on both ends. |
+| **Next step** | Drop unused `HITSPLAT`/`DEBUG` enums or implement them on both ends. |
 
 Outgoing OSRS ops: loc/npc/player/obj/IF_BUTTON*/examine/walk/appearance from menu/input. NPC op 5 uses opcode **57**, not **50**.
 
@@ -316,7 +315,6 @@ Overlays live under [`ui/devoverlay/`](../client/ui/devoverlay/) despite the nam
 | `ServerPacketId.HITSPLAT` (82) | Not decoded; hitsplats in sync blocks |
 | `ServerPacketId.DEBUG` (250) | Not decoded; use 86 |
 | `ClientPacketId.OPNPC5` (50) | Never sent; op 5 uses 57 |
-| `ClientPacketId.MAP_EDIT` (195) | No encoder |
 | CS2 `STOCKMARKET_*` / `TRADINGPOST_*` | Empty offers |
 | CS2 `WORLDLIST_*` | Zeros; custom login list instead |
 | `LocType` bank booth | TODO comment |
@@ -348,7 +346,7 @@ There is no client test for packet decode completeness, CS2 opcode coverage, or 
 ## Suggested development order (client)
 
 1. Treat **vanilla missing `GAMEMODE_DATA`** as a server issue; client already applies the packet.
-2. Clean **dead opcodes** (`HITSPLAT` 82, `DEBUG` 250, `MAP_EDIT` 195, unused `OPNPC5` 50) or implement both sides together.
+2. Clean **dead opcodes** (`HITSPLAT` 82, `DEBUG` 250, unused `OPNPC5` 50) or implement both sides together.
 3. Do not build a React HUD; extend **widgets + CS2**.
 4. GE / official world list / clans need **server packets first**; CS2 stubs will stay empty until then.
 5. Shrink or split **`OsrsClient.ts`** only when touching that area (convention, not a blocker).
