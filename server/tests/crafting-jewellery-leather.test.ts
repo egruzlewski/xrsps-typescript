@@ -18,10 +18,20 @@ import { register as registerCrafting } from "../gamemodes/vanilla/skills/crafti
 import {
     BALL_OF_WOOL_ITEM_ID,
     CHISEL_ITEM_ID,
+    CRUSHED_GEM_ITEM_ID,
     GOLD_BAR_ITEM_ID,
+    ONYX_ITEM_ID,
     RING_MOULD_ITEM_ID,
+    BRACELET_MOULD_ITEM_ID,
+    UNCUT_ONYX_ITEM_ID,
+    UNCUT_ZENYTE_ITEM_ID,
+    ZENYTE_FUSE_RECIPE,
+    ZENYTE_ITEM_ID,
+    ZENYTE_SHARD_ITEM_ID,
     getGemCutRecipeByUncutId,
     getJewelleryRecipeById,
+    getZenyteFuseRecipeById,
+    rollSemiPreciousCutSuccess,
 } from "../gamemodes/vanilla/skills/crafting/jewelleryData";
 import {
     LEATHER_ITEM_ID,
@@ -39,6 +49,15 @@ const SAPPHIRE_RING = 1637;
 const UNCUT_SAPPHIRE = 1623;
 const GOLD_AMULET_U = 1673;
 const GOLD_AMULET = 1692;
+const ONYX_RING = 6575;
+const ONYX_AMULET_U = 6579;
+const ONYX_AMULET = 6581;
+const ZENYTE_RING = 19538;
+const ZENYTE_BRACELET = 19532;
+const ZENYTE_AMULET_U = 19501;
+const ZENYTE_AMULET = 19541;
+const UNCUT_OPAL = 1625;
+const OPAL = 1609;
 const LEATHER_GLOVES = 1059;
 const GREEN_D_LEATHER = 1745;
 const GREEN_DHIDE_BODY = 1135;
@@ -71,6 +90,95 @@ const cutSapphire = getGemCutRecipeByUncutId(UNCUT_SAPPHIRE);
 assert(cutSapphire);
 assert.equal(cutSapphire.cutItemId, SAPPHIRE);
 assert.equal(cutSapphire.xp, 50);
+assert.equal(cutSapphire.crush, undefined);
+
+const onyxRing = getJewelleryRecipeById("onyx_ring");
+assert(onyxRing);
+assert.equal(onyxRing.productItemId, ONYX_RING);
+assert.equal(onyxRing.gemItemId, ONYX_ITEM_ID);
+assert.equal(onyxRing.level, 67);
+assert.equal(onyxRing.xp, 115);
+
+const onyxNecklace = getJewelleryRecipeById("onyx_necklace");
+assert(onyxNecklace);
+assert.equal(onyxNecklace.productItemId, 6577);
+assert.equal(onyxNecklace.level, 82);
+assert.equal(onyxNecklace.xp, 120);
+
+const onyxBracelet = getJewelleryRecipeById("onyx_bracelet");
+assert(onyxBracelet);
+assert.equal(onyxBracelet.productItemId, 11130);
+assert.equal(onyxBracelet.level, 84);
+assert.equal(onyxBracelet.xp, 125);
+
+const onyxAmulet = getJewelleryRecipeById("onyx_amulet");
+assert(onyxAmulet);
+assert.equal(onyxAmulet.productItemId, ONYX_AMULET_U);
+assert.equal(onyxAmulet.level, 90);
+assert.equal(onyxAmulet.xp, 165);
+
+const zenyteRing = getJewelleryRecipeById("zenyte_ring");
+assert(zenyteRing);
+assert.equal(zenyteRing.productItemId, ZENYTE_RING);
+assert.equal(zenyteRing.gemItemId, ZENYTE_ITEM_ID);
+assert.equal(zenyteRing.level, 89);
+assert.equal(zenyteRing.xp, 150);
+
+const zenyteNecklace = getJewelleryRecipeById("zenyte_necklace");
+assert(zenyteNecklace);
+assert.equal(zenyteNecklace.productItemId, 19535);
+assert.equal(zenyteNecklace.level, 92);
+assert.equal(zenyteNecklace.xp, 165);
+
+const zenyteBracelet = getJewelleryRecipeById("zenyte_bracelet");
+assert(zenyteBracelet);
+assert.equal(zenyteBracelet.productItemId, ZENYTE_BRACELET);
+assert.equal(zenyteBracelet.level, 95);
+assert.equal(zenyteBracelet.xp, 180);
+
+const zenyteAmulet = getJewelleryRecipeById("zenyte_amulet");
+assert(zenyteAmulet);
+assert.equal(zenyteAmulet.productItemId, ZENYTE_AMULET_U);
+assert.equal(zenyteAmulet.level, 98);
+assert.equal(zenyteAmulet.xp, 200);
+
+const cutOnyx = getGemCutRecipeByUncutId(UNCUT_ONYX_ITEM_ID);
+assert(cutOnyx);
+assert.equal(cutOnyx.cutItemId, ONYX_ITEM_ID);
+assert.equal(cutOnyx.level, 67);
+assert.equal(cutOnyx.xp, 167.5);
+
+const cutZenyte = getGemCutRecipeByUncutId(UNCUT_ZENYTE_ITEM_ID);
+assert(cutZenyte);
+assert.equal(cutZenyte.cutItemId, ZENYTE_ITEM_ID);
+assert.equal(cutZenyte.level, 89);
+assert.equal(cutZenyte.xp, 50);
+
+const cutOpal = getGemCutRecipeByUncutId(UNCUT_OPAL);
+assert(cutOpal);
+assert.equal(cutOpal.cutItemId, OPAL);
+assert.equal(cutOpal.crush?.low, 128);
+assert.equal(cutOpal.crush?.high, 250);
+assert.equal(cutOpal.crush?.xp, 3.8);
+assert.equal(rollSemiPreciousCutSuccess(1, cutOpal.crush!, () => 0), true);
+assert.equal(rollSemiPreciousCutSuccess(1, cutOpal.crush!, () => 0.999), false);
+
+const cutJade = getGemCutRecipeByUncutId(1627);
+assert(cutJade?.crush);
+assert.equal(cutJade.crush.low, 100);
+assert.equal(cutJade.crush.xp, 5);
+const cutTopaz = getGemCutRecipeByUncutId(1629);
+assert(cutTopaz?.crush);
+assert.equal(cutTopaz.crush.low, 90);
+assert.equal(cutTopaz.crush.xp, 6.3);
+
+const fuseZenyte = getZenyteFuseRecipeById(ZENYTE_FUSE_RECIPE.id);
+assert(fuseZenyte);
+assert.equal(fuseZenyte.shardItemId, ZENYTE_SHARD_ITEM_ID);
+assert.equal(fuseZenyte.gemItemId, ONYX_ITEM_ID);
+assert.equal(fuseZenyte.productItemId, UNCUT_ZENYTE_ITEM_ID);
+assert.equal(fuseZenyte.level, 70);
+assert.equal(fuseZenyte.xp, 15);
 
 const gloves = getLeatherRecipeById("leather_gloves");
 assert(gloves);
@@ -298,12 +406,19 @@ registerCrafting(registry, services);
 assert(itemOnLoc.has(`${GOLD_BAR_ITEM_ID}:-1`), "gold bar should register on any furnace loc");
 assert(itemOnLoc.has(`${RING_MOULD_ITEM_ID}:-1`), "ring mould should register on any furnace loc");
 assert(itemOnItem.has(`${CHISEL_ITEM_ID}:${UNCUT_SAPPHIRE}`));
+assert(itemOnItem.has(`${CHISEL_ITEM_ID}:${UNCUT_ONYX_ITEM_ID}`));
+assert(itemOnItem.has(`${CHISEL_ITEM_ID}:${UNCUT_ZENYTE_ITEM_ID}`));
+assert(itemOnItem.has(`${CHISEL_ITEM_ID}:${UNCUT_OPAL}`));
+assert(itemOnItem.has(`${ZENYTE_SHARD_ITEM_ID}:${ONYX_ITEM_ID}`));
+assert(itemOnItem.has(`${BALL_OF_WOOL_ITEM_ID}:${ONYX_AMULET_U}`));
+assert(itemOnItem.has(`${BALL_OF_WOOL_ITEM_ID}:${ZENYTE_AMULET_U}`));
 assert(itemOnItem.has(`${NEEDLE_ITEM_ID}:${LEATHER_ITEM_ID}`));
 assert(itemOnItem.has(`${NEEDLE_ITEM_ID}:${SNAKESKIN_ITEM_ID}`));
 assert(itemOnItem.has(`${BALL_OF_WOOL_ITEM_ID}:${GOLD_AMULET_U}`));
 assert(actionHandlers.has("skill.jewellery"));
 assert(actionHandlers.has("skill.gem_cut"));
 assert(actionHandlers.has("skill.string_amulet"));
+assert(actionHandlers.has("skill.zenyte_fuse"));
 assert(actionHandlers.has("skill.leather"));
 
 resetState(99, [
@@ -383,6 +498,126 @@ assert.equal(count(GOLD_AMULET), 1);
 assert.equal(count(GOLD_AMULET_U), 0);
 assert.equal(count(BALL_OF_WOOL_ITEM_ID), 0);
 assert.deepEqual(xp, [4]);
+
+resetState(99, [
+    { itemId: CHISEL_ITEM_ID, quantity: 1 },
+    { itemId: UNCUT_ONYX_ITEM_ID, quantity: 1 },
+]);
+useOnItem(UNCUT_ONYX_ITEM_ID, CHISEL_ITEM_ID);
+assert.equal(skillMultis.length, 1);
+skillMultis[0].onSelect?.(0, 1);
+assert.equal(actions[0]?.kind, "skill.gem_cut");
+runAction("skill.gem_cut", { recipeId: "cut_onyx", count: 1 });
+assert.equal(count(ONYX_ITEM_ID), 1);
+assert.equal(count(UNCUT_ONYX_ITEM_ID), 0);
+assert.deepEqual(xp, [167.5]);
+
+resetState(99, [
+    { itemId: GOLD_BAR_ITEM_ID, quantity: 1 },
+    { itemId: RING_MOULD_ITEM_ID, quantity: 1 },
+    { itemId: ONYX_ITEM_ID, quantity: 1 },
+]);
+useOnLoc(GOLD_BAR_ITEM_ID, FURNACE_LOC);
+assert.equal(skillMultis.length, 1);
+assert(skillMultis[0].products.some((product) => product.itemId === ONYX_RING));
+runAction("skill.jewellery", { recipeId: "onyx_ring", count: 1 });
+assert.equal(count(ONYX_RING), 1);
+assert.equal(count(ONYX_ITEM_ID), 0);
+assert.equal(count(GOLD_BAR_ITEM_ID), 0);
+assert.deepEqual(xp, [115]);
+
+resetState(99, [
+    { itemId: ZENYTE_SHARD_ITEM_ID, quantity: 1 },
+    { itemId: ONYX_ITEM_ID, quantity: 1 },
+]);
+useOnItem(ZENYTE_SHARD_ITEM_ID, ONYX_ITEM_ID);
+assert.equal(actions[0]?.kind, "skill.zenyte_fuse");
+runAction("skill.zenyte_fuse", { recipeId: "fuse_uncut_zenyte", count: 1 });
+assert.equal(count(UNCUT_ZENYTE_ITEM_ID), 1);
+assert.equal(count(ZENYTE_SHARD_ITEM_ID), 0);
+assert.equal(count(ONYX_ITEM_ID), 0);
+assert.deepEqual(xp, [15]);
+
+resetState(69, [
+    { itemId: ZENYTE_SHARD_ITEM_ID, quantity: 1 },
+    { itemId: ONYX_ITEM_ID, quantity: 1 },
+]);
+useOnItem(ZENYTE_SHARD_ITEM_ID, ONYX_ITEM_ID);
+assert.equal(actions.length, 0);
+assert.match(messages[0] ?? "", /Crafting level 70/);
+
+resetState(99, [
+    { itemId: CHISEL_ITEM_ID, quantity: 1 },
+    { itemId: UNCUT_ZENYTE_ITEM_ID, quantity: 1 },
+]);
+runAction("skill.gem_cut", { recipeId: "cut_zenyte", count: 1 });
+assert.equal(count(ZENYTE_ITEM_ID), 1);
+assert.deepEqual(xp, [50]);
+
+resetState(99, [
+    { itemId: GOLD_BAR_ITEM_ID, quantity: 1 },
+    { itemId: RING_MOULD_ITEM_ID, quantity: 1 },
+    { itemId: ZENYTE_ITEM_ID, quantity: 1 },
+]);
+runAction("skill.jewellery", { recipeId: "zenyte_ring", count: 1 });
+assert.equal(count(ZENYTE_RING), 1);
+assert.equal(count(ZENYTE_ITEM_ID), 0);
+assert.deepEqual(xp, [150]);
+
+resetState(99, [
+    { itemId: GOLD_BAR_ITEM_ID, quantity: 1 },
+    { itemId: BRACELET_MOULD_ITEM_ID, quantity: 1 },
+    { itemId: ZENYTE_ITEM_ID, quantity: 1 },
+]);
+runAction("skill.jewellery", { recipeId: "zenyte_bracelet", count: 1 });
+assert.equal(count(ZENYTE_BRACELET), 1);
+assert.deepEqual(xp, [180]);
+
+resetState(99, [
+    { itemId: ONYX_AMULET_U, quantity: 1 },
+    { itemId: BALL_OF_WOOL_ITEM_ID, quantity: 1 },
+]);
+runAction("skill.string_amulet", { recipeId: "string_onyx_amulet", count: 1 });
+assert.equal(count(ONYX_AMULET), 1);
+assert.deepEqual(xp, [4]);
+
+resetState(99, [
+    { itemId: ZENYTE_AMULET_U, quantity: 1 },
+    { itemId: BALL_OF_WOOL_ITEM_ID, quantity: 1 },
+]);
+runAction("skill.string_amulet", { recipeId: "string_zenyte_amulet", count: 1 });
+assert.equal(count(ZENYTE_AMULET), 1);
+assert.deepEqual(xp, [4]);
+
+{
+    const originalRandom = Math.random;
+    try {
+        Math.random = () => 0.999;
+        resetState(1, [
+            { itemId: CHISEL_ITEM_ID, quantity: 1 },
+            { itemId: UNCUT_OPAL, quantity: 1 },
+        ]);
+        const crushResult = runAction("skill.gem_cut", { recipeId: "cut_opal", count: 1 });
+        assert.equal(count(CRUSHED_GEM_ITEM_ID), 1);
+        assert.equal(count(OPAL), 0);
+        assert.deepEqual(xp, [3.8]);
+        const crushMessage = crushResult.effects?.find((effect) => effect.type === "message");
+        assert(crushMessage && crushMessage.type === "message");
+        assert.match(crushMessage.message, /smash the opal/);
+
+        Math.random = () => 0;
+        resetState(1, [
+            { itemId: CHISEL_ITEM_ID, quantity: 1 },
+            { itemId: UNCUT_OPAL, quantity: 1 },
+        ]);
+        runAction("skill.gem_cut", { recipeId: "cut_opal", count: 1 });
+        assert.equal(count(OPAL), 1);
+        assert.equal(count(CRUSHED_GEM_ITEM_ID), 0);
+        assert.deepEqual(xp, [15]);
+    } finally {
+        Math.random = originalRandom;
+    }
+}
 
 resetState(99, [
     { itemId: NEEDLE_ITEM_ID, quantity: 1 },

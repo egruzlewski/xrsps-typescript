@@ -13,9 +13,14 @@ import {
 import {
     BALL_OF_WOOL_ITEM_ID,
     CHISEL_ITEM_ID,
+    CRUSHED_GEM_ITEM_ID,
+    ONYX_ITEM_ID,
+    ZENYTE_FUSE_RECIPE,
+    ZENYTE_SHARD_ITEM_ID,
     type AmuletStringRecipe,
     type GemCutRecipe,
     type JewelleryRecipe,
+    type ZenyteFuseRecipe,
     JEWELLERY_BAR_ITEM_IDS,
     JEWELLERY_MOULD_ITEM_IDS,
     JEWELLERY_RECIPES,
@@ -26,13 +31,16 @@ import {
     getGemCutRecipeById,
     getGemCutRecipeByUncutId,
     getJewelleryRecipeById,
+    getZenyteFuseRecipeById,
     isFurnaceLoc,
+    rollSemiPreciousCutSuccess,
 } from "./jewelleryData";
 
 const MAX_BATCH = 28;
 const JEWELLERY_GROUP = "skill.jewellery";
 const GEM_CUT_GROUP = "skill.gem_cut";
 const STRING_GROUP = "skill.string_amulet";
+const ZENYTE_FUSE_GROUP = "skill.zenyte_fuse";
 
 type InventoryEntry = ScriptInventoryEntry;
 
@@ -47,6 +55,11 @@ type GemCutActionData = {
 };
 
 type StringActionData = {
+    recipeId: string;
+    count: number;
+};
+
+type ZenyteFuseActionData = {
     recipeId: string;
     count: number;
 };
@@ -84,6 +97,17 @@ function computeStringBatch(entries: InventoryEntry[], recipe: AmuletStringRecip
             MAX_BATCH,
             countItem(entries, recipe.unstrungItemId),
             countItem(entries, BALL_OF_WOOL_ITEM_ID),
+        ),
+    );
+}
+
+function computeZenyteFuseBatch(entries: InventoryEntry[], recipe: ZenyteFuseRecipe): number {
+    return Math.max(
+        0,
+        Math.min(
+            MAX_BATCH,
+            countItem(entries, recipe.shardItemId),
+            countItem(entries, recipe.gemItemId),
         ),
     );
 }
@@ -298,7 +322,20 @@ function executeGemCutAction(ctx: ScriptActionHandlerContext): ActionExecutionRe
         };
     }
 
-    if (!placeProduct(services, player, gemSlot, recipe.cutItemId)) {
+    const crush = recipe.crush;
+    const crushed =
+        crush !== undefined &&
+        !rollSemiPreciousCutSuccess(
+            Math.max(1, (skill?.baseLevel ?? 1) + (skill?.boost ?? 0)),
+            crush,
+        );
+    const productItemId = crushed ? CRUSHED_GEM_ITEM_ID : recipe.cutItemId;
+    const xp = crushed && crush ? crush.xp : recipe.xp;
+    const message = crushed
+        ? `You mis-hit the chisel and smash the ${recipe.name} into pieces!`
+        : `You cut the ${recipe.name}.`;
+
+    if (!placeProduct(services, player, gemSlot, productItemId)) {
         restoreSlot(services, player, gemSlot, recipe.uncutItemId);
         return {
             ok: true,
@@ -306,16 +343,16 @@ function executeGemCutAction(ctx: ScriptActionHandlerContext): ActionExecutionRe
         };
     }
     services.animation.playPlayerSeq(player, recipe.animation);
-    services.skills.addSkillXp(player, SkillId.Crafting, recipe.xp);
+    services.skills.addSkillXp(player, SkillId.Crafting, xp);
     services.system.eventBus?.emit("item:craft", {
         playerId: player.id,
-        itemId: recipe.cutItemId,
+        itemId: productItemId,
         count: 1,
     });
 
     const effects: ActionEffect[] = [
         { type: "inventorySnapshot", playerId: player.id },
-        buildMessageEffect(player, `You cut the ${recipe.name}.`),
+        buildMessageEffect(player, message),
     ];
 
     const remaining = Math.max(0, Math.max(1, data.count) - 1);
@@ -433,10 +470,101 @@ function executeAmuletStringAction(ctx: ScriptActionHandlerContext): ActionExecu
     };
 }
 
+function executeZenyteFuseAction(ctx: ScriptActionHandlerContext): ActionExecutionResult {
+    const { player, tick, services } = ctx;
+    const data = ctx.data as ZenyteFuseActionData;
+    const recipe = getZenyteFuseRecipeById(data.recipeId);
+    if (!recipe) {
+        return { ok: true, effects: [buildMessageEffect(player, "You can't fuse that.")] };
+    }
+
+    const skill = services.skills.getSkill(player, SkillId.Crafting);
+    if ((skill?.baseLevel ?? 1) < recipe.level) {
+        return {
+            ok: true,
+            effects: [
+                buildMessageEffect(
+                    player,
+                    `You need Crafting level ${recipe.level} to make an ${recipe.name}.`,
+                ),
+            ],
+        };
+    }
+
+    const shardSlot = consumeOne(services, player, recipe.shardItemId);
+    if (shardSlot === undefined) {
+        return {
+            ok: true,
+            effects: [buildMessageEffect(player, "You need a zenyte shard to fuse that.")],
+        };
+    }
+
+    const gemSlot = consumeOne(services, player, recipe.gemItemId);
+    if (gemSlot === undefined) {
+        restoreSlot(services, player, shardSlot, recipe.shardItemId);
+        return {
+            ok: true,
+            effects: [buildMessageEffect(player, "You need a cut onyx to fuse that.")],
+        };
+    }
+
+    if (!placeProduct(services, player, shardSlot, recipe.productItemId)) {
+        restoreSlot(services, player, shardSlot, recipe.shardItemId);
+        restoreSlot(services, player, gemSlot, recipe.gemItemId);
+        return {
+            ok: true,
+            effects: [buildMessageEffect(player, "You need more inventory space to keep fusing.")],
+        };
+    }
+    services.animation.playPlayerSeq(player, recipe.animation);
+    services.skills.addSkillXp(player, SkillId.Crafting, recipe.xp);
+    services.system.eventBus?.emit("item:craft", {
+        playerId: player.id,
+        itemId: recipe.productItemId,
+        count: 1,
+    });
+
+    const effects: ActionEffect[] = [
+        { type: "inventorySnapshot", playerId: player.id },
+        buildMessageEffect(
+            player,
+            "You fuse the zenyte shard and onyx together, forming an uncut zenyte.",
+        ),
+    ];
+
+    const remaining = Math.max(0, Math.max(1, data.count) - 1);
+    if (remaining > 0) {
+        const reschedule = services.combat.scheduleAction(
+            player.id,
+            {
+                kind: "skill.zenyte_fuse",
+                data: { recipeId: recipe.id, count: remaining },
+                delayTicks: recipe.delayTicks,
+                cooldownTicks: recipe.delayTicks,
+                groups: [ZENYTE_FUSE_GROUP],
+            },
+            tick,
+        );
+        if (!reschedule?.ok) {
+            effects.push(
+                buildMessageEffect(player, "You stop fusing because you're already busy."),
+            );
+        }
+    }
+
+    return {
+        ok: true,
+        cooldownTicks: recipe.delayTicks,
+        groups: [ZENYTE_FUSE_GROUP],
+        effects,
+    };
+}
+
 export function register(registry: IScriptRegistry, services: ScriptServices): void {
     registry.registerActionHandler("skill.jewellery", executeJewelleryAction);
     registry.registerActionHandler("skill.gem_cut", executeGemCutAction);
     registry.registerActionHandler("skill.string_amulet", executeAmuletStringAction);
+    registry.registerActionHandler("skill.zenyte_fuse", executeZenyteFuseAction);
 
     const openJewelleryMenu = (
         player: PlayerState,
@@ -627,4 +755,46 @@ export function register(registry: IScriptRegistry, services: ScriptServices): v
     for (const unstrungId of UNSTRUNG_AMULET_ITEM_IDS) {
         registry.registerItemOnItem(BALL_OF_WOOL_ITEM_ID, unstrungId, handleStringAmulet);
     }
+
+    const handleZenyteFuse = (event: ItemOnItemEvent) => {
+        const recipe = ZENYTE_FUSE_RECIPE;
+        const otherId =
+            event.source.itemId === recipe.shardItemId ? event.target.itemId : event.source.itemId;
+        if (otherId !== recipe.gemItemId) return;
+        const inventory = services.inventory.getInventoryItems(event.player);
+        const batch = computeZenyteFuseBatch(inventory, recipe);
+        if (batch <= 0) {
+            services.messaging.sendGameMessage(
+                event.player,
+                "You need a zenyte shard and a cut onyx to fuse those.",
+            );
+            return;
+        }
+        const level = services.skills.getSkill(event.player, SkillId.Crafting)?.baseLevel ?? 1;
+        if (level < recipe.level) {
+            services.messaging.sendGameMessage(
+                event.player,
+                `You need Crafting level ${recipe.level} to make an ${recipe.name}.`,
+            );
+            return;
+        }
+        const ok = enqueueRecipeAction(
+            services,
+            event.player,
+            "skill.zenyte_fuse",
+            ZENYTE_FUSE_GROUP,
+            recipe.id,
+            batch,
+            recipe.delayTicks,
+            event.tick,
+        );
+        if (!ok) {
+            services.messaging.sendGameMessage(
+                event.player,
+                "You're too busy to fuse that right now.",
+            );
+        }
+    };
+
+    registry.registerItemOnItem(ZENYTE_SHARD_ITEM_ID, ONYX_ITEM_ID, handleZenyteFuse);
 }

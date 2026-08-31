@@ -14,6 +14,13 @@ export const HOLY_MOULD_ITEM_ID = 1599;
 export const TIARA_MOULD_ITEM_ID = 5523;
 export const SICKLE_MOULD_ITEM_ID = 2976;
 
+export const CRUSHED_GEM_ITEM_ID = 1633;
+export const UNCUT_ONYX_ITEM_ID = 6571;
+export const ONYX_ITEM_ID = 6573;
+export const UNCUT_ZENYTE_ITEM_ID = 19496;
+export const ZENYTE_ITEM_ID = 19493;
+export const ZENYTE_SHARD_ITEM_ID = 19529;
+
 export const JEWELLERY_FURNACE_ANIMATION_ID = 899; // same furnace craft as smithing
 export const GEM_CUT_ANIMATION_ID = 891;
 export const AMULET_STRING_ANIMATION_ID = 890;
@@ -36,11 +43,32 @@ export interface JewelleryRecipe {
     delayTicks: number;
 }
 
+export interface GemCutCrush {
+    /** OSRS skilling-success low numerator (level 1). */
+    low: number;
+    /** OSRS skilling-success high numerator (level 99). */
+    high: number;
+    xp: number;
+}
+
 export interface GemCutRecipe {
     id: string;
     name: string;
     uncutItemId: number;
     cutItemId: number;
+    level: number;
+    xp: number;
+    animation: number;
+    delayTicks: number;
+    crush?: GemCutCrush;
+}
+
+export interface ZenyteFuseRecipe {
+    id: string;
+    name: string;
+    shardItemId: number;
+    gemItemId: number;
+    productItemId: number;
     level: number;
     xp: number;
     animation: number;
@@ -128,6 +156,22 @@ const GOLD_GEM_SEEDS: GemSeed[] = [
         xp: { ring: 100, necklace: 105, bracelet: 110, amulet: 150 },
         products: { ring: 1645, necklace: 1664, bracelet: 11115, amulet: 1683 },
     },
+    {
+        key: "onyx",
+        adjective: "onyx",
+        gemItemId: ONYX_ITEM_ID,
+        levels: { ring: 67, necklace: 82, bracelet: 84, amulet: 90 },
+        xp: { ring: 115, necklace: 120, bracelet: 125, amulet: 165 },
+        products: { ring: 6575, necklace: 6577, bracelet: 11130, amulet: 6579 },
+    },
+    {
+        key: "zenyte",
+        adjective: "zenyte",
+        gemItemId: ZENYTE_ITEM_ID,
+        levels: { ring: 89, necklace: 92, bracelet: 95, amulet: 98 },
+        xp: { ring: 150, necklace: 165, bracelet: 180, amulet: 200 },
+        products: { ring: 19538, necklace: 19535, bracelet: 19532, amulet: 19501 },
+    },
 ];
 
 const GOLD_RECIPES: JewelleryRecipe[] = GOLD_GEM_SEEDS.flatMap((gem) =>
@@ -198,6 +242,7 @@ export const GEM_CUT_RECIPES: GemCutRecipe[] = [
         xp: 15,
         animation: GEM_CUT_ANIMATION_ID,
         delayTicks: GEM_CUT_DELAY_TICKS,
+        crush: { low: 128, high: 250, xp: 3.8 },
     },
     {
         id: "cut_jade",
@@ -208,6 +253,7 @@ export const GEM_CUT_RECIPES: GemCutRecipe[] = [
         xp: 20,
         animation: GEM_CUT_ANIMATION_ID,
         delayTicks: GEM_CUT_DELAY_TICKS,
+        crush: { low: 100, high: 245, xp: 5 },
     },
     {
         id: "cut_red_topaz",
@@ -218,6 +264,7 @@ export const GEM_CUT_RECIPES: GemCutRecipe[] = [
         xp: 25,
         animation: GEM_CUT_ANIMATION_ID,
         delayTicks: GEM_CUT_DELAY_TICKS,
+        crush: { low: 90, high: 240, xp: 6.3 },
     },
     {
         id: "cut_sapphire",
@@ -269,7 +316,40 @@ export const GEM_CUT_RECIPES: GemCutRecipe[] = [
         animation: GEM_CUT_ANIMATION_ID,
         delayTicks: GEM_CUT_DELAY_TICKS,
     },
+    {
+        id: "cut_onyx",
+        name: "onyx",
+        uncutItemId: UNCUT_ONYX_ITEM_ID,
+        cutItemId: ONYX_ITEM_ID,
+        level: 67,
+        xp: 167.5,
+        animation: GEM_CUT_ANIMATION_ID,
+        delayTicks: GEM_CUT_DELAY_TICKS,
+    },
+    {
+        id: "cut_zenyte",
+        name: "zenyte",
+        uncutItemId: UNCUT_ZENYTE_ITEM_ID,
+        cutItemId: ZENYTE_ITEM_ID,
+        level: 89,
+        xp: 50,
+        animation: GEM_CUT_ANIMATION_ID,
+        delayTicks: GEM_CUT_DELAY_TICKS,
+    },
 ];
+
+/** OSRS: zenyte shard + cut onyx → uncut zenyte (70 Crafting, 15 XP). */
+export const ZENYTE_FUSE_RECIPE: ZenyteFuseRecipe = {
+    id: "fuse_uncut_zenyte",
+    name: "uncut zenyte",
+    shardItemId: ZENYTE_SHARD_ITEM_ID,
+    gemItemId: ONYX_ITEM_ID,
+    productItemId: UNCUT_ZENYTE_ITEM_ID,
+    level: 70,
+    xp: 15,
+    animation: JEWELLERY_FURNACE_ANIMATION_ID,
+    delayTicks: JEWELLERY_DELAY_TICKS,
+};
 
 export const AMULET_STRING_RECIPES: AmuletStringRecipe[] = [
     {
@@ -332,6 +412,26 @@ export const AMULET_STRING_RECIPES: AmuletStringRecipe[] = [
         animation: AMULET_STRING_ANIMATION_ID,
         delayTicks: AMULET_STRING_DELAY_TICKS,
     },
+    {
+        id: "string_onyx_amulet",
+        name: "onyx amulet",
+        unstrungItemId: 6579,
+        productItemId: 6581,
+        level: 90,
+        xp: 4,
+        animation: AMULET_STRING_ANIMATION_ID,
+        delayTicks: AMULET_STRING_DELAY_TICKS,
+    },
+    {
+        id: "string_zenyte_amulet",
+        name: "zenyte amulet",
+        unstrungItemId: 19501,
+        productItemId: 19541,
+        level: 98,
+        xp: 4,
+        animation: AMULET_STRING_ANIMATION_ID,
+        delayTicks: AMULET_STRING_DELAY_TICKS,
+    },
 ];
 
 const JEWELLERY_BY_ID = new Map(JEWELLERY_RECIPES.map((recipe) => [recipe.id, recipe]));
@@ -360,6 +460,21 @@ export function getAmuletStringRecipeByUnstrungId(itemId: number): AmuletStringR
 
 export function getAmuletStringRecipeById(id: string): AmuletStringRecipe | undefined {
     return STRING_BY_ID.get(id);
+}
+
+export function getZenyteFuseRecipeById(id: string): ZenyteFuseRecipe | undefined {
+    return id === ZENYTE_FUSE_RECIPE.id ? ZENYTE_FUSE_RECIPE : undefined;
+}
+
+/** Interpolated low/high numerators out of 256 (same curve as other OSRS skilling success). */
+export function rollSemiPreciousCutSuccess(
+    level: number,
+    crush: GemCutCrush,
+    rng: () => number = Math.random,
+): boolean {
+    const lvl = Math.min(99, Math.max(1, Math.floor(level)));
+    const numer = Math.floor(((99 - lvl) * crush.low + (lvl - 1) * crush.high) / 98);
+    return rng() * 256 < numer;
 }
 
 export const JEWELLERY_BAR_ITEM_IDS = [GOLD_BAR_ITEM_ID, SILVER_BAR_ITEM_ID] as const;
