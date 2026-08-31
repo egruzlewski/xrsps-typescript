@@ -4,8 +4,8 @@
  * Barbarian Outpost, Wilderness, Draynor Village rooftop, Al Kharid rooftop,
  * Varrock rooftop, Canifis rooftop, Falador rooftop, Seers' Village rooftop,
  * Pollnivneach rooftop, Agility Pyramid, Ardougne rooftop, Ape Atoll,
- * Colossal Wyrm Agility Course, Shayzien Agility Course, and Penguin Agility
- * Course are registered from sibling files.
+ * Colossal Wyrm Agility Course, Shayzien Agility Course, Penguin Agility Course,
+ * and Dorgesh-Kaan Agility Course are registered from sibling files.
  */
 import { SkillId } from "../../../../../client/rs/skill/skills";
 import type { PlayerState } from "../../../../src/game/player";
@@ -17,6 +17,7 @@ import { register as registerBarbarian } from "./barbarian";
 import { register as registerBrimhaven } from "./brimhaven";
 import { register as registerCanifis } from "./canifis";
 import { register as registerColossalWyrm } from "./colossalWyrm";
+import { register as registerDorgeshKaan } from "./dorgeshKaan";
 import { register as registerDraynor } from "./draynor";
 import { register as registerFalador } from "./falador";
 import { register as registerPenguin } from "./penguin";
@@ -230,6 +231,7 @@ export function register(registry: IScriptRegistry): void {
     registerColossalWyrm(registry);
     registerShayzien(registry);
     registerPenguin(registry);
+    registerDorgeshKaan(registry);
 }
 
 /** Test helper: clear lap tracking for one player or all players. */
@@ -320,3 +322,7 @@ export {
     getPenguinCourseStage,
     resetPenguinCourseProgress,
 } from "./penguin";
+export {
+    getDorgeshKaanCourseStage,
+    resetDorgeshKaanCourseProgress,
+} from "./dorgeshKaan";
