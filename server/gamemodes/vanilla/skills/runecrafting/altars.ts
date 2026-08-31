@@ -4,24 +4,28 @@
  * Members altars require pure essence (`pureEssenceOnly`).
  */
 
-export interface RuneAltarDef {
+/** Fields needed to bind essence into runes at an altar loc. */
+export interface RuneCraftDef {
     id: string;
     name: string;
     level: number;
     xpPerEssence: number;
     multiplierDiv: number;
     runeId: number;
+    altarLocId: number;
+    /** When true, rune essence cannot be bound (OSRS members altars). */
+    pureEssenceOnly?: boolean;
+}
+
+export interface RuneAltarDef extends RuneCraftDef {
     talismanId: number;
     tiaraId: number;
     /** Runecraft XP for binding a blank tiara with this altar's talisman. */
     tiaraXp: number;
     ruinsLocIds: readonly number[];
-    altarLocId: number;
     portalLocId: number;
     altarEnter: { x: number; y: number; level: number };
     ruinsExit: { x: number; y: number; level: number };
-    /** When true, rune essence cannot be bound (OSRS members altars). */
-    pureEssenceOnly?: boolean;
 }
 
 export const RUNE_ESSENCE = 1436;
@@ -127,7 +131,7 @@ export const F2P_ALTARS: readonly RuneAltarDef[] = [
     },
 ];
 
-/** Members ruins altars. Soul (Arceuus) and Astral have no mysterious ruins. */
+/** Members ruins altars. Soul (Arceuus) has no mysterious ruins (walk-up, unverified loc). */
 export const MEMBERS_ALTARS: readonly RuneAltarDef[] = [
     {
         id: "cosmic",
@@ -251,4 +255,23 @@ export const MEMBERS_ALTARS: readonly RuneAltarDef[] = [
     },
 ];
 
+/**
+ * Walk-up surface altars: no ruins, talisman, tiara, or portal.
+ * OSRS Astral also requires Lunar Diplomacy; that quest is not registered here,
+ * so craft is not quest-locked.
+ */
+export const WALKUP_ALTARS: readonly RuneCraftDef[] = [
+    {
+        id: "astral",
+        name: "Astral",
+        level: 40,
+        xpPerEssence: 8.7,
+        multiplierDiv: 82,
+        runeId: 9075,
+        altarLocId: 34771,
+        pureEssenceOnly: true,
+    },
+];
+
 export const ALL_ALTARS: readonly RuneAltarDef[] = [...F2P_ALTARS, ...MEMBERS_ALTARS];
+export const ALL_CRAFT_ALTARS: readonly RuneCraftDef[] = [...ALL_ALTARS, ...WALKUP_ALTARS];

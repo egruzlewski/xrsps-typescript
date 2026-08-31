@@ -1,7 +1,8 @@
 /**
- * Runecraft loops: F2P Air–Body plus members ruins altars.
- * Enter ruins with talisman/tiara → craft on altar → exit portal.
- * Same altars also bind blank tiaras and combination runes (Mist–Lava).
+ * Runecraft loops: F2P Air–Body plus members ruins altars, and walk-up Astral.
+ * Ruins: talisman/tiara enter → craft on altar → exit portal.
+ * Walk-up: click the surface altar (no ruins/portal). Same ruins altars also
+ * bind blank tiaras and combination runes (Mist–Lava).
  */
 import { EquipmentSlot } from "../../../../../client/rs/config/player/Equipment";
 import { SkillId } from "../../../../../client/rs/skill/skills";
@@ -17,7 +18,9 @@ import {
     BLANK_TIARA,
     PURE_ESSENCE,
     RUNE_ESSENCE,
+    WALKUP_ALTARS,
     type RuneAltarDef,
+    type RuneCraftDef,
 } from "./altars";
 import {
     combinationBindingsForAltar,
@@ -64,7 +67,7 @@ function tryEnterWithTalisman(altar: RuneAltarDef, event: ItemOnLocEvent): void 
     enterAltar(event.player, event.services, altar);
 }
 
-function craftRunes(altar: RuneAltarDef, player: PlayerState, services: ScriptServices): void {
+function craftRunes(altar: RuneCraftDef, player: PlayerState, services: ScriptServices): void {
     const level = rcLevel(player, services);
     if (level < altar.level) {
         services.messaging.sendGameMessage(
@@ -222,15 +225,7 @@ function registerAltar(registry: IScriptRegistry, altar: RuneAltarDef): void {
         );
     }
 
-    const craftFromLoc = (event: LocInteractionEvent) =>
-        craftRunes(altar, event.player, event.services);
-    const craftFromItem = (event: ItemOnLocEvent) => craftRunes(altar, event.player, event.services);
-
-    registry.registerLocInteraction(altar.altarLocId, craftFromLoc, "craft-rune");
-    registry.registerLocInteraction(altar.altarLocId, craftFromLoc, "craft rune");
-    registry.registerLocInteraction(altar.altarLocId, craftFromLoc, undefined);
-    registry.registerItemOnLoc(RUNE_ESSENCE, altar.altarLocId, craftFromItem);
-    registry.registerItemOnLoc(PURE_ESSENCE, altar.altarLocId, craftFromItem);
+    registerCraftHandlers(registry, altar);
 
     const imbue = (event: ItemOnLocEvent) => imbueTiara(altar, event.player, event.services);
     registry.registerItemOnLoc(BLANK_TIARA, altar.altarLocId, imbue);
@@ -249,8 +244,23 @@ function registerAltar(registry: IScriptRegistry, altar: RuneAltarDef): void {
     registry.registerLocInteraction(altar.portalLocId, (event) => exitAltar(altar, event), undefined);
 }
 
+function registerCraftHandlers(registry: IScriptRegistry, altar: RuneCraftDef): void {
+    const craftFromLoc = (event: LocInteractionEvent) =>
+        craftRunes(altar, event.player, event.services);
+    const craftFromItem = (event: ItemOnLocEvent) => craftRunes(altar, event.player, event.services);
+
+    registry.registerLocInteraction(altar.altarLocId, craftFromLoc, "craft-rune");
+    registry.registerLocInteraction(altar.altarLocId, craftFromLoc, "craft rune");
+    registry.registerLocInteraction(altar.altarLocId, craftFromLoc, undefined);
+    registry.registerItemOnLoc(RUNE_ESSENCE, altar.altarLocId, craftFromItem);
+    registry.registerItemOnLoc(PURE_ESSENCE, altar.altarLocId, craftFromItem);
+}
+
 export function register(registry: IScriptRegistry): void {
     for (const altar of ALL_ALTARS) {
         registerAltar(registry, altar);
+    }
+    for (const altar of WALKUP_ALTARS) {
+        registerCraftHandlers(registry, altar);
     }
 }
