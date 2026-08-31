@@ -1,10 +1,12 @@
 /**
  * Gnome Stronghold agility course (LostCity gnome_course.rs2, soft exact-move port).
  * Fail-proof; lap bonus only if obstacles are completed in order.
+ * Barbarian Outpost is registered from ./barbarian.
  */
 import { SkillId } from "../../../../../client/rs/skill/skills";
 import type { PlayerState } from "../../../../src/game/player";
 import type { IScriptRegistry, LocInteractionEvent } from "../../../../src/game/scripts/types";
+import { register as registerBarbarian } from "./barbarian";
 
 const LOG_WALK_ANIM = 762; // human_walk_logbalance
 const CLIMB_ANIM = 828; // human_climb
@@ -189,6 +191,7 @@ export function register(registry: IScriptRegistry): void {
             }
         }
     }
+    registerBarbarian(registry);
 }
 
 /** Test helper: clear lap tracking for one player or all players. */
@@ -203,3 +206,8 @@ export function resetGnomeCourseProgress(playerId?: number): void {
 export function getGnomeCourseStage(playerId: number): number {
     return courseProgress.get(playerId) ?? 0;
 }
+
+export {
+    getBarbarianCourseStage,
+    resetBarbarianCourseProgress,
+} from "./barbarian";
