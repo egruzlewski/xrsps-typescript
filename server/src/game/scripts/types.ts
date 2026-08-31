@@ -79,6 +79,17 @@ export interface LocSpellResult {
     reason?: string;
 }
 
+export interface InvSpellEvent extends ScriptExecutionContext {
+    player: PlayerState;
+    spellId: number;
+    slot: number;
+    itemId: number;
+    /** Optional out-param so inv scripts can report spell success/failure. */
+    spellResult?: LocSpellResult;
+}
+
+export type InvSpellHandler = (event: InvSpellEvent) => void | Promise<void>;
+
 export interface LocInteractionEvent extends ScriptExecutionContext {
     player: PlayerState;
     locId: number;
@@ -448,6 +459,9 @@ export interface IScriptRegistry {
         handler: LocInteractionHandler;
     }): ScriptRegistrationResult;
     registerLocAction(action: string, handler: LocInteractionHandler): ScriptRegistrationResult;
+    /** Spell-on-item (OPOBJ_T / inventory target). Enchant jewellery and similar utility spells. */
+    registerSpellOnItem(spellId: number, handler: InvSpellHandler): ScriptRegistrationResult;
+    findSpellOnItem(spellId: number): InvSpellHandler | undefined;
     registerItemOnItem(
         sourceItemId: number,
         targetItemId: number,

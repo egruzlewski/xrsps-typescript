@@ -683,6 +683,9 @@ export class ScriptRuntime {
             registerLocScript: (params) => track(this.registry.registerLocScript(params)),
             registerLocAction: (action, handler) =>
                 track(this.registry.registerLocAction(action, handler)),
+            registerSpellOnItem: (spellId, handler) =>
+                track(this.registry.registerSpellOnItem(spellId, handler)),
+            findSpellOnItem: (spellId) => this.registry.findSpellOnItem(spellId),
             registerItemOnItem: (
                 sourceItemId: number,
                 targetItemId: number,

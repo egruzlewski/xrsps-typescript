@@ -210,6 +210,40 @@ export class SpellCastingService {
             return;
         }
 
+        const invSpellHandler = this.svc.scriptRegistry?.findSpellOnItem(spellId);
+        if (invSpellHandler) {
+            const services = this.svc.scriptRuntime?.getServices();
+            if (!services) {
+                this.sendSpellFailure(player, spellId, "server_error");
+                return;
+            }
+            const spellResult: { outcome: "success" | "failure"; reason?: string } = {
+                outcome: "failure",
+                reason: "invalid_target",
+            };
+            const tick = this.svc.activeFrame?.tick ?? this.svc.ticker.currentTick();
+            invSpellHandler({
+                player,
+                spellId,
+                slot,
+                itemId: targetItemId,
+                spellResult,
+                tick,
+                services,
+            });
+            if (spellResult.outcome === "success") {
+                this.svc.broadcastService.queueSpellResult(player.id, {
+                    casterId: player.id,
+                    spellId,
+                    outcome: "success",
+                    targetType: "item",
+                });
+            } else {
+                this.sendSpellFailure(player, spellId, spellResult.reason ?? "invalid_target");
+            }
+            return;
+        }
+
         this.svc.messagingService.queueChatMessage({
             messageType: "game",
             playerId: player.id,
@@ -299,6 +333,9 @@ export class SpellCastingService {
                 break;
             case "charge_orb_missing_orb":
                 text = "You need an unpowered orb to cast this spell.";
+                break;
+            case "enchant_invalid_item":
+                text = "This spell cannot be used on this item.";
                 break;
             case "invalid_spell":
             default:

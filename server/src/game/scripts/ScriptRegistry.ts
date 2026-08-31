@@ -8,6 +8,7 @@ import {
     type EquipmentActionHandler,
     type GroundItemInteractionHandler,
     type IScriptRegistry,
+    type InvSpellHandler,
     type ItemOnGroundHandler,
     type ItemOnItemHandler,
     type ItemOnLocHandler,
@@ -180,6 +181,7 @@ export class ScriptRegistry implements IScriptRegistry {
     private readonly commandHandlers = new Map<string, CommandHandler>();
     private readonly clientMessageHandlers = new Map<string, ClientMessageHandler>();
     private readonly actionHandlers = new Map<string, ScriptActionHandler>();
+    private readonly invSpellHandlers: HandlerStackMap<number, InvSpellHandler> = new Map();
 
     registerNpcInteraction(
         npcId: number,
@@ -236,6 +238,14 @@ export class ScriptRegistry implements IScriptRegistry {
     registerLocAction(action: string, handler: LocInteractionHandler): ScriptRegistrationResult {
         const key = normalizeOption(action);
         return registerStackedHandler(this.locActionHandlers, key, handler, "loc-action");
+    }
+
+    registerSpellOnItem(spellId: number, handler: InvSpellHandler): ScriptRegistrationResult {
+        return registerStackedHandler(this.invSpellHandlers, spellId, handler, "spell-on-item");
+    }
+
+    findSpellOnItem(spellId: number): InvSpellHandler | undefined {
+        return findStackedHandler(this.invSpellHandlers, spellId);
     }
 
     registerItemOnItem(
@@ -736,5 +746,6 @@ export class ScriptRegistry implements IScriptRegistry {
         this.commandHandlers.clear();
         this.clientMessageHandlers.clear();
         this.actionHandlers.clear();
+        this.invSpellHandlers.clear();
     }
 }

@@ -350,11 +350,11 @@ Server→client opcodes: [`ServerPacketId.ts`](../client/common/packets/ServerPa
 
 ### Skills vs `SkillId`
 
-Combat skills (Attack, Strength, Defence, Hitpoints, Ranged, Magic) are **engine combat**, not `skills/` folders. Charge Orb is the Magic exception: [`skills/magic/`](../server/gamemodes/vanilla/skills/magic/).
+Combat skills (Attack, Strength, Defence, Hitpoints, Ranged, Magic) are **engine combat**, not `skills/` folders. Charge Orb and Enchant Jewellery are the Magic exceptions: [`skills/magic/`](../server/gamemodes/vanilla/skills/magic/).
 
 | Skill | Status | Path | What exists | Next step |
 | --- | --- | --- | --- | --- |
-| Attack / Strength / Defence / Hitpoints / Ranged / Magic | Wired | combat engine + [`skills/magic/`](../server/gamemodes/vanilla/skills/magic/) | XP, styles, regen/boosts; Charge Water/Earth/Fire/Air Orb at obelisks 2151/2150/2153/2152 (unpowered 567 → 571/575/569/573). [`magic-charge-orb.test.ts`](../server/tests/magic-charge-orb.test.ts) | Other utility spells (superheat, bones to bananas, enchant jewellery) still thin |
+| Attack / Strength / Defence / Hitpoints / Ranged / Magic | Wired | combat engine + [`skills/magic/`](../server/gamemodes/vanilla/skills/magic/) | XP, styles, regen/boosts; Charge Water/Earth/Fire/Air Orb at obelisks 2151/2150/2153/2152 (unpowered 567 → 571/575/569/573); Enchant Lvl-1–7 jewellery (sapphire–onyx + zenyte; strung amulets). [`magic-charge-orb.test.ts`](../server/tests/magic-charge-orb.test.ts), [`magic-enchant-jewellery.test.ts`](../server/tests/magic-enchant-jewellery.test.ts) | Superheat, bones to bananas; silver jewellery (opal/jade/topaz) still thin |
 | Prayer | Partial | [`skills/prayer/`](../server/gamemodes/vanilla/skills/prayer/) | Bones/ashes, altars, prayer book widgets | Remaining bones/gilded/etc. as needed |
 | Cooking | Partial | [`skills/production/cooking.ts`](../server/gamemodes/vanilla/skills/production/cooking.ts) | Recipe table + loc interactions | Expand recipes |
 | Woodcutting | Partial | [`skills/woodcutting/`](../server/gamemodes/vanilla/skills/woodcutting/) | Loc map, hatchets, depletion | Missing tree types |

@@ -48,6 +48,13 @@ const SPELL_CAST_SEQUENCE_OVERRIDES: Record<number, number> = {
     9078: 726, // Charge Fire Orb
     9079: 726, // Charge Water Orb
     9001: 722, // Bones to Bananas
+    3276: 719, // Lvl-1 Enchant
+    3287: 719, // Lvl-2 Enchant
+    3298: 719, // Lvl-3 Enchant
+    3305: 719, // Lvl-4 Enchant
+    3318: 719, // Lvl-5 Enchant
+    6567: 719, // Lvl-6 Enchant
+    19475: 719, // Lvl-7 Enchant
     // Ancient Magicks – Rush / Blitz (single target)
     4629: 1978, // Smoke Rush
     4630: 1978, // Shadow Rush
@@ -224,6 +231,13 @@ export class PlayerCombatService {
             9078: 117,
             9079: 118,
             9001: 114,
+            3276: 136,
+            3287: 136,
+            3298: 136,
+            3305: 136,
+            3318: 136,
+            6567: 136,
+            19475: 136,
         };
         const impactMap: Record<number, number> = {
             3273: 221,

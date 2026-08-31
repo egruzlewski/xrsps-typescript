@@ -85,6 +85,7 @@ const registry = {
         widgetHandlers.push(handler);
         return { unregister() {} };
     },
+    registerSpellOnItem: () => ({ unregister() {} }),
 } as unknown as IScriptRegistry;
 
 type Slot = ScriptInventoryEntry;
