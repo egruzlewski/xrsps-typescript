@@ -3,18 +3,21 @@
  * Fail-proof; lap bonus only if obstacles are completed in order.
  * Barbarian Outpost, Wilderness, Draynor Village rooftop, Al Kharid rooftop,
  * Varrock rooftop, Canifis rooftop, Falador rooftop, Seers' Village rooftop,
- * Pollnivneach rooftop, and Agility Pyramid are registered from sibling files.
+ * Pollnivneach rooftop, Agility Pyramid, and Ardougne rooftop are registered from sibling files.
  */
 import { SkillId } from "../../../../../client/rs/skill/skills";
 import type { PlayerState } from "../../../../src/game/player";
 import type { IScriptRegistry, LocInteractionEvent } from "../../../../src/game/scripts/types";
 import { register as registerAlKharid } from "./alkharid";
+import { register as registerArdougne } from "./ardougne";
 import { register as registerBarbarian } from "./barbarian";
+import { register as registerBrimhaven } from "./brimhaven";
 import { register as registerCanifis } from "./canifis";
 import { register as registerDraynor } from "./draynor";
 import { register as registerFalador } from "./falador";
 import { register as registerPollnivneach } from "./pollnivneach";
 import { register as registerPyramid } from "./pyramid";
+import { register as registerRellekka } from "./rellekka";
 import { register as registerSeers } from "./seers";
 import { register as registerVarrock } from "./varrock";
 import { register as registerWilderness } from "./wilderness";
@@ -204,6 +207,7 @@ export function register(registry: IScriptRegistry): void {
     }
     registerBarbarian(registry);
     registerWilderness(registry);
+    registerBrimhaven(registry);
     registerDraynor(registry);
     registerAlKharid(registry);
     registerVarrock(registry);
@@ -211,7 +215,9 @@ export function register(registry: IScriptRegistry): void {
     registerFalador(registry);
     registerSeers(registry);
     registerPollnivneach(registry);
+    registerRellekka(registry);
     registerPyramid(registry);
+    registerArdougne(registry);
 }
 
 /** Test helper: clear lap tracking for one player or all players. */
@@ -252,6 +258,10 @@ export {
     resetPollnivneachCourseProgress,
 } from "./pollnivneach";
 export {
+    getRellekkaCourseStage,
+    resetRellekkaCourseProgress,
+} from "./rellekka";
+export {
     getSeersCourseStage,
     resetSeersCourseProgress,
 } from "./seers";
@@ -265,6 +275,14 @@ export {
     resetWildernessCourseProgress,
 } from "./wilderness";
 export {
+    hasTaggedBrimhavenDispenser,
+    resetBrimhavenArenaProgress,
+} from "./brimhaven";
+export {
     hasCollectedPyramidTop,
     resetPyramidCourseProgress,
 } from "./pyramid";
+export {
+    getArdougneCourseStage,
+    resetArdougneCourseProgress,
+} from "./ardougne";
