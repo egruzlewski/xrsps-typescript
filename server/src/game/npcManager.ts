@@ -14,7 +14,13 @@ import { PathService } from "../pathfinding/PathService";
 import { CollisionFlag } from "../pathfinding/legacy/pathfinder/flag/CollisionFlag";
 import { logger } from "../utils/logger";
 import { MapCollisionService } from "../world/MapCollisionService";
-import { BossScript, createBossScript, type BossTileGraphic } from "./combat/BossScriptFramework";
+import type { Actor } from "./actor";
+import {
+    BossScript,
+    createBossScript,
+    type BossHitsplat,
+    type BossTileGraphic,
+} from "./combat/BossScriptFramework";
 import { damageTracker } from "./combat/DamageTracker";
 import { interceptFrozenCombatMovement } from "./combat/engine/CombatMovementInterceptor";
 import { StatusHitsplat } from "./combat/HitEffects";
@@ -247,6 +253,7 @@ export class NpcManager {
 
     private groundItemSpawner?: GroundItemSpawner;
     private enqueueSpotAnimationFn?: (gfx: BossTileGraphic & { tick: number }) => void;
+    private enqueueHitsplatFn?: (hit: BossHitsplat) => void;
 
     constructor(
         _mapService: MapCollisionService,
@@ -285,6 +292,15 @@ export class NpcManager {
         fn: ((gfx: BossTileGraphic & { tick: number }) => void) | undefined,
     ): void {
         this.enqueueSpotAnimationFn = fn;
+    }
+
+    setHitsplatEnqueuer(fn: ((hit: BossHitsplat) => void) | undefined): void {
+        this.enqueueHitsplatFn = fn;
+    }
+
+    /** Tell a bound boss script that this NPC was hit so it can acquire aggro. */
+    notifyBossAttacked(npcId: number, attacker: Actor, damage: number): void {
+        this.bossScripts.get(npcId | 0)?.onAttacked(attacker, damage);
     }
 
     loadFromFile(filePath: string): void {
@@ -561,6 +577,9 @@ export class NpcManager {
             bossScript.setSpawnNpc((config) => this.spawnTransientNpc(config));
             bossScript.setEnqueueSpotAnimation((gfx) => {
                 this.enqueueSpotAnimationFn?.({ ...gfx, tick: this.currentTick });
+            });
+            bossScript.setEnqueueHitsplat((hit) => {
+                this.enqueueHitsplatFn?.(hit);
             });
             this.bossScripts.set(npc.id, bossScript);
         }

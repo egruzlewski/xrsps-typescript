@@ -1914,6 +1914,10 @@ export class CombatHitProcessor {
             this.services.combatEffectService.tryActivateRedemption(target);
         }
 
+        if (target instanceof NpcState && source) {
+            this.services.npcManager?.notifyBossAttacked(target.id, source, hit.amount);
+        }
+
         this.retaliationEngine?.intercept(target, hit.pending.source, hit.appliedClock);
 
         if (source instanceof PlayerState) {

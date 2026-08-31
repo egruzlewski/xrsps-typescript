@@ -15,6 +15,9 @@ import type { Actor } from "../actor";
 import { NpcState, type NpcSpawnConfig } from "../npc";
 import { PlayerState } from "../player";
 import { type DropEligibility, damageTracker, multiCombatSystem } from "../scripts/types";
+import { combatEffectApplicator } from "./CombatEffectApplicator";
+import { HITMARK_DAMAGE } from "./HitEffects";
+import type { HitsplatSourceType } from "./OsrsHitsplatIds";
 
 type SpawnNpcFn = (config: NpcSpawnConfig) => NpcState | undefined;
 
@@ -26,7 +29,20 @@ export type BossTileGraphic = {
     delay?: number;
 };
 
+/** Hitsplat queued onto the active tick frame (same shape as combat hits). */
+export type BossHitsplat = {
+    targetType: "player" | "npc";
+    targetId: number;
+    damage: number;
+    style: number;
+    sourceType?: HitsplatSourceType;
+    hpCurrent: number;
+    hpMax: number;
+    tick?: number;
+};
+
 type EnqueueSpotAnimationFn = (gfx: BossTileGraphic) => void;
+type EnqueueHitsplatFn = (hit: BossHitsplat) => void;
 
 type Npc = NpcState;
 
@@ -81,6 +97,7 @@ export abstract class BossScript {
     protected currentTick: number = 0;
     private spawnNpcFn?: SpawnNpcFn;
     private enqueueSpotAnimationFn?: EnqueueSpotAnimationFn;
+    private enqueueHitsplatFn?: EnqueueHitsplatFn;
 
     constructor(npc: Npc) {
         this.npc = npc;
@@ -104,7 +121,11 @@ export abstract class BossScript {
         this.checkPhaseTransition();
         this.processMechanics();
         this.updateCooldowns();
-        if (this.target && !this.state.phaseTransitioning) {
+        if (this.state.phaseTransitioning) return;
+        if (!this.target || !this.isValidTarget(this.target)) {
+            this.target = this.findNewTarget();
+        }
+        if (this.target) {
             this.processCombat();
         }
     }
@@ -213,7 +234,10 @@ export abstract class BossScript {
 
     protected isValidTarget(target: Actor): boolean {
         if (target instanceof PlayerState) {
-            return true;
+            return target.skillSystem.getHitpointsCurrent() > 0;
+        }
+        if (target instanceof NpcState) {
+            return target.getHitpoints() > 0;
         }
         return target !== null;
     }
@@ -266,22 +290,57 @@ export abstract class BossScript {
     }
 
     protected defaultAttackExecution(attack: BossSpecialAttack, target: Actor): void {
-        const damage = Math.floor(
-            Math.random() * (attack.maxDamage - attack.minDamage + 1) + attack.minDamage,
-        );
+        const lo = Math.min(attack.minDamage, attack.maxDamage);
+        const hi = Math.max(attack.minDamage, attack.maxDamage);
+        const damage = Math.floor(Math.random() * (hi - lo + 1) + lo);
 
-        if (attack.telegraphTicks && attack.telegraphTicks > 0) {
-            // Schedule delayed damage
+        if (attack.animation > 0) {
+            this.npc.queueOneShotSeq(attack.animation);
         }
 
-        if (attack.aoeRadius && attack.aoeRadius > 0) {
-            // Apply to all targets in radius
-        } else {
-            this.dealDamage(target, damage, attack.style);
-        }
+        // Telegraph has no delayed-hit scheduler; damage lands this tick.
+        // AoE has no area-hit API; still apply to the combat target.
+        this.dealDamage(target, damage, attack.style);
     }
 
-    protected dealDamage(target: Actor, damage: number, style: string): void {}
+    protected dealDamage(target: Actor, damage: number, _style: string): void {
+        const result =
+            target instanceof PlayerState
+                ? combatEffectApplicator.applyPlayerHitsplat(
+                      target,
+                      HITMARK_DAMAGE,
+                      damage,
+                      this.currentTick,
+                  )
+                : target instanceof NpcState
+                  ? combatEffectApplicator.applyNpcHitsplat(
+                        target,
+                        HITMARK_DAMAGE,
+                        damage,
+                        this.currentTick,
+                    )
+                  : undefined;
+        if (!result) return;
+
+        this.enqueueHitsplatFn?.({
+            targetType: target instanceof PlayerState ? "player" : "npc",
+            targetId: target.id,
+            damage: result.amount,
+            style: result.style,
+            sourceType: "npc",
+            hpCurrent: result.hpCurrent,
+            hpMax: result.hpMax,
+            tick: this.currentTick,
+        });
+
+        if (target instanceof PlayerState && result.amount > 0) {
+            target.refreshActiveCombatTimer();
+            target.setLastHitBy(this.npc);
+        }
+        if (result.hpCurrent <= 0 && this.target === target) {
+            this.target = null;
+        }
+    }
 
     onDeath(): void {
         const eligibility = damageTracker.getDropEligibility(this.npc);
@@ -360,6 +419,13 @@ export abstract class BossScript {
      */
     enqueueSpotAnimation(gfx: BossTileGraphic): void {
         this.enqueueSpotAnimationFn?.(gfx);
+    }
+
+    /**
+     * Wire TickFrame.hitsplats (or a test double). Used by default auto-attacks.
+     */
+    setEnqueueHitsplat(fn: EnqueueHitsplatFn): void {
+        this.enqueueHitsplatFn = fn;
     }
 
     getCurrentTick(): number {

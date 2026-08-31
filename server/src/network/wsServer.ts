@@ -1061,6 +1061,9 @@ export class WSServer {
             this.npcManager.setSpotAnimationEnqueuer((anim) => {
                 this.broadcastService.enqueueSpotAnimation(anim);
             });
+            this.npcManager.setHitsplatEnqueuer((hit) => {
+                this.activeFrame?.hitsplats.push(hit);
+            });
         }
 
         this.actionDispatchService = new ActionDispatchService(this.svc);

@@ -12,6 +12,7 @@ export {
     getBossScript,
     createBossScript,
     type BossTileGraphic,
+    type BossHitsplat,
 } from "../../../src/game/combat/BossScriptFramework";
 
 // ============================================
