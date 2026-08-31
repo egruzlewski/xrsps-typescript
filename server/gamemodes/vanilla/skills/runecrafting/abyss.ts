@@ -2,13 +2,20 @@
  * Abyss inner-ring entry: wilderness Mage of Zamorak teleport, plus rift locs
  * that send the player to the matching ruins inner altars.
  *
- * Loc IDs verified against cache osrs-237 (names + Exit-through ops) and OSRS wiki.
+ * Outer-ring obstacles click through to the inner ring after a skill-level
+ * check (wiki level 1; always succeed). Loc IDs verified against cache
+ * osrs-237 (names + ops) and OSRS wiki. Blockage 25383 has no op.
+ *
  * Wrath has no Abyss rift. Soul rift 25377 exists but stays locked (dark-essence
  * unlock skipped). Blood "Exit-through (Kourend)" skipped.
  *
  * Wilderness spawn 3228 is a varp-492 transform into 2580 (Talk-to/Trade) or
  * 2581 (Talk-to/Trade/Teleport). Handlers bind the spawn id and both visibles.
+ *
+ * Skipped: skulling / prayer drain, fail chance, tools, 25 XP, loc transforms,
+ * random obstacle layouts.
  */
+import { SkillId } from "../../../../../client/rs/skill/skills";
 import type { PlayerState } from "../../../../src/game/player";
 import type {
     IScriptRegistry,
@@ -48,6 +55,78 @@ export const ABYSS_RIFTS: readonly AbyssRiftDef[] = [
     { altarId: "blood", locIds: [43824, 43825] },
 ];
 
+export interface AbyssObstacleDef {
+    id: string;
+    locIds: readonly number[];
+    action: string;
+    skillId?: SkillId;
+    skillName?: string;
+    level: number;
+    passMessage: string;
+}
+
+/**
+ * Clickable complete locs only. Partial/broken variants and the blockage
+ * have no cache ops. Passage has no skill gate and cannot fail.
+ */
+export const ABYSS_OBSTACLES: readonly AbyssObstacleDef[] = [
+    {
+        id: "rock",
+        locIds: [25422],
+        action: "mine",
+        skillId: SkillId.Mining,
+        skillName: "Mining",
+        level: 1,
+        passMessage: "You mine through the rock...",
+    },
+    {
+        id: "tendrils",
+        locIds: [25425],
+        action: "chop",
+        skillId: SkillId.Woodcutting,
+        skillName: "Woodcutting",
+        level: 1,
+        passMessage: "You chop through the tendrils...",
+    },
+    {
+        id: "boil",
+        locIds: [25590],
+        action: "burn-down",
+        skillId: SkillId.Firemaking,
+        skillName: "Firemaking",
+        level: 1,
+        passMessage: "You burn through the boil...",
+    },
+    {
+        id: "eyes",
+        locIds: [26146],
+        action: "distract",
+        skillId: SkillId.Thieving,
+        skillName: "Thieving",
+        level: 1,
+        passMessage: "You distract the eyes...",
+    },
+    {
+        id: "gap",
+        locIds: [25428],
+        action: "squeeze-through",
+        skillId: SkillId.Agility,
+        skillName: "Agility",
+        level: 1,
+        passMessage: "You squeeze through the gap...",
+    },
+    {
+        id: "passage",
+        locIds: [25381],
+        action: "go-through",
+        level: 0,
+        passMessage: "You step through the passage...",
+    },
+];
+
+/** Impassable outer-ring loc; no handler. */
+export const ABYSS_BLOCKAGE_LOC_ID = 25383;
+
 const altarById = new Map<string, RuneAltarDef>(ALL_ALTARS.map((altar) => [altar.id, altar]));
 
 export function teleportToInnerAbyss(player: PlayerState, services: ScriptServices): void {
@@ -76,6 +155,28 @@ function exitThroughRift(altar: RuneAltarDef, event: LocInteractionEvent): void 
     );
 }
 
+function tryPassObstacle(obstacle: AbyssObstacleDef, event: LocInteractionEvent): void {
+    const { player, services } = event;
+    if (obstacle.skillId != null) {
+        const level = services.skills.getSkill(player, obstacle.skillId)?.baseLevel ?? 1;
+        if (level < obstacle.level) {
+            services.messaging.sendGameMessage(
+                player,
+                `You need a ${obstacle.skillName} level of at least ${obstacle.level} to pass.`,
+            );
+            return;
+        }
+    }
+    services.messaging.sendGameMessage(player, obstacle.passMessage);
+    services.movement.teleportPlayer(
+        player,
+        INNER_ABYSS.x,
+        INNER_ABYSS.y,
+        INNER_ABYSS.level,
+        true,
+    );
+}
+
 function onMageInteract(event: NpcInteractionEvent): void {
     teleportToInnerAbyss(event.player, event.services);
 }
@@ -88,6 +189,14 @@ export function registerAbyss(registry: IScriptRegistry): void {
         for (const locId of rift.locIds) {
             registry.registerLocInteraction(locId, enter, "exit-through");
             registry.registerLocInteraction(locId, enter, undefined);
+        }
+    }
+
+    for (const obstacle of ABYSS_OBSTACLES) {
+        const pass = (event: LocInteractionEvent) => tryPassObstacle(obstacle, event);
+        for (const locId of obstacle.locIds) {
+            registry.registerLocInteraction(locId, pass, obstacle.action);
+            registry.registerLocInteraction(locId, pass, undefined);
         }
     }
 
