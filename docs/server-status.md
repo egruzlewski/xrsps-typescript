@@ -52,7 +52,7 @@ Start here if you want a development path. Ordered roughly by “missing entire 
 - **PvP / wilderness** — PvP hit path and wilderness helpers exist; PvP *world type* and Duel Arena are TODO.
 - **Degradation** — crystal-bow (and related) charge logic; modern crystal bow varbit ID is a TODO (`4212` placeholder).
 - **Shops** — `isMembersWorld = false` hardcoded TODO.
-- **OSRS opcode `OPNPC5` (id 50)** — named in [`ClientPacketId`](../client/common/network/ClientPacketId.ts) but [`PacketHandler`](../server/src/network/packet/PacketHandler.ts) decodes NPC option 5 via `OPNPC1` (57). Opcode **50 is not in the decode switch**.
+- **OSRS opcode `OPNPC5` (id 50)** — decoded as NPC option 5 (same 3-byte layout as this client's legacy `OPNPC1` alias for option 5). See protocol section.
 - **`MAP_EDIT` (opcode 195)** — defined on the high-level packet enum; no server handler found.
 
 ### Skills with dedicated modules (still not full OSRS)
@@ -109,7 +109,7 @@ Both feed [`MessageRouter`](../server/src/network/MessageRouter.ts) via [`regist
 
 | Opcode / name | Notes |
 | --- | --- |
-| `OPNPC5` = 50 | Enumerated; decode switch maps option 5 to `OPNPC1` (57). **50 has no `case`.** |
+| `OPNPC5` = 50 | Decoded as `npc_op` option 5. This client still *sends* option 5 as `OPNPC1` (57) from menu/`sendNpcOption`; both opcodes share `writeByteAdd` + `writeShortLE`. |
 | `MAP_EDIT` = 195 | In high-level enum; no handler/grep hit under `server/`. |
 | Unrecognized OSRS opcodes | `decodePacket` returns `{ type: "unknown" }`. |
 
@@ -119,9 +119,9 @@ Server→client opcodes: [`ServerPacketId.ts`](../client/common/packets/ServerPa
 
 | | |
 | --- | --- |
-| **Status** | Partial (coverage of defined opcodes is high; two gaps above) |
-| **Tests** | Handler-specific tests (trade, friends chat, inventory); no full opcode-matrix test. |
-| **Next step** | Confirm whether clients ever send opcode 50; add `MAP_EDIT` or remove the unused enum. |
+| **Status** | Partial (coverage of defined opcodes is high; `MAP_EDIT` unused) |
+| **Tests** | Handler-specific tests (trade, friends chat, inventory); [`opnpc5-decode.test.ts`](../server/tests/opnpc5-decode.test.ts) for opcode 50 / legacy 57. |
+| **Next step** | `MAP_EDIT`: add a handler or remove the unused enum. Client still emits 57 for NPC option 5 (server accepts both). |
 
 ### Broadcast and actor sync
 
@@ -592,7 +592,7 @@ There are ~90 individual test files: heavy on quests and combat specials; light 
 2. Fill **skill holes you care about first** (Agility/Runecraft/Crafting are the thinnest of the “existing” skills; Slayer/Hunter/Farming/Construction are absent).
 3. **World scripts** for hubs you actually play (default talk is the symptom of missing loc/NPC handlers).
 4. **Boss scripts**: implement or unregister Mole/Zulrah empty mechanics.
-5. **Protocol**: opcode 50 / `MAP_EDIT` cleanup.
+5. **Protocol**: `MAP_EDIT` cleanup (opcode 50 / `OPNPC5` is decoded).
 6. **Vanilla `getContentDataPacket()`** only if custom items must show on vanilla.
 7. Expand `yarn --cwd server test` or CI to the quest/combat files you rely on.
 

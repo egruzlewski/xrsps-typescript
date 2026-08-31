@@ -374,9 +374,11 @@ export function decodePacket(opcode: number, data: Uint8Array): DecodedPacket {
             return { type: "npc_op", opNum: 4, npcIndex, ctrlHeld };
         }
 
-        // OPNPC5 (57)
-        // Note: this currently comes through ClientPacketId.OPNPC1 (legacy alias naming).
-        // Client: writeByteAdd(ctrl), writeShortLE(identifier)
+        // NPC option 5.
+        // Enumerated OPNPC5 is opcode 50. This client's menu / sendNpcOption currently
+        // emit OPNPC1 (57) for option 5 (legacy alias naming). Both use the same
+        // 3-byte layout: writeByteAdd(ctrl), writeShortLE(identifier).
+        case ClientPacketId.OPNPC5:
         case ClientPacketId.OPNPC1: {
             const ctrlHeld = buf.readByteAdd() !== 0;
             const npcIndex = buf.readShortLE();
