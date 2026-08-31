@@ -1,8 +1,8 @@
 /**
  * Gnome Stronghold agility course (LostCity gnome_course.rs2, soft exact-move port).
  * Fail-proof; lap bonus only if obstacles are completed in order.
- * Barbarian Outpost, Wilderness, Draynor Village rooftop, and Al Kharid rooftop
- * are registered from sibling files.
+ * Barbarian Outpost, Wilderness, Draynor Village rooftop, Al Kharid rooftop,
+ * and Varrock rooftop are registered from sibling files.
  */
 import { SkillId } from "../../../../../client/rs/skill/skills";
 import type { PlayerState } from "../../../../src/game/player";
@@ -10,6 +10,7 @@ import type { IScriptRegistry, LocInteractionEvent } from "../../../../src/game/
 import { register as registerAlKharid } from "./alkharid";
 import { register as registerBarbarian } from "./barbarian";
 import { register as registerDraynor } from "./draynor";
+import { register as registerVarrock } from "./varrock";
 import { register as registerWilderness } from "./wilderness";
 
 const LOG_WALK_ANIM = 762; // human_walk_logbalance
@@ -199,6 +200,7 @@ export function register(registry: IScriptRegistry): void {
     registerWilderness(registry);
     registerDraynor(registry);
     registerAlKharid(registry);
+    registerVarrock(registry);
 }
 
 /** Test helper: clear lap tracking for one player or all players. */
@@ -226,6 +228,10 @@ export {
     getDraynorCourseStage,
     resetDraynorCourseProgress,
 } from "./draynor";
+export {
+    getVarrockCourseStage,
+    resetVarrockCourseProgress,
+} from "./varrock";
 export {
     getWildernessCourseStage,
     hasPendingWildernessTicket,
