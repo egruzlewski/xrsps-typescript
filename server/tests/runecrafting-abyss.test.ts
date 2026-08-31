@@ -37,6 +37,8 @@ const registry = {
         npcHandlers.set(`${npcId}:${option ?? "*"}`, handler);
         return { unregister() {} };
     },
+    registerItemAction: () => ({ unregister() {} }),
+    registerItemOnItem: () => ({ unregister() {} }),
 } as unknown as IScriptRegistry;
 
 register(registry);

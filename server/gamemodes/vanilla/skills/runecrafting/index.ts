@@ -6,6 +6,7 @@
  * bind blank tiaras and combination runes (Mist–Lava).
  * Abyss: wilderness Mage of Zamorak teleports into the inner ring; rifts
  * there send the player to the matching ruins inner altars (Air–Blood).
+ * Essence pouches fill / empty / check rune or pure essence; Dark Mage repairs.
  */
 import { EquipmentSlot } from "../../../../../client/rs/config/player/Equipment";
 import { SkillId } from "../../../../../client/rs/skill/skills";
@@ -26,6 +27,7 @@ import {
     type RuneCraftDef,
 } from "./altars";
 import { registerAbyss } from "./abyss";
+import { registerPouches } from "./pouches";
 import {
     BINDING_NECKLACE_ID,
     combinationBindingsForAltar,
@@ -333,4 +335,5 @@ export function register(registry: IScriptRegistry): void {
         registerCraftHandlers(registry, altar);
     }
     registerAbyss(registry);
+    registerPouches(registry);
 }

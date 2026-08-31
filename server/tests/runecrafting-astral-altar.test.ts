@@ -29,6 +29,8 @@ const registry = {
         return { unregister() {} };
     },
     registerNpcInteraction: () => ({ unregister() {} }),
+    registerItemAction: () => ({ unregister() {} }),
+    registerItemOnItem: () => ({ unregister() {} }),
 } as unknown as IScriptRegistry;
 
 register(registry);
