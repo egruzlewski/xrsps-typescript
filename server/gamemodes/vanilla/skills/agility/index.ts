@@ -3,7 +3,7 @@
  * Fail-proof; lap bonus only if obstacles are completed in order.
  * Barbarian Outpost, Wilderness, Draynor Village rooftop, Al Kharid rooftop,
  * Varrock rooftop, Canifis rooftop, Falador rooftop, Seers' Village rooftop,
- * and Pollnivneach rooftop are registered from sibling files.
+ * Pollnivneach rooftop, and Agility Pyramid are registered from sibling files.
  */
 import { SkillId } from "../../../../../client/rs/skill/skills";
 import type { PlayerState } from "../../../../src/game/player";
@@ -14,6 +14,7 @@ import { register as registerCanifis } from "./canifis";
 import { register as registerDraynor } from "./draynor";
 import { register as registerFalador } from "./falador";
 import { register as registerPollnivneach } from "./pollnivneach";
+import { register as registerPyramid } from "./pyramid";
 import { register as registerSeers } from "./seers";
 import { register as registerVarrock } from "./varrock";
 import { register as registerWilderness } from "./wilderness";
@@ -210,6 +211,7 @@ export function register(registry: IScriptRegistry): void {
     registerFalador(registry);
     registerSeers(registry);
     registerPollnivneach(registry);
+    registerPyramid(registry);
 }
 
 /** Test helper: clear lap tracking for one player or all players. */
@@ -262,3 +264,7 @@ export {
     hasPendingWildernessTicket,
     resetWildernessCourseProgress,
 } from "./wilderness";
+export {
+    hasCollectedPyramidTop,
+    resetPyramidCourseProgress,
+} from "./pyramid";
