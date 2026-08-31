@@ -26,9 +26,12 @@ import {
 import {
     LEATHER_ITEM_ID,
     NEEDLE_ITEM_ID,
+    SNAKESKIN_ITEM_ID,
     THREAD_ITEM_ID,
     getLeatherRecipeById,
+    getLeatherRecipesForHide,
 } from "../gamemodes/vanilla/skills/crafting/leatherData";
+import { getTanningRecipeById } from "../gamemodes/vanilla/skills/production/tanningData";
 
 const GOLD_RING = 1635;
 const SAPPHIRE = 1607;
@@ -39,6 +42,13 @@ const GOLD_AMULET = 1692;
 const LEATHER_GLOVES = 1059;
 const GREEN_D_LEATHER = 1745;
 const GREEN_DHIDE_BODY = 1135;
+const SNAKE_HIDE = 6287;
+const SWAMP_SNAKE_HIDE = 7801;
+const SNAKESKIN_BOOTS = 6328;
+const SNAKESKIN_VAMBRACES = 6330;
+const SNAKESKIN_BANDANA = 6326;
+const SNAKESKIN_CHAPS = 6324;
+const SNAKESKIN_BODY = 6322;
 const FURNACE_LOC = 24009;
 const NOT_FURNACE_LOC = 12;
 
@@ -72,6 +82,34 @@ assert(greenBody);
 assert.equal(greenBody.productItemId, GREEN_DHIDE_BODY);
 assert.equal(greenBody.hideQuantity, 3);
 assert.equal(greenBody.xp, 186);
+
+const snakeskinPieces = [
+    { id: "snakeskin_boots", product: SNAKESKIN_BOOTS, hides: 6, level: 45, xp: 30 },
+    { id: "snakeskin_vambraces", product: SNAKESKIN_VAMBRACES, hides: 8, level: 47, xp: 35 },
+    { id: "snakeskin_bandana", product: SNAKESKIN_BANDANA, hides: 5, level: 48, xp: 45 },
+    { id: "snakeskin_chaps", product: SNAKESKIN_CHAPS, hides: 12, level: 51, xp: 50 },
+    { id: "snakeskin_body", product: SNAKESKIN_BODY, hides: 15, level: 53, xp: 55 },
+] as const;
+for (const piece of snakeskinPieces) {
+    const recipe = getLeatherRecipeById(piece.id);
+    assert(recipe, `expected leather recipe ${piece.id}`);
+    assert.equal(recipe.hideItemId, SNAKESKIN_ITEM_ID);
+    assert.equal(recipe.productItemId, piece.product);
+    assert.equal(recipe.hideQuantity, piece.hides);
+    assert.equal(recipe.level, piece.level);
+    assert.equal(recipe.xp, piece.xp);
+}
+assert.equal(getLeatherRecipesForHide(SNAKESKIN_ITEM_ID).length, 5);
+
+const tanSnakeskin = getTanningRecipeById("tan_snakeskin");
+assert(tanSnakeskin);
+assert.equal(tanSnakeskin.inputItemId, SNAKE_HIDE);
+assert.equal(tanSnakeskin.outputItemId, SNAKESKIN_ITEM_ID);
+
+const tanSwampSnakeskin = getTanningRecipeById("tan_swamp_snakeskin");
+assert(tanSwampSnakeskin);
+assert.equal(tanSwampSnakeskin.inputItemId, SWAMP_SNAKE_HIDE);
+assert.equal(tanSwampSnakeskin.outputItemId, SNAKESKIN_ITEM_ID);
 
 const itemOnLoc = new Map<string, ItemOnLocHandler>();
 const itemOnItem = new Map<string, ItemOnItemHandler>();
@@ -261,6 +299,7 @@ assert(itemOnLoc.has(`${GOLD_BAR_ITEM_ID}:-1`), "gold bar should register on any
 assert(itemOnLoc.has(`${RING_MOULD_ITEM_ID}:-1`), "ring mould should register on any furnace loc");
 assert(itemOnItem.has(`${CHISEL_ITEM_ID}:${UNCUT_SAPPHIRE}`));
 assert(itemOnItem.has(`${NEEDLE_ITEM_ID}:${LEATHER_ITEM_ID}`));
+assert(itemOnItem.has(`${NEEDLE_ITEM_ID}:${SNAKESKIN_ITEM_ID}`));
 assert(itemOnItem.has(`${BALL_OF_WOOL_ITEM_ID}:${GOLD_AMULET_U}`));
 assert(actionHandlers.has("skill.jewellery"));
 assert(actionHandlers.has("skill.gem_cut"));
@@ -392,5 +431,82 @@ resetState(99, [
 ]);
 useOnItem(NEEDLE_ITEM_ID, LEATHER_ITEM_ID);
 assert.match(messages[0] ?? "", /thread/i);
+
+resetState(99, [
+    { itemId: NEEDLE_ITEM_ID, quantity: 1 },
+    { itemId: THREAD_ITEM_ID, quantity: 1 },
+    { itemId: SNAKESKIN_ITEM_ID, quantity: 15 },
+]);
+useOnItem(NEEDLE_ITEM_ID, SNAKESKIN_ITEM_ID);
+assert.equal(skillMultis.length, 1);
+assert(skillMultis[0].products.some((product) => product.itemId === SNAKESKIN_BOOTS));
+assert(skillMultis[0].products.some((product) => product.itemId === SNAKESKIN_VAMBRACES));
+assert(skillMultis[0].products.some((product) => product.itemId === SNAKESKIN_BANDANA));
+assert(skillMultis[0].products.some((product) => product.itemId === SNAKESKIN_CHAPS));
+assert(skillMultis[0].products.some((product) => product.itemId === SNAKESKIN_BODY));
+skillMultis[0].onSelect?.(0, 1);
+assert.equal(actions[0]?.kind, "skill.leather");
+
+resetState(45, [
+    { itemId: NEEDLE_ITEM_ID, quantity: 1 },
+    { itemId: THREAD_ITEM_ID, quantity: 1 },
+    { itemId: SNAKESKIN_ITEM_ID, quantity: 15 },
+]);
+useOnItem(NEEDLE_ITEM_ID, SNAKESKIN_ITEM_ID);
+assert.equal(skillMultis.length, 1);
+assert.equal(skillMultis[0].products.length, 1);
+assert.equal(skillMultis[0].products[0]?.itemId, SNAKESKIN_BOOTS);
+
+resetState(44, [
+    { itemId: NEEDLE_ITEM_ID, quantity: 1 },
+    { itemId: THREAD_ITEM_ID, quantity: 1 },
+    { itemId: SNAKESKIN_ITEM_ID, quantity: 15 },
+]);
+useOnItem(NEEDLE_ITEM_ID, SNAKESKIN_ITEM_ID);
+assert.equal(skillMultis.length, 0);
+assert.match(messages[0] ?? "", /Crafting level 45/);
+
+resetState(99, [
+    { itemId: NEEDLE_ITEM_ID, quantity: 1 },
+    { itemId: THREAD_ITEM_ID, quantity: 1 },
+    { itemId: SNAKESKIN_ITEM_ID, quantity: 6 },
+]);
+runAction("skill.leather", { recipeId: "snakeskin_boots", count: 1, craftsDone: 0 });
+assert.equal(count(SNAKESKIN_BOOTS), 1);
+assert.equal(count(SNAKESKIN_ITEM_ID), 0);
+assert.equal(count(THREAD_ITEM_ID), 0);
+assert.equal(count(NEEDLE_ITEM_ID), 1);
+assert.deepEqual(xp, [30]);
+
+resetState(99, [
+    { itemId: NEEDLE_ITEM_ID, quantity: 1 },
+    { itemId: THREAD_ITEM_ID, quantity: 1 },
+    { itemId: SNAKESKIN_ITEM_ID, quantity: 15 },
+]);
+runAction("skill.leather", { recipeId: "snakeskin_body", count: 1, craftsDone: 0 });
+assert.equal(count(SNAKESKIN_BODY), 1);
+assert.equal(count(SNAKESKIN_ITEM_ID), 0);
+assert.deepEqual(xp, [55]);
+
+resetState(99, [
+    { itemId: NEEDLE_ITEM_ID, quantity: 1 },
+    { itemId: THREAD_ITEM_ID, quantity: 1 },
+    { itemId: SNAKESKIN_ITEM_ID, quantity: 8 },
+]);
+runAction("skill.leather", { recipeId: "snakeskin_vambraces", count: 1, craftsDone: 0 });
+assert.equal(count(SNAKESKIN_VAMBRACES), 1);
+assert.equal(count(SNAKESKIN_ITEM_ID), 0);
+assert.deepEqual(xp, [35]);
+
+resetState(99, [
+    { itemId: NEEDLE_ITEM_ID, quantity: 1 },
+    { itemId: THREAD_ITEM_ID, quantity: 1 },
+    { itemId: SNAKESKIN_ITEM_ID, quantity: 14 },
+]);
+runAction("skill.leather", { recipeId: "snakeskin_body", count: 1, craftsDone: 0 });
+assert.equal(count(SNAKESKIN_BODY), 0);
+assert.equal(count(SNAKESKIN_ITEM_ID), 14);
+assert.equal(count(THREAD_ITEM_ID), 1);
+assert.equal(xp.length, 0);
 
 console.log("crafting-jewellery-leather.test.ts: all assertions passed");

@@ -8,6 +8,7 @@ export const GREEN_D_LEATHER_ITEM_ID = 1745;
 export const BLUE_D_LEATHER_ITEM_ID = 2505;
 export const RED_D_LEATHER_ITEM_ID = 2507;
 export const BLACK_D_LEATHER_ITEM_ID = 2509;
+export const SNAKESKIN_ITEM_ID = 6289;
 
 export const LEATHER_CRAFT_ANIMATION_ID = 1249; // same leatherwork anim as tanning
 export const LEATHER_DELAY_TICKS = 3;
@@ -99,6 +100,51 @@ const RECIPE_SEEDS: LeatherSeed[] = [
         productItemId: 1131,
         level: 28,
         xp: 35,
+    },
+    {
+        id: "snakeskin_boots",
+        name: "snakeskin boots",
+        hideItemId: SNAKESKIN_ITEM_ID,
+        hideQuantity: 6,
+        productItemId: 6328,
+        level: 45,
+        xp: 30,
+    },
+    {
+        id: "snakeskin_vambraces",
+        name: "snakeskin vambraces",
+        hideItemId: SNAKESKIN_ITEM_ID,
+        hideQuantity: 8,
+        productItemId: 6330,
+        level: 47,
+        xp: 35,
+    },
+    {
+        id: "snakeskin_bandana",
+        name: "snakeskin bandana",
+        hideItemId: SNAKESKIN_ITEM_ID,
+        hideQuantity: 5,
+        productItemId: 6326,
+        level: 48,
+        xp: 45,
+    },
+    {
+        id: "snakeskin_chaps",
+        name: "snakeskin chaps",
+        hideItemId: SNAKESKIN_ITEM_ID,
+        hideQuantity: 12,
+        productItemId: 6324,
+        level: 51,
+        xp: 50,
+    },
+    {
+        id: "snakeskin_body",
+        name: "snakeskin body",
+        hideItemId: SNAKESKIN_ITEM_ID,
+        hideQuantity: 15,
+        productItemId: 6322,
+        level: 53,
+        xp: 55,
     },
     {
         id: "green_dhide_vamb",

@@ -70,6 +70,26 @@ export const TANNING_RECIPES: TanningRecipe[] = [
         animation: 1249,
         delayTicks: 2,
     },
+    {
+        id: "tan_snakeskin",
+        name: "Snakeskin",
+        level: 1,
+        xp: 1,
+        inputItemId: 6287,
+        outputItemId: 6289,
+        animation: 1249,
+        delayTicks: 2,
+    },
+    {
+        id: "tan_swamp_snakeskin",
+        name: "Snakeskin (swamp)",
+        level: 1,
+        xp: 1,
+        inputItemId: 7801,
+        outputItemId: 6289,
+        animation: 1249,
+        delayTicks: 2,
+    },
 ];
 
 export function getTanningRecipeById(id: string): TanningRecipe | undefined {
