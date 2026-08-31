@@ -3,8 +3,9 @@
  * Fail-proof; lap bonus only if obstacles are completed in order.
  * Barbarian Outpost, Wilderness, Draynor Village rooftop, Al Kharid rooftop,
  * Varrock rooftop, Canifis rooftop, Falador rooftop, Seers' Village rooftop,
- * Pollnivneach rooftop, Agility Pyramid, Ardougne rooftop, and Ape Atoll
- * are registered from sibling files.
+ * Pollnivneach rooftop, Agility Pyramid, Ardougne rooftop, Ape Atoll,
+ * Colossal Wyrm Agility Course, and Shayzien Agility Course are registered
+ * from sibling files.
  */
 import { SkillId } from "../../../../../client/rs/skill/skills";
 import type { PlayerState } from "../../../../src/game/player";
@@ -15,6 +16,7 @@ import { register as registerArdougne } from "./ardougne";
 import { register as registerBarbarian } from "./barbarian";
 import { register as registerBrimhaven } from "./brimhaven";
 import { register as registerCanifis } from "./canifis";
+import { register as registerColossalWyrm } from "./colossalWyrm";
 import { register as registerDraynor } from "./draynor";
 import { register as registerFalador } from "./falador";
 import { register as registerPollnivneach } from "./pollnivneach";
@@ -22,6 +24,7 @@ import { register as registerPrifddinas } from "./prifddinas";
 import { register as registerPyramid } from "./pyramid";
 import { register as registerRellekka } from "./rellekka";
 import { register as registerSeers } from "./seers";
+import { register as registerShayzien } from "./shayzien";
 import { register as registerVarrock } from "./varrock";
 import { register as registerWilderness } from "./wilderness";
 
@@ -223,6 +226,8 @@ export function register(registry: IScriptRegistry): void {
     registerArdougne(registry);
     registerApeAtoll(registry);
     registerPrifddinas(registry);
+    registerColossalWyrm(registry);
+    registerShayzien(registry);
 }
 
 /** Test helper: clear lap tracking for one player or all players. */
@@ -299,3 +304,13 @@ export {
     getPrifddinasCourseStage,
     resetPrifddinasCourseProgress,
 } from "./prifddinas";
+export {
+    getColossalWyrmCourseStage,
+    isColossalWyrmAdvancedLap,
+    resetColossalWyrmCourseProgress,
+} from "./colossalWyrm";
+export {
+    getShayzienCourseStage,
+    isShayzienAdvancedLap,
+    resetShayzienCourseProgress,
+} from "./shayzien";
