@@ -11,6 +11,92 @@ export {
 } from "../../../src/game/combat/BossScriptFramework";
 
 // ============================================
+// Giant Mole dig (NPC 5779)
+// ============================================
+// OSRS: below 50% HP the mole can dig and teleport to another chamber in the
+// Falador Park lair. The player is not teleported — they have to find it again.
+
+export const GIANT_MOLE_NPC_ID = 5779;
+
+/** Matches MultiCombatZones "Giant Mole Lair". */
+export const GIANT_MOLE_LAIR = {
+    minX: 1728,
+    minY: 5120,
+    maxX: 1791,
+    maxY: 5247,
+    level: 0,
+} as const;
+
+/** Main chambers the mole relocates between (inside GIANT_MOLE_LAIR). */
+export const GIANT_MOLE_DIG_SPOTS: ReadonlyArray<{ x: number; y: number; level: number }> = [
+    { x: 1736, y: 5223, level: GIANT_MOLE_LAIR.level },
+    { x: 1776, y: 5230, level: GIANT_MOLE_LAIR.level },
+    { x: 1760, y: 5183, level: GIANT_MOLE_LAIR.level },
+    { x: 1738, y: 5191, level: GIANT_MOLE_LAIR.level },
+    { x: 1769, y: 5163, level: GIANT_MOLE_LAIR.level },
+    { x: 1752, y: 5236, level: GIANT_MOLE_LAIR.level },
+];
+
+/** Sequential with claw (3312) / stomp (3313). */
+export const GIANT_MOLE_DIG_ANIM = 3314;
+
+const MIN_DIG_CHEBYSHEV = 8;
+
+function chebyshev(ax: number, ay: number, bx: number, by: number): number {
+    return Math.max(Math.abs(ax - bx), Math.abs(ay - by));
+}
+
+function pickFrom<T>(items: readonly T[], random: () => number): T {
+    const index = Math.min(items.length - 1, Math.floor(random() * items.length));
+    return items[index];
+}
+
+export function isInGiantMoleLair(x: number, y: number, level: number): boolean {
+    return (
+        level === GIANT_MOLE_LAIR.level &&
+        x >= GIANT_MOLE_LAIR.minX &&
+        x <= GIANT_MOLE_LAIR.maxX &&
+        y >= GIANT_MOLE_LAIR.minY &&
+        y <= GIANT_MOLE_LAIR.maxY
+    );
+}
+
+export function pickGiantMoleDigDestination(
+    fromX: number,
+    fromY: number,
+    random: () => number = Math.random,
+): { x: number; y: number; level: number } {
+    const far = GIANT_MOLE_DIG_SPOTS.filter(
+        (spot) => chebyshev(fromX, fromY, spot.x, spot.y) >= MIN_DIG_CHEBYSHEV,
+    );
+    if (far.length > 0) {
+        return pickFrom(far, random);
+    }
+    const other = GIANT_MOLE_DIG_SPOTS.filter((spot) => spot.x !== fromX || spot.y !== fromY);
+    if (other.length > 0) {
+        return pickFrom(other, random);
+    }
+    const fallbackX = GIANT_MOLE_LAIR.minX + 8;
+    const fallbackY = GIANT_MOLE_LAIR.minY + 8;
+    if (fallbackX !== fromX || fallbackY !== fromY) {
+        return { x: fallbackX, y: fallbackY, level: GIANT_MOLE_LAIR.level };
+    }
+    return { x: fallbackX + 4, y: fallbackY, level: GIANT_MOLE_LAIR.level };
+}
+
+/** Teleport the mole to another lair chamber. Player stays put (OSRS). */
+export function executeGiantMoleDig(
+    boss: BossScript,
+    random: () => number = Math.random,
+): { x: number; y: number; level: number } {
+    const npc = boss.getNpc();
+    const dest = pickGiantMoleDigDestination(npc.tileX, npc.tileY, random);
+    npc.queueOneShotSeq(GIANT_MOLE_DIG_ANIM);
+    boss.teleportNpc(dest.x, dest.y, dest.level);
+    return dest;
+}
+
+// ============================================
 // Boss Implementations
 // ============================================
 
@@ -50,7 +136,7 @@ class GiantMoleScript extends BossScript {
                 return hpPercent < 0.5 && Math.random() < 0.15;
             },
             tick: (boss) => {
-                // Teleport to random location in lair
+                executeGiantMoleDig(boss);
             },
         });
     }

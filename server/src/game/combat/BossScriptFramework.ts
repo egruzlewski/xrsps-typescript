@@ -307,6 +307,19 @@ export abstract class BossScript {
     getNpc(): Npc {
         return this.npc;
     }
+
+    /**
+     * Instantly relocate the boss NPC (Actor.teleport) and drop the current
+     * combat target. Used by mechanics such as Giant Mole dig.
+     */
+    teleportNpc(tileX: number, tileY: number, level?: number): void {
+        this.npc.teleport(tileX, tileY, level);
+        this.target = null;
+    }
+
+    getCombatTarget(): Actor | null {
+        return this.target;
+    }
 }
 
 const bossScriptRegistry = new Map<number, new (npc: Npc) => BossScript>();
