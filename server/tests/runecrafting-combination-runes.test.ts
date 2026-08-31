@@ -14,7 +14,12 @@ import type {
 import { F2P_ALTARS, PURE_ESSENCE, RUNE_ESSENCE } from "../gamemodes/vanilla/skills/runecrafting/altars";
 import {
     allCombinationBindings,
+    BINDING_NECKLACE_CHARGES,
+    BINDING_NECKLACE_ID,
     COMBINATION_RUNES,
+    countCombinationSuccesses,
+    nextBindingNecklaceCharges,
+    wearsBindingNecklace,
 } from "../gamemodes/vanilla/skills/runecrafting/combination";
 import { register } from "../gamemodes/vanilla/skills/runecrafting";
 
@@ -47,14 +52,23 @@ type Counts = Map<number, number>;
 function makePlayer(opts: {
     level: number;
     head?: number;
+    neck?: number;
     items?: Record<number, number>;
+    charges?: Record<number, number>;
 }) {
     const counts: Counts = new Map(
         Object.entries(opts.items ?? {}).map(([id, qty]) => [Number(id), qty]),
     );
+    const chargeMap = new Map(
+        Object.entries(opts.charges ?? {}).map(([id, qty]) => [Number(id), qty]),
+    );
     const messages: string[] = [];
     const xp: number[] = [];
     const snapshots: number[] = [];
+    const appearanceSnapshots: number[] = [];
+    const equip = new Array<number>(12).fill(0);
+    if (opts.head) equip[EquipmentSlot.HEAD] = opts.head;
+    if (opts.neck) equip[EquipmentSlot.AMULET] = opts.neck;
     const player = {
         id: 9,
         items: {
@@ -66,6 +80,15 @@ function makePlayer(opts: {
                 counts.set(itemId, (counts.get(itemId) ?? 0) + amount);
             },
         },
+        equipment: {
+            getCharges: (itemId: number) => chargeMap.get(itemId) ?? 0,
+            setCharges: (itemId: number, charges: number) => {
+                if (charges <= 0) chargeMap.delete(itemId);
+                else chargeMap.set(itemId, charges);
+            },
+        },
+        markEquipmentDirty() {},
+        markAppearanceDirty() {},
     } as unknown as PlayerState;
 
     const services = {
@@ -80,11 +103,15 @@ function makePlayer(opts: {
             },
         },
         equipment: {
-            getEquipArray: () => {
-                const equip = new Array<number>(12).fill(0);
-                if (opts.head) equip[EquipmentSlot.HEAD] = opts.head;
-                return equip;
+            getEquipArray: () => equip,
+        },
+        appearance: {
+            queueAppearanceSnapshot: () => {
+                appearanceSnapshots.push(1);
             },
+            refreshAppearanceKits: () => {},
+            savePlayerSnapshot: () => {},
+            logoutPlayer: () => {},
         },
         inventory: {
             snapshotInventory: () => {
@@ -93,7 +120,7 @@ function makePlayer(opts: {
         },
     } as unknown as ScriptServices;
 
-    return { player, services, messages, xp, snapshots, counts };
+    return { player, services, messages, xp, snapshots, counts, equip, chargeMap, appearanceSnapshots };
 }
 
 function useOnAltar(
@@ -118,6 +145,36 @@ const air = F2P_ALTARS[0];
 const water = F2P_ALTARS[2];
 const earth = F2P_ALTARS[3];
 const fire = F2P_ALTARS[4];
+
+assert.equal(countCombinationSuccesses(4, true), 4);
+assert.equal(countCombinationSuccesses(4, false, () => 0), 4);
+assert.equal(countCombinationSuccesses(4, false, () => 0.5), 0);
+assert.equal(countCombinationSuccesses(4, false, () => 0.49), 4);
+assert.deepEqual(countCombinationSuccesses(4, false, (() => {
+    const rolls = [0, 0.9, 0, 0.9];
+    let i = 0;
+    return () => rolls[i++]!;
+})()), 2);
+assert.equal(wearsBindingNecklace([0, 0, BINDING_NECKLACE_ID]), true);
+assert.equal(wearsBindingNecklace([0, 0, 0]), false);
+assert.deepEqual(nextBindingNecklaceCharges(0), { remaining: 15, disintegrated: false });
+assert.deepEqual(nextBindingNecklaceCharges(BINDING_NECKLACE_CHARGES), {
+    remaining: 15,
+    disintegrated: false,
+});
+assert.deepEqual(nextBindingNecklaceCharges(1), { remaining: 0, disintegrated: true });
+
+const originalRandom = Math.random;
+function withRandom(value: number | number[], fn: () => void): void {
+    const rolls = Array.isArray(value) ? value : [value];
+    let i = 0;
+    Math.random = () => rolls[Math.min(i++, rolls.length - 1)]!;
+    try {
+        fn();
+    } finally {
+        Math.random = originalRandom;
+    }
+}
 
 const mist = COMBINATION_RUNES[0];
 const dust = COMBINATION_RUNES[1];
@@ -167,6 +224,8 @@ const missingCatalyst = makePlayer({
 useOnAltar(water.runeId, air, missingCatalyst);
 assert.equal(missingCatalyst.counts.get(PURE_ESSENCE), 4);
 assert(missingCatalyst.messages[0]?.includes("Water Talisman"));
+
+Math.random = () => 0;
 
 const mistAtAir = makePlayer({
     level: 6,
@@ -292,5 +351,110 @@ assert.equal(clickStillAir.counts.get(mist.runeId) ?? 0, 0);
 assert.equal(clickStillAir.counts.get(water.runeId), 5);
 assert.equal(clickStillAir.counts.get(water.talismanId), 1);
 assert.deepEqual(clickStillAir.xp, [25]);
+
+Math.random = originalRandom;
+
+withRandom(0.5, () => {
+    const allFail = makePlayer({
+        level: 6,
+        items: {
+            [PURE_ESSENCE]: 10,
+            [water.runeId]: 10,
+            [water.talismanId]: 1,
+        },
+    });
+    useOnAltar(water.talismanId, air, allFail);
+    assert.equal(allFail.counts.get(PURE_ESSENCE) ?? 0, 0);
+    assert.equal(allFail.counts.get(water.runeId) ?? 0, 0);
+    assert.equal(allFail.counts.get(water.talismanId) ?? 0, 0);
+    assert.equal(allFail.counts.get(mist.runeId) ?? 0, 0);
+    assert.equal(allFail.xp.length, 0);
+    assert.equal(allFail.snapshots.length, 1);
+});
+
+withRandom([0, 0.9, 0, 0.9], () => {
+    const mixed = makePlayer({
+        level: 6,
+        items: {
+            [PURE_ESSENCE]: 4,
+            [water.runeId]: 4,
+            [water.talismanId]: 1,
+        },
+    });
+    useOnAltar(water.talismanId, air, mixed);
+    assert.equal(mixed.counts.get(mist.runeId), 2);
+    assert.deepEqual(mixed.xp, [16]);
+});
+
+withRandom(0.9, () => {
+    const necklace = makePlayer({
+        level: 6,
+        neck: BINDING_NECKLACE_ID,
+        items: {
+            [PURE_ESSENCE]: 10,
+            [water.runeId]: 10,
+            [water.talismanId]: 1,
+        },
+    });
+    useOnAltar(water.talismanId, air, necklace);
+    assert.equal(necklace.counts.get(mist.runeId), 10);
+    assert.deepEqual(necklace.xp, [80]);
+    assert.equal(necklace.chargeMap.get(BINDING_NECKLACE_ID), 15);
+    assert.equal(necklace.equip[EquipmentSlot.AMULET], BINDING_NECKLACE_ID);
+    assert(necklace.messages.some((m) => m.includes("15 charges left")));
+});
+
+withRandom(0.9, () => {
+    const twoCrafts = makePlayer({
+        level: 6,
+        neck: BINDING_NECKLACE_ID,
+        items: {
+            [PURE_ESSENCE]: 2,
+            [water.runeId]: 2,
+            [water.talismanId]: 2,
+        },
+    });
+    useOnAltar(water.talismanId, air, twoCrafts);
+    twoCrafts.counts.set(PURE_ESSENCE, 2);
+    twoCrafts.counts.set(water.runeId, 2);
+    useOnAltar(water.talismanId, air, twoCrafts);
+    assert.equal(twoCrafts.counts.get(mist.runeId), 4);
+    assert.equal(twoCrafts.chargeMap.get(BINDING_NECKLACE_ID), 14, "one charge per craft, not per rune");
+});
+
+withRandom(0.9, () => {
+    const lastCharge = makePlayer({
+        level: 6,
+        neck: BINDING_NECKLACE_ID,
+        charges: { [BINDING_NECKLACE_ID]: 1 },
+        items: {
+            [PURE_ESSENCE]: 2,
+            [water.runeId]: 2,
+            [water.talismanId]: 1,
+        },
+    });
+    useOnAltar(water.talismanId, air, lastCharge);
+    assert.equal(lastCharge.counts.get(mist.runeId), 2);
+    assert.equal(lastCharge.chargeMap.get(BINDING_NECKLACE_ID), undefined);
+    assert.equal(lastCharge.equip[EquipmentSlot.AMULET], -1);
+    assert.equal(lastCharge.appearanceSnapshots.length, 1);
+    assert(lastCharge.messages.some((m) => m.includes("has disintegrated")));
+});
+
+withRandom(0.5, () => {
+    const invNecklace = makePlayer({
+        level: 6,
+        items: {
+            [PURE_ESSENCE]: 4,
+            [water.runeId]: 4,
+            [water.talismanId]: 1,
+            [BINDING_NECKLACE_ID]: 1,
+        },
+    });
+    useOnAltar(water.talismanId, air, invNecklace);
+    assert.equal(invNecklace.counts.get(mist.runeId) ?? 0, 0, "unworn necklace does not guarantee binds");
+    assert.equal(invNecklace.counts.get(BINDING_NECKLACE_ID), 1);
+    assert.equal(invNecklace.chargeMap.size, 0);
+});
 
 console.log("runecrafting-combination-runes.test.ts: all assertions passed");

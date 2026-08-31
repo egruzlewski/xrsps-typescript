@@ -24,7 +24,11 @@ import {
     type RuneCraftDef,
 } from "./altars";
 import {
+    BINDING_NECKLACE_ID,
     combinationBindingsForAltar,
+    countCombinationSuccesses,
+    nextBindingNecklaceCharges,
+    wearsBindingNecklace,
     type CombinationBinding,
 } from "./combination";
 
@@ -208,6 +212,9 @@ function craftCombination(
     }
 
     const craftCount = Math.min(pureEss, opposingRunes);
+    const guaranteed = wearsBindingNecklace(services.equipment.getEquipArray(player));
+    const successCount = countCombinationSuccesses(craftCount, guaranteed);
+
     player.items.removeItem(PURE_ESSENCE, craftCount, { assureFullRemoval: true });
     player.items.removeItem(opposing.runeId, craftCount, { assureFullRemoval: true });
     if (hasTalisman) {
@@ -215,12 +222,39 @@ function craftCombination(
     } else {
         player.items.removeItem(opposing.tiaraId, 1, { assureFullRemoval: true });
     }
-    player.items.addItem(def.runeId, craftCount);
+    if (successCount > 0) {
+        player.items.addItem(def.runeId, successCount);
+        services.skills.addSkillXp(player, SkillId.Runecraft, successCount * xpPerEssence);
+    }
     services.inventory.snapshotInventory(player);
-    services.skills.addSkillXp(player, SkillId.Runecraft, craftCount * xpPerEssence);
     services.messaging.sendGameMessage(
         player,
         `You bind the temple's power into ${def.name} Runes.`,
+    );
+    if (guaranteed) {
+        consumeBindingNecklaceCharge(player, services);
+    }
+}
+
+function consumeBindingNecklaceCharge(player: PlayerState, services: ScriptServices): void {
+    const { remaining, disintegrated } = nextBindingNecklaceCharges(
+        player.equipment.getCharges(BINDING_NECKLACE_ID),
+    );
+    player.equipment.setCharges(BINDING_NECKLACE_ID, remaining);
+    if (disintegrated) {
+        const equip = services.equipment.getEquipArray(player);
+        if (Array.isArray(equip) && equip[EquipmentSlot.AMULET] === BINDING_NECKLACE_ID) {
+            equip[EquipmentSlot.AMULET] = -1;
+        }
+        player.markEquipmentDirty();
+        services.appearance.queueAppearanceSnapshot(player);
+        services.messaging.sendGameMessage(player, "Your Binding necklace has disintegrated.");
+        return;
+    }
+    const unit = remaining === 1 ? "charge" : "charges";
+    services.messaging.sendGameMessage(
+        player,
+        `You have ${remaining} ${unit} left before your Binding necklace disintegrates.`,
     );
 }
 

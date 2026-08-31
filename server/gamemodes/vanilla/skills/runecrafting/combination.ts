@@ -2,8 +2,15 @@
  * Combination runes (Mist–Lava). Craft by using the opposing talisman or
  * opposing elemental runes on the matching altar with pure essence.
  * XP is higher at the higher-levelled of the two altars (OSRS wiki).
+ * Bind chance is 50% per essence unless a binding necklace is worn.
  */
+import { EquipmentSlot } from "../../../../../client/rs/config/player/Equipment";
 import { ALL_ALTARS, type RuneAltarDef } from "./altars";
+
+/** Enchanted emerald necklace. Worn, 16 charges, one per combination craft. */
+export const BINDING_NECKLACE_ID = 5521;
+export const BINDING_NECKLACE_CHARGES = 16;
+export const COMBINATION_BIND_SUCCESS_CHANCE = 0.5;
 
 export interface CombinationRuneDef {
     id: string;
@@ -101,4 +108,34 @@ export function allCombinationBindings(): CombinationBinding[] {
 
 export function combinationBindingsForAltar(altarId: string): CombinationBinding[] {
     return allCombinationBindings().filter((binding) => binding.altar.id === altarId);
+}
+
+export function wearsBindingNecklace(equip: ReadonlyArray<number> | undefined): boolean {
+    if (!Array.isArray(equip) || equip.length <= EquipmentSlot.AMULET) return false;
+    return equip[EquipmentSlot.AMULET] === BINDING_NECKLACE_ID;
+}
+
+/** Successful binds out of `attempts`. Failed essence still consumed, no XP. */
+export function countCombinationSuccesses(
+    attempts: number,
+    guaranteed: boolean,
+    random: () => number = Math.random,
+): number {
+    if (attempts <= 0) return 0;
+    if (guaranteed) return attempts;
+    let successes = 0;
+    for (let i = 0; i < attempts; i++) {
+        if (random() < COMBINATION_BIND_SUCCESS_CHANCE) successes += 1;
+    }
+    return successes;
+}
+
+/** Next necklace charge after one altar craft. Unset/0 starts at 16. */
+export function nextBindingNecklaceCharges(currentCharges: number): {
+    remaining: number;
+    disintegrated: boolean;
+} {
+    const started = currentCharges > 0 ? currentCharges : BINDING_NECKLACE_CHARGES;
+    const remaining = started - 1;
+    return { remaining, disintegrated: remaining <= 0 };
 }
