@@ -20,6 +20,7 @@ import {
     resolveMagicImpactSpotAnimHeight,
 } from "../../spells/SpellDataProvider";
 import type { PoweredStaffSpellData } from "../../spells/SpellDataProvider";
+import { applyCurseSpellDrain } from "../../spells/CurseSpellEffects";
 import type {
     CombatAttackActionData,
     CombatPlayerHitActionData,
@@ -498,6 +499,15 @@ export class NpcHitHandler {
         // Freeze and multi-target
         if (spell?.freezeDuration && landed) {
             npc.applyFreeze(spell.freezeDuration, tick);
+        }
+
+        // Curse spell stat drain (Confuse/Weaken/Curse/Vulnerability/Enfeeble/Stun).
+        if (spell?.statDebuff && landed) {
+            applyCurseSpellDrain({
+                spellData: spell,
+                attacker: player,
+                targetNpc: npc,
+            });
         }
 
         // Blood spell healing: heal caster for 25% of damage dealt

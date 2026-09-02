@@ -16,6 +16,7 @@ import {
     resolveMagicImpactSpotAnimHeight,
 } from "../../spells/SpellDataProvider";
 import type { PoweredStaffSpellData } from "../../spells/SpellDataProvider";
+import { applyCurseSpellDrain } from "../../spells/CurseSpellEffects";
 import type { CombatAutocastActionData, CombatPlayerHitActionData } from "../actionPayloads";
 import type { ActionEffect, ActionExecutionResult } from "../types";
 import type { CombatActionServices } from "./CombatActionHandler";
@@ -319,24 +320,18 @@ export class PvpCombatHandler {
             }
         }
 
-        // Stat debuffs
+        // Stat debuffs (curse spells: Confuse/Weaken/Curse/Vulnerability/Enfeeble/Stun).
+        // Shared helper enforces the OSRS "no stack" rule and Tome of Water bonus.
         if (spell?.statDebuff && landed) {
-            const targetSock = this.services.getPlayerSocket(targetId);
-            const skillId =
-                spell.statDebuff.stat === "attack"
-                    ? 0
-                    : spell.statDebuff.stat === "strength"
-                      ? 2
-                      : 1;
-            const cur = target.skillSystem.getSkill(skillId);
-            const currentLevel = Math.max(1, cur.baseLevel + cur.boost);
-            const drop = Math.max(
-                1,
-                Math.floor((currentLevel * Math.max(0, spell.statDebuff.percent)) / 100),
-            );
-            const newLevel = Math.max(1, currentLevel - drop);
-            target.skillSystem.setSkillBoost(skillId, newLevel);
-            if (targetSock) this.services.sendSkillsMessage(targetSock, target);
+            const result = applyCurseSpellDrain({
+                spellData: spell,
+                attacker: player,
+                targetPlayer: target,
+            });
+            if (result.drained) {
+                const targetSock = this.services.getPlayerSocket(targetId);
+                if (targetSock) this.services.sendSkillsMessage(targetSock, target);
+            }
         }
 
         // Spot animation
