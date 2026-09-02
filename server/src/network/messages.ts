@@ -336,7 +336,7 @@ export type SpellResultPayload = {
         | "line_of_sight"
         | "server_error"
         | string;
-    targetType: "npc" | "player" | "loc" | "obj" | "tile" | "item";
+    targetType: "npc" | "player" | "loc" | "obj" | "tile" | "item" | "ground_item";
     targetId?: number;
     tile?: { x: number; y: number; plane?: number };
     modifiers?: SpellCastModifiers;

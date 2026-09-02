@@ -90,6 +90,26 @@ export interface InvSpellEvent extends ScriptExecutionContext {
 
 export type InvSpellHandler = (event: InvSpellEvent) => void | Promise<void>;
 
+/**
+ * Event payload for spells cast directly on a ground item (Telekinetic Grab
+ * is the only standard-book example). The handler resolves the target stack
+ * and decides whether to consume it and add it to the player's inventory.
+ */
+export interface GroundSpellEvent extends ScriptExecutionContext {
+    player: PlayerState;
+    spellId: number;
+    /** Ground item stack id from GroundItemManager. */
+    stackId: number;
+    /** Item id of the targeted stack (validated at cast time). */
+    itemId: number;
+    /** Tile the stack sits on. */
+    tile: { x: number; y: number; level: number };
+    /** Optional out-param so scripts can report spell success/failure. */
+    spellResult?: LocSpellResult;
+}
+
+export type GroundSpellHandler = (event: GroundSpellEvent) => void | Promise<void>;
+
 export interface LocInteractionEvent extends ScriptExecutionContext {
     player: PlayerState;
     locId: number;
@@ -462,6 +482,13 @@ export interface IScriptRegistry {
     /** Spell-on-item (OPOBJ_T / inventory target). Enchant jewellery and similar utility spells. */
     registerSpellOnItem(spellId: number, handler: InvSpellHandler): ScriptRegistrationResult;
     findSpellOnItem(spellId: number): InvSpellHandler | undefined;
+    /**
+     * Spell-on-ground-item (Telekinetic Grab and similar). Handlers receive the
+     * target ground item stack id and tile and decide whether to consume the
+     * stack and add it to the player's inventory.
+     */
+    registerSpellOnGroundItem(spellId: number, handler: GroundSpellHandler): ScriptRegistrationResult;
+    findSpellOnGroundItem(spellId: number): GroundSpellHandler | undefined;
     registerItemOnItem(
         sourceItemId: number,
         targetItemId: number,

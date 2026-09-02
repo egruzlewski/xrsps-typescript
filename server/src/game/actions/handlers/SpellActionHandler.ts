@@ -63,14 +63,20 @@ export interface SpellCastModifiers {
 }
 
 /** Spell target kinds. */
-export type SpellTargetKind = "npc" | "player" | "loc" | "obj";
+export type SpellTargetKind = "npc" | "player" | "loc" | "obj" | "ground_item";
 
 /** Spell cast request target. */
 export type SpellCastTarget =
     | { type: "npc"; npcId: number }
     | { type: "player"; playerId: number }
     | { type: "loc"; locId: number; tile: { x: number; y: number; plane?: number } }
-    | { type: "obj"; objId: number; tile: { x: number; y: number; plane?: number } };
+    | { type: "obj"; objId: number; tile: { x: number; y: number; plane?: number } }
+    | {
+          type: "ground_item";
+          stackId: number;
+          itemId: number;
+          tile: { x: number; y: number; plane?: number };
+      };
 
 /** Spell cast request. */
 export interface SpellCastRequest {
@@ -956,6 +962,34 @@ export class SpellActionHandler {
                     },
                 };
             }
+            case "ground_item": {
+                const groundPayload = raw as SpellCastObjPayload;
+                const stackId = (groundPayload as { stackId?: number }).stackId ?? -1;
+                const groundItemId =
+                    (groundPayload as { groundItemId?: number }).groundItemId ??
+                    (groundPayload as { itemId?: number }).itemId ??
+                    -1;
+                const tile = this.normalizeSpellTile(groundPayload.tile, groundPayload.plane);
+                baseResult.targetId = stackId > 0 ? stackId : undefined;
+                baseResult.tile = tile ? { ...tile } : undefined;
+                if (!(stackId > 0 && groundItemId > 0 && tile)) {
+                    baseResult.reason = "invalid_target";
+                    return { ok: false, result: baseResult };
+                }
+                return {
+                    ok: true,
+                    request: {
+                        spellId: spellId,
+                        modifiers,
+                        target: {
+                            type: "ground_item",
+                            stackId,
+                            itemId: groundItemId,
+                            tile,
+                        },
+                    },
+                };
+            }
         }
     }
 
@@ -1018,6 +1052,66 @@ export class SpellActionHandler {
     }
 
     /**
+     * Dispatch a ground-item-targeted utility spell (Telekinetic Grab).
+     *
+     * The handler is responsible for validating the stack still exists, that
+     * the player is within OSRS range, and that the spell is allowed in the
+     * caster's current zone. Rune consumption and Magic XP happen on the
+     * standard combat path before dispatch.
+     */
+    private dispatchGroundItemSpell(
+        player: PlayerState,
+        request: SpellCastRequest,
+        base: SpellResultPayload,
+        tick: number,
+    ): SpellResultPayload {
+        if (request.target.type !== "ground_item") {
+            base.reason = "invalid_target";
+            return base;
+        }
+        const handler = this.svc.scriptRegistry?.findSpellOnGroundItem(request.spellId);
+        if (!handler) {
+            base.reason = "invalid_target";
+            try {
+                this.svc.spellCastingService?.enqueueSpellFailureChat(
+                    player,
+                    request.spellId,
+                    "invalid_target",
+                );
+            } catch (err) {
+                logger.warn("[spell] failed to enqueue ground item spell failure chat", err);
+            }
+            return base;
+        }
+
+        const spellResult: { outcome: "success" | "failure"; reason?: string } = {
+            outcome: "failure",
+            reason: "invalid_target",
+        };
+        const services = this.svc.scriptRuntime?.getServices();
+        if (!services) {
+            base.reason = "server_error";
+            return base;
+        }
+
+        const tile = request.target.tile;
+        handler({
+            player,
+            spellId: request.spellId,
+            stackId: request.target.stackId,
+            itemId: request.target.itemId,
+            tile: { x: tile.x, y: tile.y, level: tile.plane ?? player.level },
+            spellResult,
+            tick,
+            services,
+        });
+
+        base.outcome = spellResult.outcome;
+        base.reason = spellResult.reason;
+        return base;
+    }
+
+    /**
      * Process spell cast request.
      */
     processSpellCastRequest(
@@ -1048,6 +1142,10 @@ export class SpellActionHandler {
                 break;
             case "obj":
                 base.targetId = request.target.objId;
+                base.tile = { ...request.target.tile };
+                break;
+            case "ground_item":
+                base.targetId = request.target.stackId;
                 base.tile = { ...request.target.tile };
                 break;
         }
@@ -1106,6 +1204,8 @@ export class SpellActionHandler {
             base.tile = { ...targetTile };
         } else if (request.target.type === "loc") {
             return this.dispatchLocSpell(player, request, base, tick);
+        } else if (request.target.type === "ground_item") {
+            return this.dispatchGroundItemSpell(player, request, base, tick);
         } else {
             base.reason = "invalid_target";
             return base;

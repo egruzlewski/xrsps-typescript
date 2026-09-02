@@ -86,6 +86,7 @@ const registry = {
         return { unregister() {} };
     },
     registerSpellOnItem: () => ({ unregister() {} }),
+    registerSpellOnGroundItem: () => ({ unregister() {} }),
 } as unknown as IScriptRegistry;
 
 type Slot = ScriptInventoryEntry;

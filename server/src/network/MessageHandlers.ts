@@ -236,7 +236,7 @@ export interface MessageHandlerServices {
             | MessagePayload<"spell_cast_player">
             | MessagePayload<"spell_cast_loc">
             | MessagePayload<"spell_cast_obj">,
-        targetType: "npc" | "player" | "loc" | "obj",
+        targetType: "npc" | "player" | "loc" | "obj" | "ground_item",
         tick: number,
     ) => void;
     handleSpellCastOnItem: (ws: WebSocket, payload: MessagePayload<"spell_cast_item">) => void;

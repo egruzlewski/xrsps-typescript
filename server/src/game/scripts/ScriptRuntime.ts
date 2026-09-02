@@ -686,6 +686,10 @@ export class ScriptRuntime {
             registerSpellOnItem: (spellId, handler) =>
                 track(this.registry.registerSpellOnItem(spellId, handler)),
             findSpellOnItem: (spellId) => this.registry.findSpellOnItem(spellId),
+            registerSpellOnGroundItem: (spellId, handler) =>
+                track(this.registry.registerSpellOnGroundItem(spellId, handler)),
+            findSpellOnGroundItem: (spellId) =>
+                this.registry.findSpellOnGroundItem(spellId),
             registerItemOnItem: (
                 sourceItemId: number,
                 targetItemId: number,

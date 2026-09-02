@@ -75,6 +75,7 @@ const registry = {
         invSpellHandlers.set(spellId, handler);
         return { unregister() {} };
     },
+    registerSpellOnGroundItem: () => ({ unregister() {} }),
     registerLocInteraction: () => ({ unregister() {} }),
     registerWidgetAction: () => ({ unregister() {} }),
 } as unknown as IScriptRegistry;

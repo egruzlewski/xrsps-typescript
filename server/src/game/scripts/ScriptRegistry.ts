@@ -7,6 +7,7 @@ import {
     type CommandHandler,
     type EquipmentActionHandler,
     type GroundItemInteractionHandler,
+    type GroundSpellHandler,
     type IScriptRegistry,
     type InvSpellHandler,
     type ItemOnGroundHandler,
@@ -182,6 +183,7 @@ export class ScriptRegistry implements IScriptRegistry {
     private readonly clientMessageHandlers = new Map<string, ClientMessageHandler>();
     private readonly actionHandlers = new Map<string, ScriptActionHandler>();
     private readonly invSpellHandlers: HandlerStackMap<number, InvSpellHandler> = new Map();
+    private readonly groundSpellHandlers: HandlerStackMap<number, GroundSpellHandler> = new Map();
 
     registerNpcInteraction(
         npcId: number,
@@ -246,6 +248,22 @@ export class ScriptRegistry implements IScriptRegistry {
 
     findSpellOnItem(spellId: number): InvSpellHandler | undefined {
         return findStackedHandler(this.invSpellHandlers, spellId);
+    }
+
+    registerSpellOnGroundItem(
+        spellId: number,
+        handler: GroundSpellHandler,
+    ): ScriptRegistrationResult {
+        return registerStackedHandler(
+            this.groundSpellHandlers,
+            spellId,
+            handler,
+            "spell-on-ground-item",
+        );
+    }
+
+    findSpellOnGroundItem(spellId: number): GroundSpellHandler | undefined {
+        return findStackedHandler(this.groundSpellHandlers, spellId);
     }
 
     registerItemOnItem(
@@ -747,5 +765,6 @@ export class ScriptRegistry implements IScriptRegistry {
         this.clientMessageHandlers.clear();
         this.actionHandlers.clear();
         this.invSpellHandlers.clear();
+        this.groundSpellHandlers.clear();
     }
 }

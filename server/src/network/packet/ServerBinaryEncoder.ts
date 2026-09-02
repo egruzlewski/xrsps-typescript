@@ -1417,7 +1417,7 @@ export class ServerBinaryEncoder {
         spellId: number;
         outcome: "success" | "failure";
         reason?: string;
-        targetType: "npc" | "player" | "loc" | "obj" | "tile" | "item";
+        targetType: "npc" | "player" | "loc" | "obj" | "tile" | "item" | "ground_item";
         targetId?: number;
         tile?: { x: number; y: number; plane?: number };
         modifiers?: {

@@ -4,6 +4,7 @@ import { register as registerBonesToBananas } from "./bonesToBananas";
 import { register as registerChargeOrb } from "./chargeOrb";
 import { register as registerEnchantJewellery } from "./enchantJewellery";
 import { register as registerSuperheatItem } from "./superheatItem";
+import { register as registerTelekineticGrab } from "./telekineticGrab";
 
 export function register(registry: IScriptRegistry, services: ScriptServices): void {
     registerChargeOrb(registry, services);
@@ -11,4 +12,5 @@ export function register(registry: IScriptRegistry, services: ScriptServices): v
     registerSuperheatItem(registry, services);
     registerBonesToBananas(registry, services);
     registerAlchemy(registry, services);
+    registerTelekineticGrab(registry);
 }
