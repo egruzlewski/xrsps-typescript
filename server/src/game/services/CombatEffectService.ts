@@ -199,6 +199,7 @@ export class CombatEffectService {
             id: number;
             maxTargets?: number;
             freezeDuration?: number;
+            bindDuration?: number;
             impactSpotAnim?: number;
             impactSpotAnimHeight?: number;
             splashSpotAnim?: number;
@@ -287,6 +288,9 @@ export class CombatEffectService {
             });
             if (opts.spell.freezeDuration && result.amount > 0) {
                 extra.applyFreeze(opts.spell.freezeDuration, opts.currentTick);
+            }
+            if (opts.spell.bindDuration && result.amount > 0) {
+                extra.applyBind(opts.spell.bindDuration, opts.currentTick);
             }
             if (opts.spell.poisonDamage && result.amount > 0) {
                 extra.inflictPoison(opts.spell.poisonDamage, opts.currentTick);

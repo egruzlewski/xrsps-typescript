@@ -50,7 +50,9 @@ export type SpellDataEntry = {
     spellbook?: "standard" | "ancient" | "lunar" | "arceuus";
     category?: "combat" | "teleport" | "utility" | "binding";
     experienceGained?: number;
-    freezeDuration?: number; // ticks
+    freezeDuration?: number; // ticks (Ice spells — applies freeze status with 5-tick immunity).
+    /** Duration of the 'bind' status effect for Bind/Snare/Entangle. */
+    bindDuration?: number; // ticks
     maxTargets?: number; // for multi-target spells like barrage
     projectileStartHeight?: number;
     projectileEndHeight?: number;

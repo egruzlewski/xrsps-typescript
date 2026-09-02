@@ -501,6 +501,13 @@ export class NpcHitHandler {
             npc.applyFreeze(spell.freezeDuration, tick);
         }
 
+        // Bind/Snare/Entangle apply the 'bind' status (no freeze immunity,
+        // never halved by Protect from Magic). distinct from the ice-spell
+        // freeze path.
+        if (spell?.bindDuration && landed) {
+            npc.applyBind(spell.bindDuration, tick);
+        }
+
         // Curse spell stat drain (Confuse/Weaken/Curse/Vulnerability/Enfeeble/Stun).
         if (spell?.statDebuff && landed) {
             applyCurseSpellDrain({

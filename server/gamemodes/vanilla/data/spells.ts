@@ -720,7 +720,13 @@ const ENTRIES: SpellDataEntry[] = [
             { runeId: 557, quantity: 3 },
         ],
     },
-    {
+    // Standard spellbook - binding spells (Bind/Snare/Entangle).
+// OSRS wiki durations (tick counts as of 2026): Bind 8, Snare 16, Entangle 24.
+// Bind deals no damage; Snare max hit 2; Entangle max hit 5.
+// These apply the 'bind' status (no freeze immunity, never halved by Protect
+// from Magic) — distinct from the ice-spell freeze path.
+
+{
         id: 3283,
         name: "Bind",
         baseMaxHit: 0,
@@ -729,9 +735,10 @@ const ENTRIES: SpellDataEntry[] = [
         impactSpotAnim: 181,
         splashSpotAnim: 85,
         levelRequired: 20,
+        experienceGained: 31,
         spellbook: "standard",
         category: "binding",
-        freezeDuration: 10,
+        bindDuration: 8,
         runeCosts: [
             { runeId: 561, quantity: 2 },
             { runeId: 555, quantity: 3 },
@@ -741,15 +748,16 @@ const ENTRIES: SpellDataEntry[] = [
     {
         id: 3300,
         name: "Snare",
-        baseMaxHit: 3,
+        baseMaxHit: 2,
         castSpotAnim: 177,
         projectileId: 178,
         impactSpotAnim: 180,
         splashSpotAnim: 85,
         levelRequired: 50,
+        experienceGained: 61,
         spellbook: "standard",
         category: "binding",
-        freezeDuration: 20,
+        bindDuration: 16,
         runeCosts: [
             { runeId: 561, quantity: 3 },
             { runeId: 555, quantity: 4 },
@@ -765,9 +773,10 @@ const ENTRIES: SpellDataEntry[] = [
         impactSpotAnim: 179,
         splashSpotAnim: 85,
         levelRequired: 79,
+        experienceGained: 89,
         spellbook: "standard",
         category: "binding",
-        freezeDuration: 30,
+        bindDuration: 24,
         runeCosts: [
             { runeId: 561, quantity: 4 },
             { runeId: 555, quantity: 5 },

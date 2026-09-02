@@ -272,6 +272,13 @@ export class SpellActionHandler {
         if (spellData.category === "combat") {
             return Math.max(0, getSpellBaseXp(spellId));
         }
+        if (spellData.category === "binding") {
+            // Binding spells award their flat experienceGained value on cast;
+            // damage XP (2/damage) is added separately by CombatXp.ts when
+            // the hit lands. Binding spells never trigger freeze-immunity
+            // gating and are not halved by Protect from Magic.
+            return Math.max(0, spellData.experienceGained ?? 0);
+        }
         return Math.max(0, spellData.experienceGained ?? 0);
     }
 

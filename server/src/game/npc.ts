@@ -421,6 +421,39 @@ export class NpcState extends Actor {
         );
     }
 
+    /**
+     * Apply a Bind/Snare/Entangle bind effect to this NPC. Distinct from
+     * freeze: bind has no freeze-immunity window, is never halved by Protect
+     * from Magic, and is cleared only by the bind duration elapsing. The
+     * bind timer piggy-backs on STUN_UNTIL_CLOCK so the existing movement
+     * gates (isFrozen + lockMovementUntil) pick it up.
+     */
+    applyBind(durationTicks: number, currentTick: number): boolean {
+        const clock = Math.trunc(currentTick);
+        const expires = clock + Math.max(1, Math.trunc(durationTicks));
+        const existing = this.combatAttributes.get(CombatAttributes.STUN_UNTIL_CLOCK);
+        if (expires > existing) {
+            this.combatAttributes.set(CombatAttributes.STUN_UNTIL_CLOCK, expires);
+            this.lockMovementUntil(expires);
+            // OSRS: green tint for bind duration.
+            this.setColorOverride(50, 5, 60, 30, Math.max(1, durationTicks));
+        }
+        return true;
+    }
+
+    isBound(currentTick: number): boolean {
+        return (
+            Math.trunc(currentTick) <
+            this.combatAttributes.get(CombatAttributes.STUN_UNTIL_CLOCK)
+        );
+    }
+
+    clearBind(): void {
+        this.combatAttributes.set(CombatAttributes.STUN_UNTIL_CLOCK, 0);
+        this.clearMovementLock();
+        this.clearColorOverride();
+    }
+
     /** Removes an active combat freeze while preserving its normal re-freeze immunity. */
     clearFreeze(): void {
         this.combatAttributes.set(CombatAttributes.FREEZE_UNTIL_CLOCK, 0);

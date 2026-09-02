@@ -78,21 +78,22 @@ export class SpellEffectsManager {
     }
 
     /**
-     * Apply a bind effect to an entity (no immunity, can stack with freeze)
+     * Apply a bind effect to an entity (Bind/Snare/Entangle).
+     *
+     * OSRS rule (Sept 2019 update): bind duration is NEVER halved by
+     * Protect from Magic. The hasProtectionPrayer argument is preserved for
+     * legacy callers but is intentionally ignored.
      */
     applyBind(
         entityType: "player" | "npc",
         entityId: number,
         durationTicks: number,
         currentTick: number,
-        hasProtectionPrayer: boolean = false,
+        _hasProtectionPrayer: boolean = false,
     ): void {
         const effects = this.getEffects(entityType, entityId);
 
-        // Apply half-bind if target has protection prayer active
-        const actualDuration = hasProtectionPrayer ? Math.floor(durationTicks / 2) : durationTicks;
-
-        const endTick = currentTick + actualDuration;
+        const endTick = currentTick + Math.max(1, Math.floor(durationTicks));
 
         // Only apply if not already bound or if new duration is longer
         if (!effects.bind || effects.bind.endTick < endTick) {

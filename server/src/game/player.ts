@@ -942,6 +942,30 @@ export class PlayerState extends Actor {
         this.clearColorOverride();
     }
 
+    /**
+     * Apply a Bind/Snare/Entangle bind effect to this player. Distinct from
+     * freeze: bind has no freeze-immunity window, is never halved by Protect
+     * from Magic, and is cleared only by the bind duration elapsing.
+     */
+    applyBind(durationTicks: number, currentTick: number): boolean {
+        const clock = Math.trunc(currentTick);
+        const expires = clock + Math.max(1, Math.trunc(durationTicks));
+        const existing = this.combatAttributes.get(CombatAttributes.STUN_UNTIL_CLOCK);
+        if (expires > existing) {
+            this.combatAttributes.set(CombatAttributes.STUN_UNTIL_CLOCK, expires);
+            this.lockMovementUntil(expires);
+            this.setColorOverride(50, 5, 60, 30, Math.max(1, durationTicks));
+        }
+        return true;
+    }
+
+    isBound(currentTick: number): boolean {
+        return (
+            Math.trunc(currentTick) <
+            this.combatAttributes.get(CombatAttributes.STUN_UNTIL_CLOCK)
+        );
+    }
+
     exportInventorySnapshot(): InventorySnapshotEntry[] {
         const snapshot: InventorySnapshotEntry[] = [];
         const inventory = this.getInventoryEntries();

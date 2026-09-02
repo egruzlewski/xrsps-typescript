@@ -353,6 +353,12 @@ export class PvpCombatHandler {
             target.applyFreeze(spell.freezeDuration, hitsplatTick);
         }
 
+        // Bind/Snare/Entangle apply the 'bind' status (no freeze immunity,
+        // never halved by Protect from Magic). distinct from ice freeze.
+        if (spell?.bindDuration && landed) {
+            target.applyBind(spell.bindDuration, hitsplatTick);
+        }
+
         // Blood spell healing: heal caster for 25% of damage dealt
         const dealt = Math.max(0, damageDealt ?? 0);
         if (spell?.healPercent && landed && dealt > 0) {
